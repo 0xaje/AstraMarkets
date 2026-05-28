@@ -1,0 +1,384 @@
+/* AstraMarkets Terminal Terra v1.0 - Premium Style Sheet */
+
+/* Color Variables & Theme System */
+:root {
+    --bg-primary: #faf6f0;
+    --surface: rgba(255, 255, 255, 0.7);
+    --surface-solid: #ffffff;
+    --surface-container: rgba(240, 236, 228, 0.6);
+    --surface-container-low: rgba(245, 241, 234, 0.5);
+    --surface-container-high: #eae6de;
+    --text-primary: #2e3230;
+    --text-secondary: #6b6358;
+    --text-muted: #74796e;
+    --primary: #4a7c59;
+    --primary-glow: #c8e8d0;
+    --secondary: #6b6358;
+    --tertiary: #705c30;
+    --border-color: rgba(74, 124, 89, 0.15);
+    --border-hover: rgba(74, 124, 89, 0.4);
+    --organic-grid: radial-gradient(circle, rgba(74, 124, 89, 0.08) 1px, transparent 1px);
+    --led-green: #4a7c59;
+    --led-gold: #705c30;
+    --shadow-premium: 0 4px 20px rgba(0, 0, 0, 0.03);
+    --shadow-hover: 0 10px 30px rgba(74, 124, 89, 0.1), inset 0 0 15px rgba(255, 255, 255, 0.5);
+    
+    --card-glow: radial-gradient(400px circle at var(--x, 0px) var(--y, 0px), rgba(74, 124, 89, 0.06), transparent 70%);
+}
+
+.dark {
+    --bg-primary: #121413;
+    --surface: rgba(22, 26, 23, 0.7);
+    --surface-solid: #161a17;
+    --surface-container: rgba(30, 36, 32, 0.6);
+    --surface-container-low: rgba(24, 30, 26, 0.5);
+    --surface-container-high: #272d29;
+    --text-primary: #e4e8e5;
+    --text-secondary: #a7a196;
+    --text-muted: #848a7f;
+    --primary: #8ecf9e;
+    --primary-glow: rgba(142, 207, 158, 0.2);
+    --secondary: #a7a196;
+    --tertiary: #dcc48e;
+    --border-color: rgba(142, 207, 158, 0.15);
+    --border-hover: rgba(142, 207, 158, 0.4);
+    --organic-grid: radial-gradient(circle, rgba(142, 207, 158, 0.06) 1px, transparent 1px);
+    --led-green: #8ecf9e;
+    --led-gold: #dcc48e;
+    --shadow-premium: 0 4px 24px rgba(0, 0, 0, 0.3);
+    --shadow-hover: 0 10px 30px rgba(142, 207, 158, 0.12), inset 0 0 15px rgba(255, 255, 255, 0.03);
+    
+    --card-glow: radial-gradient(400px circle at var(--x, 0px) var(--y, 0px), rgba(142, 207, 158, 0.08), transparent 70%);
+}
+
+/* Global Styles */
+body {
+    background-color: var(--bg-primary);
+    background-image: var(--organic-grid);
+    background-size: 32px 32px;
+    color: var(--text-primary);
+    transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1), color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    min-height: 100vh;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(circle at 20% 30%, var(--primary-glow) 0%, transparent 40%),
+        radial-gradient(circle at 80% 70%, rgba(112, 92, 48, 0.04) 0%, transparent 40%);
+    z-index: -1;
+    animation: drift 25s ease-in-out infinite alternate;
+    pointer-events: none;
+}
+
+.dark body::before {
+    background: 
+        radial-gradient(circle at 20% 30%, rgba(142, 207, 158, 0.06) 0%, transparent 40%),
+        radial-gradient(circle at 80% 70%, rgba(220, 196, 142, 0.04) 0%, transparent 40%);
+}
+
+@keyframes drift {
+    from { transform: translate(0, 0) scale(1); }
+    to { transform: translate(-1%, -1%) scale(1.05); }
+}
+
+/* Premium Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
+}
+
+/* Custom Component Classes override/extend Tailwind */
+.glass-panel {
+    background: var(--surface);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border-color);
+    transition: background-color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.cosmic-card {
+    background: var(--surface);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-premium);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: float-in 0.6s ease-out backwards;
+}
+
+.cosmic-card:hover {
+    border-color: var(--border-hover);
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-4px);
+}
+
+/* Card Radial Highlight Effect */
+.cosmic-card-interactive {
+    position: relative;
+    overflow: hidden;
+}
+
+.cosmic-card-interactive::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: var(--card-glow);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.cosmic-card-interactive:hover::before {
+    opacity: 1;
+}
+
+@keyframes float-in {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Theme Toggle Transitions */
+aside, header, main, section, .cosmic-card, .glass-panel, h1, h2, h3, p, span, button, input, select {
+    transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+                border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+                color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Nav Button Animations */
+.nav-btn {
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.nav-btn:hover {
+    transform: scale(1.15);
+    color: var(--primary);
+    box-shadow: 0 4px 12px var(--primary-glow);
+    border-color: var(--border-hover);
+}
+.nav-btn.active {
+    background-color: var(--primary-glow) !important;
+    color: var(--primary) !important;
+    box-shadow: 0 4px 12px var(--primary-glow);
+    animation: pulse-glow 3s infinite ease-in-out;
+}
+
+@keyframes pulse-glow {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.06); }
+}
+.animate-pulse-glow {
+    animation: pulse-glow 3s infinite ease-in-out;
+}
+
+/* Page Transition States */
+.page-tab {
+    opacity: 0;
+    transform: translateY(10px);
+    display: none;
+    animation: tabEnter 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.page-tab.active {
+    display: flex;
+}
+
+@keyframes tabEnter {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* SVGs and Charts styling */
+.chart-line {
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    animation: drawPath 2s ease-in-out forwards;
+}
+
+.chart-area {
+    opacity: 0;
+    animation: fadeInArea 1s ease-out 1.2s forwards;
+}
+
+@keyframes drawPath {
+    to { stroke-dashoffset: 0; }
+}
+
+@keyframes fadeInArea {
+    to { opacity: 0.15; }
+}
+
+/* Custom Interactive Faucet Animation */
+.minting-orb {
+    position: relative;
+}
+.minting-orb::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 2px solid var(--primary);
+    top: 0; left: 0;
+    animation: pulseGlow 1.5s infinite;
+}
+
+@keyframes pulseGlow {
+    0% { transform: scale(1); opacity: 0.8; }
+    100% { transform: scale(1.6); opacity: 0; }
+}
+
+/* Sliding Right-side Insight Drawer */
+.insight-drawer {
+    transform: translateX(100%);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.insight-drawer.open {
+    transform: translateX(0);
+}
+
+/* Modals */
+.modal-overlay {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.modal-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-container {
+    transform: scale(0.95) translateY(10px);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.modal-overlay.open .modal-container {
+    transform: scale(1) translateY(0);
+}
+
+/* LED Segments animations */
+.led-segment {
+    height: 4px;
+    width: 8px;
+    margin-right: 2px;
+    border-radius: 2px;
+    transition: background-color 0.3s ease;
+}
+
+.animate-led-pulse {
+    animation: led-glow 2.5s infinite alternate;
+}
+
+@keyframes led-glow {
+    from { filter: brightness(1); opacity: 0.6; }
+    to { filter: brightness(1.3); opacity: 1; box-shadow: 0 0 6px var(--primary); }
+}
+
+/* Scanning Line container */
+.scanning-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.scanning-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--primary), transparent);
+    opacity: 0.2;
+    animation: scan 6s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes scan {
+    0% { top: -5%; opacity: 0; }
+    15% { opacity: 0.3; }
+    85% { opacity: 0.3; }
+    100% { top: 105%; opacity: 0; }
+}
+
+/* Chat Bubbles Typing Animation */
+.typing-dot {
+    width: 5px;
+    height: 5px;
+    background-color: var(--text-muted);
+    border-radius: 50%;
+    display: inline-block;
+    animation: typingBounce 1.4s infinite ease-in-out both;
+}
+
+.typing-dot:nth-child(1) { animation-delay: -0.32s; }
+.typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes typingBounce {
+    0%, 80%, 100% { transform: scale(0); }
+    40% { transform: scale(1.0); }
+}
+
+/* Synaptic load circular spinner */
+.animate-spin-slow {
+    animation: spin 30s linear infinite;
+}
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Glass inputs */
+.glass-input {
+    background: rgba(255, 255, 255, 0.3);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+}
+
+.dark .glass-input {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.glass-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px var(--primary-glow);
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.dark .glass-input:focus {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+/* Glow classes for active lights */
+.glow-green {
+    box-shadow: 0 0 10px var(--led-green);
+}
+.glow-gold {
+    box-shadow: 0 0 10px var(--led-gold);
+}
+
+/* Tab contents and transitions */
+.tab-container {
+    perspective: 1000px;
+}

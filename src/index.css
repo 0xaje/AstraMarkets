@@ -1,8 +1,0 @@
-/* Global Stylesheets and baseline variables. Core theme variables are declared inside index.html */
-
-@layer base {
-  body {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-}

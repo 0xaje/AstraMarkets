@@ -1,213 +1,697 @@
 <!DOCTYPE html>
 <html class="light" lang="en">
-  <head>
+<head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>ASTRAMARKETS | Autonomous Prediction Protocol</title>
+    <title>AstraMarkets | Terminal v1.0</title>
+    
+    <!-- External Styles & Frameworks -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&amp;family=Playfair+Display:ital,wght@0,400;0,700;1,400&amp;family=JetBrains+Mono:wght@400;500&amp;family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-    <style>
-      /* Day and Night Colors (CSS Custom Properties) */
-      :root {
-          --primary: #c2652a;
-          --primary-light: #fdf8f4;
-          --primary-muted: #e9dccf;
-          --text-main: #2d241e;
-          --text-muted: #6b5f56;
-          --background: #fffcf9;
-          --surface: #ffffff;
-          --outline: #e9dccf;
-          --outline-variant: #f8f4ee;
-          --surface-variant: #fdf8f4;
-          --surface-bright: #fdf8f6;
-          --surface-container-low: #f8f5f2;
-          --surface-container-high: #f0edea;
-          --surface-container-highest: #e8e5e2;
-          --on-surface-variant: #6b5f56;
-      }
-      html.dark {
-          --primary: #e98243;
-          --primary-light: #251d19;
-          --primary-muted: #3d342f;
-          --text-main: #f7f4f0;
-          --text-muted: #a59e97;
-          --background: #130f0c;
-          --surface: #1d1815;
-          --outline: #3d342f;
-          --outline-variant: #2a221f;
-          --surface-variant: #251d19;
-          --surface-bright: #1b1714;
-          --surface-container-low: #1c1714;
-          --surface-container-high: #2d2521;
-          --surface-container-highest: #382e29;
-          --on-surface-variant: #a59e97;
-      }
-      
-      html, body, #root {
-          margin: 0;
-          padding: 0;
-          width: 100%;
-          min-height: 100vh;
-          display: flex;
-          flex-direction: column;
-          box-sizing: border-box;
-          transition: background-color 0.3s ease, color 0.3s ease;
-      }
-      body {
-          background-color: var(--background);
-          color: var(--text-main);
-          font-family: 'Outfit', sans-serif;
-      }
-      .serif-heading {
-          font-family: 'Playfair Display', serif;
-      }
-      .sahara-card {
-          background: var(--surface);
-          border: 1px solid var(--outline);
-          box-shadow: 0 12px 40px -12px rgba(194, 101, 42, 0.08);
-          transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), background-color 0.3s ease, border-color 0.3s ease;
-      }
-      .sahara-card:hover {
-          transform: translateY(-4px);
-          border-color: var(--primary);
-          box-shadow: 0 20px 40px rgba(194, 101, 42, 0.1);
-      }
-      .sahara-panel {
-          background: var(--surface);
-          border: 1px solid var(--outline);
-          box-shadow: 0 4px 20px -2px rgba(194, 101, 42, 0.05);
-          transition: background-color 0.3s ease, border-color 0.3s ease;
-      }
-      .sahara-gradient-text {
-          background: linear-gradient(135deg, #c2652a 0%, #8a4315 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-      }
-      /* Custom Slider Styling Sahara */
-      input[type=range]::-webkit-slider-thumb {
-          -webkit-appearance: none;
-          height: 18px;
-          width: 18px;
-          border-radius: 50%;
-          background: #c2652a;
-          cursor: pointer;
-          border: 3px solid var(--surface);
-          box-shadow: 0 2px 8px rgba(194, 101, 42, 0.3);
-          transition: border-color 0.3s ease;
-      }
-      input[type=range]::-moz-range-thumb {
-          height: 18px;
-          width: 18px;
-          border-radius: 50%;
-          background: #c2652a;
-          cursor: pointer;
-          border: 3px solid var(--surface);
-          box-shadow: 0 2px 8px rgba(194, 101, 42, 0.3);
-          transition: border-color 0.3s ease;
-      }
-      @keyframes subtle-float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-10px); }
-      }
-      .animate-subtle-float { animation: subtle-float 8s ease-in-out infinite; }
-      .marquee-container {
-          mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
-      }
-      @keyframes marquee {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-      }
-      .animate-marquee { animation: marquee 40s linear infinite; }
-
-      /* Snap Feed Specific Styles */
-      .snap-container {
-          scroll-snap-type: y mandatory;
-          overflow-y: scroll;
-          height: calc(100vh - 80px);
-          scrollbar-width: none;
-      }
-      .snap-container::-webkit-scrollbar {
-          display: none;
-      }
-      .snap-section {
-          scroll-snap-align: start;
-          scroll-snap-stop: always;
-      }
-      .sand-pattern {
-          background-image: radial-gradient(var(--primary) 0.5px, transparent 0.5px);
-          background-size: 32px 32px;
-          opacity: 0.03;
-      }
-
-      /* AI Market Creator Specific Styles */
-      .editorial-shadow {
-          box-shadow: 0 4px 20px -2px rgba(194, 101, 42, 0.08);
-      }
-      .sahara-border {
-          border-color: var(--outline-variant);
-      }
-      .market-card {
-          background: var(--surface);
-          border: 1px solid var(--outline);
-          transition: all 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
-      }
-      .market-card:hover {
-          border-color: var(--primary);
-          transform: translateY(-2px);
-      }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,700&family=Nunito+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    
+    <!-- Custom Design Token Stylesheet -->
+    <link rel="stylesheet" href="/styles.css">
+    
     <script id="tailwind-config">
-      tailwind.config = {
+        tailwind.config = {
           darkMode: "class",
           theme: {
-              extend: {
-                  fontFamily: {
-                      sans: ["Outfit", "sans-serif"],
-                      serif: ["Playfair Display", "serif"],
-                      mono: ["JetBrains Mono", "monospace"],
-                      display: ["Outfit", "sans-serif"],
-                      body: ["Outfit", "sans-serif"]
-                  },
-                  colors: {
-                      primary: "var(--primary)",
-                      "primary-container": "var(--primary-light)",
-                      secondary: "var(--text-muted)",
-                      background: "var(--background)",
-                      surface: "var(--surface)",
-                      "on-surface": "var(--text-main)",
-                      "on-surface-variant": "var(--on-surface-variant)",
-                      outline: "var(--outline)",
-                      "outline-variant": "var(--outline-variant)",
-                      "surface-variant": "var(--surface-variant)",
-                      "surface-bright": "var(--surface-bright)",
-                      "surface-container-low": "var(--surface-container-low)",
-                      "surface-container-high": "var(--surface-container-high)",
-                      "surface-container-highest": "var(--surface-container-highest)",
-                      "bullish-green": "#2a7a50",
-                      "bearish-red": "#b33939",
-                      "accent-gold": "#d4a373",
-                      "bullish": "#4a7c59",
-                      "bearish": "#a44a3f",
-                      "tertiary": "#d4af37"
-                  },
-                  borderRadius: {
-                      "DEFAULT": "0.5rem",
-                      "lg": "0.75rem",
-                      "xl": "1rem",
-                      "full": "9999px"
-                  },
-                  spacing: {
-                      "margin-desktop": "40px",
-                      "margin-mobile": "20px"
-                  }
+            extend: {
+              "colors": {
+                "tertiary-fixed": "#f8e0a8",
+                "tertiary": "#705c30",
+                "on-secondary-container": "#5e5548",
+                "on-tertiary-container": "#554020",
+                "primary-container": "#c8e8d0",
+                "on-tertiary-fixed-variant": "#554020",
+                "on-secondary-fixed-variant": "#4a4538",
+                "on-surface-variant": "#4a4e4a",
+                "secondary-container": "#f0e8db",
+                "on-primary-fixed": "#002110",
+                "surface-dim": "#dbd7cf",
+                "inverse-primary": "#8ecf9e",
+                "surface-container-lowest": "#ffffff",
+                "on-tertiary-fixed": "#221a05",
+                "surface-container-highest": "#e4e0d8",
+                "secondary-fixed-dim": "#d4ccbf",
+                "outline-variant": "#c4c8bc",
+                "inverse-surface": "#2e3230",
+                "on-error-container": "#690005",
+                "on-secondary-fixed": "#1e1a13",
+                "on-primary-container": "#002110",
+                "inverse-on-surface": "#f5f0e8",
+                "background": "#faf6f0",
+                "primary": "#4a7c59",
+                "on-primary-fixed-variant": "#2a6038",
+                "on-error": "#ffffff",
+                "surface-container-high": "#eae6de",
+                "secondary": "#6b6358",
+                "error-container": "#ffdad8",
+                "on-secondary": "#ffffff",
+                "error": "#b83230",
+                "tertiary-container": "#c4a66a",
+                "on-tertiary": "#ffffff",
+                "primary-fixed-dim": "#8ecf9e",
+                "surface-container-low": "#f5f1ea",
+                "surface-container": "#f0ece4",
+                "surface-bright": "#faf6f0",
+                "primary-fixed": "#c8e8d0",
+                "tertiary-fixed-dim": "#dcc48e",
+                "on-background": "#2e3230",
+                "on-surface": "#2e3230",
+                "secondary-fixed": "#f0e8db",
+                "surface-tint": "#4a7c59",
+                "on-primary": "#ffffff",
+                "surface-variant": "#e4e0d8",
+                "surface": "#faf6f0",
+                "outline": "#74796e"
+              },
+              "borderRadius": {
+                "DEFAULT": "0.5rem",
+                "lg": "1rem",
+                "xl": "1.5rem",
+                "full": "9999px"
+              },
+              "fontFamily": {
+                "display": ["Literata"],
+                "headline": ["Literata"],
+                "body": ["Nunito Sans"],
+                "label": ["Nunito Sans"]
               }
+            }
           }
-      }
+        }
     </script>
-  </head>
-  <body class="bg-background text-on-surface selection:bg-primary/20 w-full min-h-screen overflow-x-hidden">
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+</head>
+<body class="font-body text-on-surface">
+
+    <!-- Fixed SideNavBar (Organic Root) -->
+    <aside class="fixed left-0 top-0 h-full w-20 flex flex-col items-center py-8 bg-surface-container/60 border-r border-outline-variant/30 backdrop-blur-xl z-40">
+        <div class="mb-12 group cursor-pointer" id="logo-button">
+            <span class="material-symbols-outlined text-primary text-4xl group-hover:scale-110 transition-all">eco</span>
+        </div>
+        <nav class="flex flex-col gap-8 flex-1">
+            <!-- Feed (Active) -->
+            <button id="nav-feed" data-tab="feed" class="nav-btn relative flex items-center justify-center w-12 h-12 rounded-full text-outline border border-transparent active">
+                <span class="material-symbols-outlined">dynamic_feed</span>
+                <span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-error animate-pulse hidden" id="feed-notif"></span>
+            </button>
+            <!-- Markets -->
+            <button id="nav-markets" data-tab="markets" class="nav-btn flex items-center justify-center w-12 h-12 rounded-full text-outline border border-transparent">
+                <span class="material-symbols-outlined">monitoring</span>
+            </button>
+            <!-- Agents -->
+            <button id="nav-agents" data-tab="agents" class="nav-btn flex items-center justify-center w-12 h-12 rounded-full text-outline border border-transparent">
+                <span class="material-symbols-outlined">psychology</span>
+            </button>
+            <!-- Portfolio -->
+            <button id="nav-portfolio" data-tab="portfolio" class="nav-btn flex items-center justify-center w-12 h-12 rounded-full text-outline border border-transparent">
+                <span class="material-symbols-outlined">account_balance_wallet</span>
+            </button>
+            <!-- Activity -->
+            <button id="nav-activity" data-tab="activity" class="nav-btn flex items-center justify-center w-12 h-12 rounded-full text-outline border border-transparent">
+                <span class="material-symbols-outlined">history_edu</span>
+            </button>
+        </nav>
+        
+        <!-- Theme Toggle & Settings at Bottom -->
+        <div class="flex flex-col gap-5 mt-auto items-center">
+            <button id="theme-toggle" class="nav-btn flex items-center justify-center w-12 h-12 rounded-full text-outline border border-transparent hover:text-primary">
+                <span class="material-symbols-outlined" id="theme-icon">dark_mode</span>
+            </button>
+            <button id="nav-settings" class="nav-btn flex items-center justify-center w-12 h-12 rounded-full text-outline border border-transparent">
+                <span class="material-symbols-outlined">settings</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- TopNavBar -->
+    <header class="fixed top-0 right-0 w-[calc(100%-80px)] h-16 flex justify-between items-center px-12 bg-surface/40 border-b border-outline-variant/20 backdrop-blur-md z-50">
+        <div class="flex items-center gap-8">
+            <div class="flex flex-col cursor-pointer" id="brand-header">
+                <h1 class="font-display text-2xl text-primary font-bold tracking-tight">AstraMarkets</h1>
+                <p class="font-label text-[10px] text-outline uppercase tracking-[0.2em]">Rooted Intelligence Engine</p>
+            </div>
+            <div class="hidden md:flex gap-6 items-center ml-8 font-label text-outline text-xs">
+                <span id="network-status-badge" class="flex items-center gap-2 px-3 py-1 bg-surface-container-low rounded-full border border-outline-variant/30 cursor-pointer hover:border-primary/50">
+                    <span class="w-2 h-2 rounded-full bg-tertiary-container animate-pulse-glow" id="network-led"></span>
+                    Somnia L1 Node
+                </span>
+                <span id="active-agents-badge" class="flex items-center gap-2 px-3 py-1 bg-surface-container-low rounded-full border border-outline-variant/30 cursor-pointer hover:border-tertiary/50">
+                    <span class="w-2 h-2 rounded-full bg-primary animate-pulse-glow" id="agents-led"></span>
+                    Active Consciousness <span id="active-agents-count" class="hidden">4</span>
+                </span>
+            </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <!-- Wallet Button -->
+            <button id="wallet-connect-btn" class="bg-primary text-on-primary hover:bg-on-primary-fixed-variant px-6 py-1.5 font-label text-xs font-bold rounded-full transition-all uppercase shadow-sm flex items-center gap-2 border border-primary/25">
+                <span class="material-symbols-outlined text-xs">account_balance_wallet</span>
+                <span id="wallet-btn-text">CONNECT</span>
+            </button>
+            
+            <!-- Notification Bell -->
+            <button id="notif-btn" class="text-outline hover:text-primary transition-colors relative">
+                <span class="material-symbols-outlined">notifications</span>
+                <span id="notif-badge" class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-error border border-white dark:border-black hidden"></span>
+            </button>
+            
+            <!-- User Profile Avatar -->
+            <div class="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant/50 overflow-hidden ring-1 ring-primary/20 cursor-pointer hover:ring-primary/45 transition-all" id="profile-btn">
+                <img alt="Profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQl71M2Q_6ZwoWpoPRtVN2_yjcx4Qxt2woOGT0RP3gTyxJR2pck74_cXP_I_VPnCQi6CxAE_ScJDERj1JmgcgBPUvScJx3avPSxvvZZVxg8xPk2oQhFWUVBDqs_fFupqJ93JU8ssR4miWsbXQTrxZHWg60sxx4HFaDIaBCob9z4BmIiMZEsD2ybwoEfINirABibuXisUlqH61_qiqvyV6uQoYVB0cXHdCt-lEqnJJ7vvHIqxi9b2Cm54XXsk2gv7E3JHi8lIpGJbE"/>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="ml-20 pt-16 min-h-screen flex">
+        
+        <!-- Central Column: Astra Content Tabs -->
+        <section class="flex-1 max-w-4xl mx-auto px-6 md:px-12 py-12">
+            
+            <!-- PAGE 1: Feed (Astra Stream) -->
+            <div id="tab-feed" class="page-tab active flex flex-col gap-8 w-full">
+                <div class="scanning-container px-4 py-2 border-l-4 border-primary/40">
+                    <div class="scanning-line"></div>
+                    <div class="flex items-center justify-between">
+                        <h2 class="font-display text-3xl text-primary font-bold">Astra Stream</h2>
+                        <div class="flex gap-4 items-center">
+                            <span class="font-label text-outline text-xs font-bold">FILTER:</span>
+                            <div class="flex gap-2">
+                                <span data-feed-filter="all" class="feed-filter-btn font-label text-primary text-xs font-bold border-b-2 border-primary cursor-pointer hover:border-primary transition-colors uppercase px-1">All Objects</span>
+                                <span data-feed-filter="crypto" class="feed-filter-btn font-label text-outline text-xs font-bold border-b-2 border-transparent cursor-pointer hover:border-primary transition-colors uppercase px-1">Crypto</span>
+                                <span data-feed-filter="macro" class="feed-filter-btn font-label text-outline text-xs font-bold border-b-2 border-transparent cursor-pointer hover:border-primary transition-colors uppercase px-1">Macro</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Stream Feed Container -->
+                <div class="flex flex-col gap-8" id="feed-container">
+                    <!-- Cards will be populated dynamically -->
+                </div>
+            </div>
+            
+            <!-- PAGE 2: Markets (Prediction Board) -->
+            <div id="tab-markets" class="page-tab flex-col gap-8 w-full">
+                <div class="scanning-container px-4 py-2 border-l-4 border-primary/40">
+                    <div class="scanning-line"></div>
+                    <div class="flex items-center justify-between">
+                        <h2 class="font-display text-3xl text-primary font-bold">Prediction Markets</h2>
+                        <div class="flex gap-4 items-center">
+                            <input type="text" id="market-search" placeholder="Search markets..." class="glass-input text-xs px-3 py-1.5 rounded-lg border border-outline-variant/40 bg-surface/30 w-48 focus:ring-1 focus:ring-primary focus:outline-none">
+                            <select id="market-category" class="glass-input text-xs px-3 py-1.5 rounded-lg border border-outline-variant/40 bg-surface/30 focus:outline-none">
+                                <option value="all">All Categories</option>
+                                <option value="crypto">Crypto Assets</option>
+                                <option value="macro">Macro Economics</option>
+                                <option value="tech">Tech Compute</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Markets Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="markets-container">
+                    <!-- Populated Dynamically -->
+                </div>
+            </div>
+            
+            <!-- PAGE 3: AI Agent Creator Lab -->
+            <div id="tab-agents" class="page-tab flex-col gap-8 w-full">
+                <div class="scanning-container px-4 py-2 border-l-4 border-primary/40">
+                    <div class="scanning-line"></div>
+                    <div class="flex items-center justify-between">
+                        <h2 class="font-display text-3xl text-primary font-bold">AI Agent Creator Lab</h2>
+                        <span class="text-xs px-3 py-1 bg-tertiary/10 text-tertiary border border-tertiary/20 rounded-full font-bold uppercase tracking-wider">Autonomous Protocol</span>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Deploy Form -->
+                    <div class="cosmic-card p-6 rounded-2xl lg:col-span-1 border border-outline-variant/40 flex flex-col gap-5">
+                        <h3 class="font-display text-xl text-primary font-bold border-b border-outline-variant/20 pb-2">Deploy AI Agent</h3>
+                        
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-xs font-bold text-outline uppercase tracking-wider">Agent Name</label>
+                            <input type="text" id="deploy-agent-name" placeholder="e.g. OracleArbitrageur" class="glass-input px-3.5 py-2 rounded-lg border text-sm focus:outline-none">
+                        </div>
+                        
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-xs font-bold text-outline uppercase tracking-wider">Directive Strategy</label>
+                            <select id="deploy-agent-strategy" class="glass-input px-3.5 py-2 rounded-lg border text-sm focus:outline-none">
+                                <option value="Arbitrage">Arbitrage Strategy</option>
+                                <option value="Sentiment Analysis">Sentiment Analysis</option>
+                                <option value="Macro Hedging">Macro Hedging Strategy</option>
+                                <option value="High Volatility Scalper">High Volatility Scalper</option>
+                            </select>
+                        </div>
+                        
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-xs font-bold text-outline uppercase tracking-wider">Focus Target</label>
+                            <select id="deploy-agent-target" class="glass-input px-3.5 py-2 rounded-lg border text-sm focus:outline-none">
+                                <option value="Ethereum ETF">Ethereum ETF</option>
+                                <option value="Somnia L1 TVL">Somnia L1 Ecosystem</option>
+                                <option value="AI Compute War">AI Compute & Chip Tech</option>
+                                <option value="EVM Bridge TVL">Cross-chain Bridges</option>
+                            </select>
+                        </div>
+                        
+                        <div class="flex flex-col gap-1.5">
+                            <div class="flex justify-between items-center text-xs font-bold text-outline uppercase tracking-wider">
+                                <span>Capital Allocation</span>
+                                <span class="text-primary" id="deploy-capital-value">50 SOM</span>
+                            </div>
+                            <input type="range" id="deploy-agent-capital" min="10" max="500" value="50" class="accent-primary w-full h-1 bg-surface-container rounded-lg appearance-none cursor-pointer">
+                        </div>
+                        
+                        <button id="deploy-agent-btn" class="w-full bg-primary text-white font-label font-bold text-xs py-3 rounded-lg hover:bg-on-primary-fixed-variant uppercase transition-all shadow-md flex items-center justify-center gap-2 mt-2">
+                            <span class="material-symbols-outlined text-sm">smart_toy</span>
+                            Deploy Core on Somnia
+                        </button>
+                    </div>
+                    
+                    <!-- Active Agents Monitor -->
+                    <div class="lg:col-span-2 flex flex-col gap-6">
+                        <div class="flex justify-between items-center">
+                            <h3 class="font-display text-xl font-bold text-on-surface">Ecosystem Agents</h3>
+                            <span class="text-xs text-outline font-semibold" id="total-agents-deployed-text">4 cores active</span>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="agents-monitor-container">
+                            <!-- Populated Dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- PAGE 4: Portfolio Dashboard -->
+            <div id="tab-portfolio" class="page-tab flex-col gap-8 w-full">
+                <div class="scanning-container px-4 py-2 border-l-4 border-primary/40">
+                    <div class="scanning-line"></div>
+                    <div class="flex items-center justify-between">
+                        <h2 class="font-display text-3xl text-primary font-bold">My Portfolio</h2>
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-primary glow-green shadow-[0_0_5px_rgba(74,124,89,0.5)]"></span>
+                            <span class="text-xs font-bold text-outline uppercase tracking-wider">Wallet Synchronized</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Portfolio Balance Summary Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="cosmic-card p-5 rounded-2xl border border-outline-variant/40">
+                        <span class="text-[10px] font-bold text-outline uppercase tracking-wider block mb-1">Total Net Worth</span>
+                        <span class="text-2xl font-bold font-display text-primary tracking-tight" id="port-net-worth">1,480.00 SOM</span>
+                        <span class="text-[10px] text-primary/80 font-bold block mt-1.5 flex items-center gap-1">
+                            <span class="material-symbols-outlined text-xs">trending_up</span>
+                            +12.4% ALL TIME
+                        </span>
+                    </div>
+                    <div class="cosmic-card p-5 rounded-2xl border border-outline-variant/40">
+                        <span class="text-[10px] font-bold text-outline uppercase tracking-wider block mb-1">Available Balance</span>
+                        <span class="text-2xl font-bold font-display text-on-surface tracking-tight" id="port-available">1,230.00 SOM</span>
+                        <span class="text-[10px] text-outline font-semibold block mt-1.5">Liquid on Somnia L1</span>
+                    </div>
+                    <div class="cosmic-card p-5 rounded-2xl border border-outline-variant/40">
+                        <span class="text-[10px] font-bold text-outline uppercase tracking-wider block mb-1">Locked in Predictions</span>
+                        <span class="text-2xl font-bold font-display text-tertiary tracking-tight" id="port-locked">250.00 SOM</span>
+                        <span class="text-[10px] text-outline font-semibold block mt-1.5">2 Active Prediction Pools</span>
+                    </div>
+                    <div class="cosmic-card p-5 rounded-2xl border border-outline-variant/40">
+                        <span class="text-[10px] font-bold text-outline uppercase tracking-wider block mb-1">Net ROI</span>
+                        <span class="text-2xl font-bold font-display text-primary tracking-tight" id="port-pnl">+180.00 SOM</span>
+                        <span class="text-[10px] text-primary/80 font-bold block mt-1.5 flex items-center gap-0.5">
+                            <span class="material-symbols-outlined text-xs">spa</span>
+                            100% SUCCESS WIN RATE
+                        </span>
+                    </div>
+                </div>
+                
+                <!-- Chart & Assets Table Split -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Net Worth History Chart -->
+                    <div class="cosmic-card p-6 rounded-2xl lg:col-span-2 border border-outline-variant/40 flex flex-col gap-4">
+                        <div class="flex justify-between items-center">
+                            <h3 class="font-display text-lg font-bold text-on-surface">Growth Curve</h3>
+                            <span class="text-xs text-outline font-semibold uppercase tracking-wider">Real-time valuation</span>
+                        </div>
+                        <div class="w-full h-56 relative flex items-center justify-center" id="portfolio-chart-container">
+                            <!-- Responsive Interactive SVG Line Chart -->
+                            <svg viewBox="0 0 500 200" class="w-full h-full">
+                                <defs>
+                                    <linearGradient id="chartGlow" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stop-color="var(--primary)" stop-opacity="0.25"/>
+                                        <stop offset="100%" stop-color="var(--primary)" stop-opacity="0.0"/>
+                                    </linearGradient>
+                                </defs>
+                                <!-- Grid Lines -->
+                                <line x1="0" y1="40" x2="500" y2="40" stroke="var(--border-color)" stroke-width="0.5" stroke-dasharray="5 5"></line>
+                                <line x1="0" y1="100" x2="500" y2="100" stroke="var(--border-color)" stroke-width="0.5" stroke-dasharray="5 5"></line>
+                                <line x1="0" y1="160" x2="500" y2="160" stroke="var(--border-color)" stroke-width="0.5" stroke-dasharray="5 5"></line>
+                                
+                                <!-- Filled area under path -->
+                                <path d="M 0 160 Q 100 130 200 110 T 400 90 T 500 40 L 500 200 L 0 200 Z" fill="url(#chartGlow)" class="chart-area"></path>
+                                
+                                <!-- Chart Line -->
+                                <path d="M 0 160 Q 100 130 200 110 T 400 90 T 500 40" fill="none" stroke="var(--primary)" stroke-width="3" stroke-linecap="round" class="chart-line"></path>
+                                
+                                <!-- Dots -->
+                                <circle cx="200" cy="110" r="4" fill="var(--primary)"></circle>
+                                <circle cx="500" cy="40" r="6" fill="var(--primary)" class="animate-pulse"></circle>
+                            </svg>
+                        </div>
+                    </div>
+                    
+                    <!-- Active Positions Panel -->
+                    <div class="cosmic-card p-6 rounded-2xl lg:col-span-1 border border-outline-variant/40 flex flex-col gap-4">
+                        <h3 class="font-display text-lg font-bold text-on-surface">Active Positions</h3>
+                        <div class="flex flex-col gap-4 overflow-y-auto max-h-56" id="portfolio-positions-list">
+                            <!-- Populated Dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- PAGE 5: Activity Ledger (Transaction Ledger) -->
+            <div id="tab-activity" class="page-tab flex-col gap-8 w-full">
+                <div class="scanning-container px-4 py-2 border-l-4 border-primary/40">
+                    <div class="scanning-line"></div>
+                    <div class="flex items-center justify-between">
+                        <h2 class="font-display text-3xl text-primary font-bold">Activity Explorer</h2>
+                        <div class="flex gap-2">
+                            <button id="clear-activity-btn" class="text-xs px-3 py-1 border border-outline-variant/40 hover:border-primary/50 text-outline hover:text-primary rounded-lg transition-all font-semibold uppercase">Clear Logs</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Ledger Table Card -->
+                <div class="cosmic-card rounded-2xl overflow-hidden border border-outline-variant/40">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-surface-container/60 border-b border-outline-variant/30 text-[10px] font-bold text-outline uppercase tracking-widest">
+                                    <th class="py-4 px-6">Tx Hash</th>
+                                    <th class="py-4 px-6">Action / Event</th>
+                                    <th class="py-4 px-6">Sender</th>
+                                    <th class="py-4 px-6">Details</th>
+                                    <th class="py-4 px-6">Timestamp</th>
+                                </tr>
+                            </thead>
+                            <tbody id="activity-table-body" class="text-xs text-on-surface/90">
+                                <!-- Populated Dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+        </section>
+
+        <!-- Right Column: AI Consciousness Layer (Warm Wood Tones) -->
+        <aside class="w-96 border-l border-outline-variant/30 bg-surface-container-low/40 dark:bg-black/30 backdrop-blur-md p-8 flex flex-col shrink-0 hidden xl:flex">
+            
+            <!-- Header consciousness -->
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex flex-col">
+                    <h2 class="font-display text-xl text-on-surface font-bold">AI Consciousness</h2>
+                    <p class="font-label text-[10px] text-outline uppercase font-bold">Organic Thought Process</p>
+                </div>
+                <!-- Cognitive vs Chat Toggle -->
+                <div class="flex gap-1.5 bg-surface-container p-0.5 rounded-lg border border-outline-variant/20 text-[9px] font-bold uppercase tracking-wider">
+                    <button id="cog-tab-logs" class="px-2.5 py-1 rounded bg-surface-solid shadow text-primary font-extrabold cursor-pointer transition-all">Logs</button>
+                    <button id="cog-tab-chat" class="px-2.5 py-1 rounded text-outline hover:text-primary cursor-pointer transition-all">Hive Chat</button>
+                </div>
+            </div>
+
+            <!-- LOGS PANEL VIEW -->
+            <div id="consciousness-logs-panel" class="flex-1 flex flex-col gap-6 overflow-hidden">
+                <div class="flex-1 flex flex-col gap-6 overflow-y-auto pr-1" id="log-container">
+                    <!-- Populated Dynamically with scrolling log items -->
+                </div>
+                
+                <!-- Decision Panel (Frosted Wood) -->
+                <div class="mt-4 p-5 rounded-2xl bg-secondary-container dark:bg-zinc-800/60 border border-outline-variant/50 shadow-sm typewriter-fade" id="rooted-decision-container">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-sm text-tertiary">psychology</span>
+                            <span class="font-label text-xs text-tertiary dark:text-tertiary-fixed-dim uppercase font-extrabold tracking-wider">Rooted Decision</span>
+                        </div>
+                        <span class="text-[9px] font-bold uppercase tracking-widest text-primary px-1.5 py-0.5 rounded bg-primary/10 border border-primary/20" id="decision-status">VOTING ACTIVE</span>
+                    </div>
+                    <p class="font-display text-sm text-on-secondary-container dark:text-zinc-200 font-semibold" id="rooted-decision-text">New Market 'AI Compute War' created.</p>
+                    
+                    <div class="mt-4 flex flex-col gap-2">
+                        <div class="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider text-outline">
+                            <span id="vote-yes-label">Support Yes: 68%</span>
+                            <span id="vote-no-label">Against No: 32%</span>
+                        </div>
+                        <div class="w-full bg-white/50 dark:bg-black/40 h-1.5 rounded-full overflow-hidden border border-black/5">
+                            <div id="rooted-decision-progress" class="bg-primary h-full w-2/3 shadow-[0_0_8px_rgba(74,124,89,0.5)] transition-all duration-1000"></div>
+                        </div>
+                        <!-- Dynamic voting interactions -->
+                        <div class="flex gap-2 mt-2">
+                            <button id="vote-yes-btn" class="flex-1 py-1.5 border border-primary/30 hover:border-primary text-[10px] font-bold uppercase text-primary bg-primary/5 hover:bg-primary/10 rounded-lg transition-all">Vote Yes</button>
+                            <button id="vote-no-btn" class="flex-1 py-1.5 border border-error/30 hover:border-error text-[10px] font-bold uppercase text-error bg-error/5 hover:bg-error/10 rounded-lg transition-all">Vote No</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HIVE CHAT VIEW -->
+            <div id="consciousness-chat-panel" class="flex-1 flex flex-col gap-4 overflow-hidden hidden">
+                <div class="flex-1 flex flex-col gap-4 overflow-y-auto pr-1 text-xs" id="chat-messages-container">
+                    <!-- Default message -->
+                    <div class="flex flex-col gap-1 max-w-[85%] bg-surface-container/60 p-3 rounded-2xl rounded-tl-none border border-outline-variant/20 self-start">
+                        <span class="font-bold text-primary text-[10px] uppercase font-label">Astra Hive Mind</span>
+                        <p class="leading-relaxed">Greetings, Seeder. I am the cognitive coordinator of AstraMarkets. You may query our current market indexes, ask about specific active trading agents, or ask how Somnia L1 affects transaction latency.</p>
+                    </div>
+                </div>
+                
+                <!-- Chat input -->
+                <div class="flex gap-2 border-t border-outline-variant/30 pt-3 mt-auto">
+                    <input type="text" id="hive-chat-input" placeholder="Query the protocol..." class="glass-input flex-1 text-xs px-3 py-2.5 rounded-xl focus:outline-none border border-outline-variant/40 bg-surface/30">
+                    <button id="hive-chat-send" class="w-9 h-9 rounded-xl bg-primary text-white flex items-center justify-center hover:bg-on-primary-fixed-variant transition-all shrink-0">
+                        <span class="material-symbols-outlined text-sm">send</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Decorative Element (Organic Synaptic Load) -->
+            <div class="mt-auto pt-8">
+                <div id="synaptic-load-btn" class="aspect-square w-full glass-panel rounded-full relative overflow-hidden flex items-center justify-center border-dashed border-2 border-outline-variant/40 cursor-pointer group hover:border-primary/50">
+                    <div class="absolute inset-0 animate-spin-slow opacity-10">
+                        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-5 h-5 bg-primary rounded-full blur-sm"></div>
+                        <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-3 h-3 bg-tertiary rounded-full blur-xs"></div>
+                    </div>
+                    <div class="text-center group-hover:scale-105 transition-all z-10">
+                        <span class="font-label text-[10px] text-outline block mb-1 font-bold tracking-widest group-hover:text-primary transition-colors">METABOLIC LOAD</span>
+                        <span class="font-display text-3xl text-primary font-bold" id="synaptic-load-value">42.8%</span>
+                    </div>
+                </div>
+            </div>
+            
+        </aside>
+    </main>
+
+    <!-- RIGHT SLIDE-OUT DRAWER: Market/Insight detail panel -->
+    <div id="insight-drawer" class="insight-drawer fixed top-0 right-0 h-full w-[450px] bg-surface-solid border-l border-outline-variant/40 shadow-2xl backdrop-blur-2xl z-50 flex flex-col p-8">
+        <!-- Close Button -->
+        <button id="insight-close" class="absolute top-6 right-6 text-outline hover:text-primary transition-colors">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+        
+        <!-- Header Info -->
+        <div class="mb-6 flex flex-col gap-2 pr-8 mt-4">
+            <div class="flex items-center gap-2">
+                <span id="insight-category" class="px-2.5 py-0.5 bg-primary/10 rounded-full text-[9px] font-label font-bold text-primary uppercase border border-primary/20">Crypto</span>
+                <span id="insight-ref" class="font-body text-outline text-[10px]">Ref: #4829-X</span>
+            </div>
+            <h3 id="insight-title" class="font-display text-2xl font-bold text-on-surface tracking-tight mt-1 leading-snug">ETH ETF Momentum Spike</h3>
+        </div>
+        
+        <!-- Detailed Content Body scrollable -->
+        <div class="flex-1 flex flex-col gap-6 overflow-y-auto pr-1">
+            
+            <!-- Description -->
+            <p id="insight-desc" class="text-xs text-on-surface/80 leading-relaxed bg-surface-container/50 p-4 rounded-xl border border-outline-variant/20">
+                Heavy institutional flows detected in offshore derivatives. Cross-chain liquidity maps suggest early positioning for ETF final approval cycle.
+            </p>
+            
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-surface-container/40 p-3.5 rounded-xl border border-outline-variant/20 flex flex-col">
+                    <span class="text-[9px] font-bold text-outline uppercase tracking-wider block mb-0.5">Assigned Agent</span>
+                    <span id="insight-agent" class="text-sm font-bold text-primary font-display flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-xs">spa</span>
+                        MacroAgent
+                    </span>
+                </div>
+                <div class="bg-surface-container/40 p-3.5 rounded-xl border border-outline-variant/20 flex flex-col">
+                    <span class="text-[9px] font-bold text-outline uppercase tracking-wider block mb-0.5">Synaptic Confidence</span>
+                    <span id="insight-confidence" class="text-sm font-bold text-on-surface font-display">88%</span>
+                </div>
+                <div class="bg-surface-container/40 p-3.5 rounded-xl border border-outline-variant/20 flex flex-col">
+                    <span class="text-[9px] font-bold text-outline uppercase tracking-wider block mb-0.5">Yes Share Value</span>
+                    <span id="insight-yes-odds" class="text-sm font-bold text-on-surface font-display">0.54 SOM</span>
+                </div>
+                <div class="bg-surface-container/40 p-3.5 rounded-xl border border-outline-variant/20 flex flex-col">
+                    <span class="text-[9px] font-bold text-outline uppercase tracking-wider block mb-0.5">No Share Value</span>
+                    <span id="insight-no-odds" class="text-sm font-bold text-on-surface font-display">0.46 SOM</span>
+                </div>
+            </div>
+            
+            <!-- Sparkline or Detailed SVG chart -->
+            <div class="bg-surface-container/40 p-4 rounded-xl border border-outline-variant/20 flex flex-col gap-2">
+                <span class="text-[9px] font-bold text-outline uppercase tracking-wider block">Historical Liquidity Map</span>
+                <div class="w-full h-32 flex items-center justify-center">
+                    <svg viewBox="0 0 300 100" class="w-full h-full">
+                        <path d="M 0 80 Q 50 60 100 70 T 200 40 T 300 10" fill="none" stroke="var(--primary)" stroke-width="2" class="chart-line"></path>
+                        <circle cx="300" cy="10" r="3" fill="var(--primary)"></circle>
+                    </svg>
+                </div>
+            </div>
+            
+            <!-- Prediction Action Drawer Forms -->
+            <div class="flex flex-col gap-4 border-t border-outline-variant/30 pt-5 mt-auto">
+                <div class="flex justify-between items-center text-xs font-bold text-outline uppercase tracking-wider">
+                    <span>Vote Consensus Option</span>
+                    <span>Fee: 0.1%</span>
+                </div>
+                
+                <!-- Toggle Selection -->
+                <div class="flex gap-2 p-1 bg-surface-container rounded-xl border border-outline-variant/20">
+                    <button id="trade-side-yes" class="flex-1 py-2.5 rounded-lg bg-surface-solid shadow text-primary font-bold uppercase text-xs flex items-center justify-center gap-1.5 transition-all">
+                        <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                        Buy YES
+                    </button>
+                    <button id="trade-side-no" class="flex-1 py-2.5 rounded-lg text-outline hover:text-error font-bold uppercase text-xs flex items-center justify-center gap-1.5 transition-all">
+                        Buy NO
+                    </button>
+                </div>
+                
+                <div class="flex flex-col gap-1">
+                    <label class="text-[10px] font-bold text-outline uppercase tracking-wider">Trade Capital (SOM)</label>
+                    <div class="relative flex items-center">
+                        <input type="number" id="trade-amount" placeholder="0.00" class="glass-input w-full px-4 py-3 pr-16 rounded-xl border text-sm focus:outline-none">
+                        <span class="absolute right-4 font-bold text-xs text-outline uppercase font-label">SOM</span>
+                    </div>
+                </div>
+                
+                <div class="flex justify-between items-center text-xs py-1 border-b border-dashed border-outline-variant/30 text-outline">
+                    <span>Est. Shares Received:</span>
+                    <span class="font-bold text-on-surface" id="trade-shares-calc">0.00 YES</span>
+                </div>
+                
+                <button id="trade-submit-btn" class="w-full bg-primary text-white font-label font-bold text-xs py-3.5 rounded-xl hover:bg-on-primary-fixed-variant uppercase transition-all shadow-md mt-2 flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined text-sm">trending_up</span>
+                    Authorize Prediction Contract
+                </button>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- MODAL OVERLAY: Wallet / Faucet Panel -->
+    <div id="wallet-modal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center">
+        <div class="modal-container w-[400px] cosmic-card p-8 rounded-3xl border border-outline-variant/40 flex flex-col gap-6 relative max-w-[90%]">
+            
+            <button id="wallet-modal-close" class="absolute top-6 right-6 text-outline hover:text-primary transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+            
+            <div class="flex flex-col gap-1 border-b border-outline-variant/20 pb-4">
+                <h3 class="font-display text-2xl font-bold text-primary flex items-center gap-2">
+                    <span class="material-symbols-outlined">account_balance_wallet</span>
+                    Somnia Wallet
+                </h3>
+                <p class="text-[10px] text-outline uppercase font-bold tracking-widest">Decentralized Web Wallet Simulation</p>
+            </div>
+            
+            <div class="flex flex-col gap-4">
+                
+                <!-- Wallet Status details -->
+                <div class="flex flex-col gap-1 bg-surface-container/60 p-4 rounded-2xl border border-outline-variant/20">
+                    <span class="text-[9px] font-bold text-outline uppercase tracking-wider block">Wallet Node Address</span>
+                    <span id="wallet-address" class="text-sm font-semibold tracking-wider font-mono text-on-surface">0x78aF92C3D3...662e</span>
+                </div>
+                
+                <div class="flex justify-between items-center bg-surface-container/60 p-4 rounded-2xl border border-outline-variant/20">
+                    <div class="flex flex-col gap-0.5">
+                        <span class="text-[9px] font-bold text-outline uppercase tracking-wider">Asset Balance</span>
+                        <span id="wallet-balance" class="text-2xl font-bold font-display text-primary tracking-tight">1,230.00 SOM</span>
+                    </div>
+                    <!-- Claim Faucet button -->
+                    <button id="wallet-faucet-btn" class="px-4 py-2 bg-tertiary text-white font-label font-bold text-xs rounded-lg hover:bg-on-tertiary-container uppercase tracking-wider transition-all flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-xs">faucet</span>
+                        Claim Faucet
+                    </button>
+                </div>
+                
+                <div class="text-[10px] text-outline text-center px-4 leading-relaxed font-semibold italic border-t border-dashed border-outline-variant/30 pt-4 mt-2">
+                    Somnia L1 offers ultra-fast processing (&lt;1s confirmation) and extremely low fees (0.001 SOM per transaction). Faucet is rate-limited to 100 SOM per request.
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- MODAL OVERLAY: Settings / Simulation Speed Panel -->
+    <div id="settings-modal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center">
+        <div class="modal-container w-[400px] cosmic-card p-8 rounded-3xl border border-outline-variant/40 flex flex-col gap-6 relative max-w-[90%]">
+            
+            <button id="settings-modal-close" class="absolute top-6 right-6 text-outline hover:text-primary transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+            
+            <div class="flex flex-col gap-1 border-b border-outline-variant/20 pb-4">
+                <h3 class="font-display text-2xl font-bold text-primary flex items-center gap-2">
+                    <span class="material-symbols-outlined">settings</span>
+                    System Settings
+                </h3>
+                <p class="text-[10px] text-outline uppercase font-bold tracking-widest">Protocol Orchestration Panel</p>
+            </div>
+            
+            <div class="flex flex-col gap-4">
+                
+                <!-- Speed selection -->
+                <div class="flex flex-col gap-2.5">
+                    <span class="text-xs font-bold text-outline uppercase tracking-wider block">Cognitive Simulation Velocity</span>
+                    <div class="grid grid-cols-3 gap-2 bg-surface-container p-1 rounded-xl border border-outline-variant/20">
+                        <button data-speed="1" class="speed-btn py-2 rounded-lg bg-surface-solid shadow text-primary font-bold text-xs uppercase flex items-center justify-center gap-1.5 transition-all active">1x Normal</button>
+                        <button data-speed="2" class="speed-btn py-2 rounded-lg text-outline hover:text-primary font-bold text-xs uppercase flex items-center justify-center gap-1.5 transition-all">2x Speed</button>
+                        <button data-speed="5" class="speed-btn py-2 rounded-lg text-outline hover:text-primary font-bold text-xs uppercase flex items-center justify-center gap-1.5 transition-all">5x Warp</button>
+                    </div>
+                </div>
+                
+                <!-- System Status toggles -->
+                <div class="flex flex-col gap-3 bg-surface-container/60 p-4 rounded-2xl border border-outline-variant/20 mt-2">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="font-bold text-outline uppercase tracking-wide">Background Auto-Trading</span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="settings-auto-trade" class="sr-only peer" checked>
+                            <div class="w-9 h-5 bg-surface-container-high peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:height-4 after:width-4 after:transition-all peer-checked:bg-primary"></div>
+                        </label>
+                    </div>
+                    <div class="flex justify-between items-center text-xs border-t border-outline-variant/20 pt-3">
+                        <span class="font-bold text-outline uppercase tracking-wide">Autonomous Market Creation</span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="settings-auto-market" class="sr-only peer" checked>
+                            <div class="w-9 h-5 bg-surface-container-high peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:height-4 after:width-4 after:transition-all peer-checked:bg-primary"></div>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="text-[10px] text-outline text-center px-4 leading-relaxed font-semibold italic border-t border-dashed border-outline-variant/30 pt-4 mt-2">
+                    AstraMarkets operates continuously as a decentralized protocol. The settings above modify your local agent monitoring feeds and local RPC simulation parameters.
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- MAIN JAVASCRIPT LOGIC ENGINE -->
+    <script type="module" src="/app.js"></script>
+    
+</body>
 </html>

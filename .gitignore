@@ -7,56 +7,46 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Runtime data
-pids
-*.pid
-*.seed
-*.pid.lock
-
 # Dependency directories
 node_modules/
 jspm_packages/
+web_modules/
 
 # Optional npm cache directory
 .npm
 
-# Optional eslint cache
-.eslintcache
+# Output/Build directories
+dist/
+build/
+out/
 
-# Optional stylelint cache
-.stylelintcache
-
-# Output of 'npm pack'
-*.tgz
-
-# Yarn Integrity file
-.yarn-integrity
-
-# dotenv environment variable files
+# Local env files
 .env
+.env.local
 .env.development.local
 .env.test.local
 .env.production.local
-.env.local
-.env.*.local
+*.env
 
-# Vite/Rollup build output
-dist/
-dist-ssr/
-*.local
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
+# IDE / Editor configuration files
+.vscode/
 .idea/
-.DS_Store
 *.suo
-*.ntvsca*
+*.ntvs*
 *.njsproj
 *.sln
-*.sw?
+*.swp
+*.swo
 
-# Gitignore secret word / private configuration files as requested
+# OS files
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Secret/Private Configuration files
 *secret*
 secret*
 *.secret
