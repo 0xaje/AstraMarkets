@@ -22,7 +22,7 @@ export interface MarketProposal {
   badge: string;          // display badge label
   statusText: string;     // Growth Surge | Risk Alert | Steady Flow | Golden Yield
   ref: string;            // short unique reference code
-  status?: "ACTIVE" | "EXPIRED" | "RESOLVED"; // current settlement status
+  status?: "ACTIVE" | "EXPIRED" | "RESOLVED" | "DISPUTED"; // current settlement status
   resolvedOutcome?: boolean;                  // resolved YES (true) or NO (false)
   settlementTimestamp?: number;               // UNIX timestamp of settlement
   settlementTx?: string;                      // on-chain settlement transaction hash
@@ -30,6 +30,8 @@ export interface MarketProposal {
   noSharesPool?: number;
   totalLiquidity?: number;
   volume?: number;
+  onChainMarketId?: number;
+  dispute?: any;
 }
 
 // ─── AGENT DECISION ──────────────────────────────────────────────

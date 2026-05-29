@@ -731,6 +731,101 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- ADVANCED ANALYTICS & INTELLIGENCE GRID -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Advanced Visualizations: Volatility & Heatmap -->
+                    <div class="cosmic-card p-6 rounded-2xl border border-outline-variant/40 flex flex-col gap-4">
+                        <div class="flex justify-between items-center border-b border-outline-variant/20 pb-2">
+                            <span class="text-xs font-bold text-primary uppercase tracking-wider flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-[14px]">grid_view</span>
+                                Exposure Heatmap
+                            </span>
+                            <span id="port-volatility" class="text-[9px] px-2 py-0.5 bg-primary/10 border border-primary/20 rounded text-primary uppercase font-bold tracking-wider">0.12% VOLATILITY</span>
+                        </div>
+                        
+                        <div class="flex flex-col gap-3" id="exposure-heatmap-list">
+                            <!-- Populated Dynamically with stylized color bars representing heatmaps -->
+                        </div>
+                    </div>
+                    
+                    <!-- Confidence to Profit Correlation -->
+                    <div class="cosmic-card p-6 rounded-2xl border border-outline-variant/40 flex flex-col gap-4">
+                        <div class="flex justify-between items-center border-b border-outline-variant/20 pb-2">
+                            <span class="text-xs font-bold text-tertiary uppercase tracking-wider flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-[14px]">scatter_plot</span>
+                                Confidence Correlation
+                            </span>
+                            <span class="text-[9px] font-bold text-outline uppercase tracking-wider">ROI Alignment</span>
+                        </div>
+                        
+                        <div class="flex-1 flex flex-col justify-between py-2" id="correlation-bars-list">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Market Liquidity Metrics -->
+                    <div class="cosmic-card p-6 rounded-2xl border border-outline-variant/40 flex flex-col gap-4">
+                        <div class="flex justify-between items-center border-b border-outline-variant/20 pb-2">
+                            <span class="text-xs font-bold text-secondary uppercase tracking-wider flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-[14px]">query_stats</span>
+                                Protocol Velocity
+                            </span>
+                            <span class="text-[9px] font-bold text-outline uppercase tracking-wider">Real-time Telemetry</span>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-3" id="liquidity-metrics-grid">
+                            <div class="bg-surface-container/40 p-3 rounded-xl border border-outline-variant/20 flex flex-col">
+                                <span class="text-[8px] font-bold text-outline uppercase">Liquidity Velocity</span>
+                                <span id="metric-velocity" class="text-xs font-bold text-on-surface font-mono mt-0.5">0.00x</span>
+                            </div>
+                            <div class="bg-surface-container/40 p-3 rounded-xl border border-outline-variant/20 flex flex-col">
+                                <span class="text-[8px] font-bold text-outline uppercase">Staking Flow</span>
+                                <span id="metric-staking-flow" class="text-xs font-bold text-on-surface font-mono mt-0.5">0.00 SOM</span>
+                            </div>
+                            <div class="bg-surface-container/40 p-3 rounded-xl border border-outline-variant/20 flex flex-col col-span-2">
+                                <span class="text-[8px] font-bold text-outline uppercase">Avg Market Confidence</span>
+                                <span id="metric-avg-confidence" class="text-xs font-bold text-primary font-mono mt-0.5">84%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TRADING INTELLIGENCE LAYER: Leaders & Agent Accuracy -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Agent prediction accuracy rankings -->
+                    <div class="cosmic-card p-6 rounded-2xl border border-outline-variant/40 flex flex-col gap-4">
+                        <h3 class="font-display text-base font-bold text-on-surface flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-primary">spa</span>
+                            Agent Synaptic Performance
+                        </h3>
+                        <div class="flex flex-col gap-3" id="agent-accuracy-list">
+                            <!-- Populated Dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Highest ROI Markets resolved -->
+                    <div class="cosmic-card p-6 rounded-2xl border border-outline-variant/40 flex flex-col gap-4">
+                        <h3 class="font-display text-base font-bold text-on-surface flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-tertiary">workspace_premium</span>
+                            Top Performer Smart Contracts
+                        </h3>
+                        <div class="flex flex-col gap-3" id="highest-roi-list">
+                            <!-- Populated Dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Trader Leaderboard -->
+                    <div class="cosmic-card p-6 rounded-2xl border border-outline-variant/40 flex flex-col gap-4">
+                        <h3 class="font-display text-base font-bold text-on-surface flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-secondary">leaderboard</span>
+                            Institutional Leaderboard
+                        </h3>
+                        <div class="flex flex-col gap-2" id="trader-leaderboard-list">
+                            <!-- Populated Dynamically -->
+                        </div>
+                    </div>
+                </div>
             </div>
             
             <!-- PAGE 5: Activity Ledger (Transaction Ledger) -->
@@ -1069,6 +1164,42 @@
                 <div class="flex flex-col gap-2 mt-2 pt-2 border-t border-outline-variant/20">
                     <span class="text-[9px] font-bold text-outline uppercase tracking-wider">Strongest Supporting Telemetry</span>
                     <ul id="insight-telemetry-list" class="flex flex-col gap-2 text-[10px] text-on-surface/85 pl-4 list-disc font-semibold leading-relaxed">
+                        <!-- Loaded dynamically -->
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Decentralized Dispute Governance Core -->
+            <div id="insight-dispute-panel" class="bg-error/5 p-5 rounded-2xl border border-error/20 flex flex-col gap-4 hidden">
+                <div class="flex items-center justify-between border-b border-error/20 pb-2">
+                    <span class="text-[9px] font-bold text-error uppercase tracking-wider flex items-center gap-1.5 animate-pulse">
+                        <span class="material-symbols-outlined text-[14px]">gavel</span>
+                        Decentralized Dispute Governance Layer
+                    </span>
+                    <span class="text-[9px] px-2 py-0.5 bg-error/15 border border-error/30 rounded text-error uppercase font-bold tracking-wider">ACTIVE CHALLENGE</span>
+                </div>
+                
+                <div class="flex flex-col gap-2">
+                    <span class="text-[9px] font-bold text-outline uppercase tracking-wider">Dispute Assessment & Rationale</span>
+                    <p id="insight-dispute-reason" class="text-[10px] text-on-surface-variant italic font-semibold leading-relaxed">
+                        Ambiguous news reports triggered multiple oracle deviations. Stakeholders initiated governance validation round.
+                    </p>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3.5 my-1">
+                    <div class="bg-surface-container/60 p-3 rounded-xl border border-outline-variant/20 flex flex-col text-center">
+                        <span class="text-[8px] font-bold text-outline uppercase">Yes consensus weight</span>
+                        <span id="insight-dispute-yes-weight" class="text-sm font-bold text-primary font-mono mt-0.5">0.00 YES</span>
+                    </div>
+                    <div class="bg-surface-container/60 p-3 rounded-xl border border-outline-variant/20 flex flex-col text-center">
+                        <span class="text-[8px] font-bold text-outline uppercase">No consensus weight</span>
+                        <span id="insight-dispute-no-weight" class="text-sm font-bold text-error font-mono mt-0.5">0.00 NO</span>
+                    </div>
+                </div>
+                
+                <div class="flex flex-col gap-2">
+                    <span class="text-[9px] font-bold text-outline uppercase tracking-wider">Oracle Conflict Sources</span>
+                    <ul id="insight-dispute-oracles" class="flex flex-col gap-1.5 text-[9px] text-outline font-mono list-disc pl-4">
                         <!-- Loaded dynamically -->
                     </ul>
                 </div>

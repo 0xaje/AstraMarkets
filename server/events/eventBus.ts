@@ -30,11 +30,12 @@ export interface MarketProposal {
   badge: string;
   statusText: string;
   ref: string;
-  status?: "ACTIVE" | "EXPIRED" | "RESOLVED";
+  status?: "ACTIVE" | "EXPIRED" | "RESOLVED" | "DISPUTED";
   resolvedOutcome?: boolean;
   settlementTimestamp?: number;
   settlementTx?: string;
   onChainMarketId?: number;
+  dispute?: any;
 }
 
 export interface AgentDecision {

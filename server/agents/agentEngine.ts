@@ -1,17 +1,3 @@
-/**
- * AstraMarkets — Agent Decision Engine v1.0
- * ─────────────────────────────────────────────────────────────────
- * Four autonomous agents run on a shared 15-second cycle, consuming
- * live signals from signalEngine.ts and issuing LLM-driven market
- * creation decisions. Agents communicate via a typed EventEmitter bus.
- *
- * Agents:
- *   MacroAgent   — crypto price action + macroeconomic news
- *   SocialAgent  — Reddit sentiment + viral trends
- *   SportsAgent  — sports events & outcomes (trends / news)
- *   RiskAgent    — cross-agent filter: vetoes low-quality proposals
- */
-
 import EventEmitter from "eventemitter3";
 import OpenAI from "openai";
 import { env } from "../config/env.js";
@@ -25,18 +11,16 @@ import type {
   AgentStatus,
   MarketProposal,
 } from "./agentTypes.js";
-import { createMarketOnChain } from "../services/somnia/marketFactory.js";
+import { createMarketOnChain, provider } from "../services/somnia/marketFactory.js";
 import { eventBus } from "../events/eventBus.js";
 
 // ─── OPENAI CLIENT ───────────────────────────────────────────────
-
 const openai = env.OPENAI_API_KEY
   ? new OpenAI({ apiKey: env.OPENAI_API_KEY })
   : null;
 const LLM_MODEL = env.AGENT_LLM_MODEL;
 
 // ─── EVENT BUS ───────────────────────────────────────────────────
-
 interface BusEvents {
   marketProposed: [MarketProposal, string];
   proposalVetoed: [string, string];
@@ -46,14 +30,8 @@ interface BusEvents {
 export const agentBus = new EventEmitter<BusEvents>();
 
 // ─── SHARED STATE ────────────────────────────────────────────────
-
-/** Approved market proposals this session — exposed to the REST API */
 export const approvedMarkets: MarketProposal[] = [];
-
-/** Agent runtime status snapshots */
 export const agentStatuses: Map<string, AgentStatus> = new Map();
-
-/** Deduplication: fingerprint → timestamp of last creation */
 const marketFingerprints = new Map<string, number>();
 const DEDUP_TTL_MS = 30 * 60_000; // 30 min window
 
@@ -76,8 +54,73 @@ function evictOldFingerprints() {
   }
 }
 
-// ─── LLM DECISION CALL ───────────────────────────────────────────
+// ─── TRANSACTION MONITORING & REPLAY RECOVERY ─────────────────────
+export interface TransactionRecord {
+  title: string;
+  onChainMarketId?: number;
+  txHash?: string;
+  status: "CONFIRMED" | "FAILED" | "PENDING";
+  error?: string;
+  timestamp: number;
+}
 
+export const transactionHistory: TransactionRecord[] = [];
+
+// A set of pending transaction hashes to track for replay recovery
+const pendingTxHashes = new Set<{ txHash: string; proposal: MarketProposal }>();
+
+/**
+ * Periodically replays status queries on all pending transactions to recover missed confirmations.
+ */
+export async function runEventReplayRecovery(): Promise<void> {
+  if (pendingTxHashes.size === 0) return;
+  console.log(`[Event Recovery] 🛡️ Running Event Replay Recovery check for ${pendingTxHashes.size} pending transaction(s)...`);
+
+  for (const pending of Array.from(pendingTxHashes)) {
+    try {
+      if (!provider) continue;
+      const tx = await provider.getTransaction(pending.txHash);
+      
+      if (!tx) {
+        console.warn(`[Event Recovery] ⚠️ Pending transaction hash ${pending.txHash} not found in mempool. Clearing.`);
+        pendingTxHashes.delete(pending);
+        continue;
+      }
+
+      const receipt = await tx.wait(1);
+      if (receipt) {
+        console.log(`[Event Recovery] 🎉 Successfully recovered and confirmed transaction: ${pending.txHash}`);
+        
+        // Find marketId from logs
+        let marketId: number | undefined;
+        // Search logs
+        pending.proposal.status = "ACTIVE";
+        pending.proposal.settlementTx = pending.txHash;
+        
+        const record = transactionHistory.find(r => r.txHash === pending.txHash);
+        if (record) {
+          record.status = "CONFIRMED";
+        }
+
+        eventBus.emit("MARKET_CREATED", {
+          market: pending.proposal,
+          onChainMarketId: marketId,
+          txHash: pending.txHash,
+          timestamp: Date.now()
+        });
+
+        pendingTxHashes.delete(pending);
+      }
+    } catch (err: any) {
+      console.error(`[Event Recovery] Error validating transaction recovery for ${pending.txHash}:`, err.message || err);
+    }
+  }
+}
+
+// Start polling for pending transaction checks every 20 seconds
+setInterval(runEventReplayRecovery, 20000);
+
+// ─── LLM DECISION CALL ───────────────────────────────────────────
 interface LLMDecisionResult {
   createMarket: boolean;
   title: string;
@@ -97,48 +140,8 @@ async function callLLM(
   if (signals.length === 0) return null;
 
   if (!openai) {
-    // Elegant Heuristic Fallback when OpenAI key is not set
-    const topSig = signals[0]!;
-    if (topSig.importance < 65) {
-      return {
-        createMarket: false,
-        title: "",
-        category: "crypto",
-        description: "",
-        expiry: "",
-        confidence: 0,
-        yesOdds: 0.5,
-        reasoning: "Top signal importance is too low."
-      };
-    }
-
-    // Heuristically propose a market based on the signal
-    const isBullish = topSig.sentiment === "bullish";
-    const cleanTopic = topSig.topic.replace(/moved|trending|surge|drop|spike/gi, "").trim();
-    
-    let category = "crypto";
-    if (agentName === "SocialAgent") category = "social";
-    else if (agentName === "SportsAgent") category = "sports";
-    else if (agentName === "RiskAgent") category = "macro";
-    else if (topSig.source === "news") category = "macro";
-    else if (topSig.source === "trends") category = "tech";
-
-    const title = isBullish
-      ? `Will ${cleanTopic} lead to a major growth breakout by next week?`
-      : `Will market volatility for ${cleanTopic} intensify over the next 14 days?`;
-
-    const description = `Autonomous market proposed by ${agentName} based on high-importance signal: "${topSig.topic}". Velocity: ${topSig.velocity.toFixed(0)}.`;
-    
-    return {
-      createMarket: true,
-      title: title.slice(0, 80),
-      category,
-      description: description.slice(0, 200),
-      expiry: new Date(Date.now() + 14 * 24 * 3600 * 1000).toISOString(),
-      confidence: topSig.importance,
-      yesOdds: isBullish ? 0.65 : 0.40,
-      reasoning: `Heuristic match: High importance signal detected on ${topSig.source} (${topSig.sentiment}).`
-    };
+    console.warn(`[${agentName}] ⚠️ OpenAI client unconfigured. Real LLM execution required. Skipping heuristic creation.`);
+    return null;
   }
 
   const signalSummary = signals
@@ -195,7 +198,6 @@ Rules:
 }
 
 // ─── HELPER ──────────────────────────────────────────────────────
-
 function emit(level: AgentLog["level"], agentName: string, message: string, decision?: AgentDecision) {
   agentBus.emit("log", { agentName, level, message, timestamp: Date.now(), decision });
 }
@@ -224,7 +226,6 @@ function expiryDate(daysFromNow: number): string {
 }
 
 // ─── BASE AGENT ──────────────────────────────────────────────────
-
 abstract class BaseAgent {
   abstract name: string;
   abstract strategy: string;
@@ -269,7 +270,7 @@ abstract class BaseAgent {
     const result = await callLLM(this.name, this.systemPrompt, signals);
 
     if (!result) {
-      const msg = "LLM unavailable — skipping decision.";
+      const msg = "LLM unconfigured or unavailable — skipping decision.";
       this.updateStatus(msg);
       return { createMarket: false, reasoning: msg, agentName: this.name, timestamp: Date.now() };
     }
@@ -324,7 +325,6 @@ abstract class BaseAgent {
 }
 
 // ─── AGENT IMPLEMENTATIONS ────────────────────────────────────────
-
 class MacroAgentImpl extends BaseAgent {
   name = "MacroAgent";
   strategy = "Offshore Liquidity & Crypto Price Analysis";
@@ -382,8 +382,6 @@ You look for systemic risk signals: regulatory changes, exchange failures, proto
 Only propose markets around genuine systemic risk events with clear binary outcomes.`;
 
   async run(allSignals: Signal[]): Promise<AgentDecision> {
-    // RiskAgent also reacts to proposals from other agents via the bus
-    // It listens for proposals and can emit vetoes — see bus setup in engine loop
     const highImportance = allSignals.filter((s) => s.importance >= 70);
     if (highImportance.length === 0) {
       const msg = "Market risk level: NOMINAL — no systemic signals detected.";
@@ -396,7 +394,6 @@ Only propose markets around genuine systemic risk events with clear binary outco
 }
 
 // ─── AGENT INSTANCES ─────────────────────────────────────────────
-
 const agents = [
   new MacroAgentImpl(),
   new SocialAgentImpl(),
@@ -404,19 +401,7 @@ const agents = [
   new RiskAgentImpl(),
 ] as const;
 
-// ─── BUS WIRING & SAFE TRANSACTION WORKFLOW ────────────────────────
-
-export interface TransactionRecord {
-  title: string;
-  onChainMarketId?: number;
-  txHash?: string;
-  status: "CONFIRMED" | "FAILED";
-  error?: string;
-  timestamp: number;
-}
-
-export const transactionHistory: TransactionRecord[] = [];
-
+// ─── DEPLOYMENT WITH AUTOMATED RETRY WORKFLOW ──────────────────────
 async function deployWithRetry(proposal: MarketProposal, maxAttempts = 3): Promise<any> {
   let lastError: any = null;
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
@@ -441,7 +426,6 @@ agentBus.on("marketProposed", (proposal, sourceAgent) => {
   const titleKey = marketFingerprint(proposal.title);
   
   if (sourceAgent === "RiskAgent") {
-    // RiskAgent's own proposals bypass veto
     const alreadyApproved = approvedMarkets.some((m) => marketFingerprint(m.title) === titleKey);
     if (!alreadyApproved) {
       approvedMarkets.unshift(proposal);
@@ -499,7 +483,6 @@ agentBus.on("marketProposed", (proposal, sourceAgent) => {
     return;
   }
 
-  // Approved — add to live list
   const alreadyApproved = approvedMarkets.some((m) => marketFingerprint(m.title) === titleKey);
   if (!alreadyApproved) {
     approvedMarkets.unshift(proposal);
@@ -549,7 +532,6 @@ agentBus.on("proposalVetoed", (title, reason) => {
 });
 
 // ─── AGENT LOG BUFFER ────────────────────────────────────────────
-
 export const agentLogs: AgentLog[] = [];
 
 agentBus.on("log", (entry) => {
@@ -559,7 +541,6 @@ agentBus.on("log", (entry) => {
 });
 
 // ─── MAIN ENGINE LOOP ────────────────────────────────────────────
-
 const CYCLE_MS = env.AGENT_CYCLE_MS;
 let engineRunning = false;
 let cycleTimer: ReturnType<typeof setInterval> | null = null;
@@ -580,14 +561,14 @@ async function runCycle(): Promise<void> {
 
   evictOldFingerprints();
 
-  // Run all agents concurrently (RiskAgent also runs independently to create risk markets)
+  // Run all agents concurrently
   const results = await Promise.allSettled(agents.map((agent) => agent.run(allSignals)));
 
   const decisions = results
     .filter((r): r is PromiseFulfilledResult<AgentDecision> => r.status === "fulfilled")
     .map((r) => r.value);
 
-  // Emit agent decisions to the central type-safe event bus
+  // Emit agent decisions
   decisions.forEach((decision) => {
     console.log(`[INTEGRATION] 🧠 AGENT_DECISION: agentName=${decision.agentName} | createMarket=${decision.createMarket} | reasoning="${decision.reasoning.slice(0, 120).replace(/\n/g, " ")}..."`);
     eventBus.emit("AGENT_DECISION_MADE", {
@@ -596,7 +577,6 @@ async function runCycle(): Promise<void> {
         createMarket: decision.createMarket,
         market: decision.market ? {
           ...decision.market,
-          // Map to correct category union type to satisfy strict typing
           category: decision.market.category as any
         } : undefined,
         reasoning: decision.reasoning,
@@ -626,7 +606,6 @@ export async function startAgentEngine(): Promise<void> {
   console.log("║  RiskAgent  | EventBus  | LLM: " + LLM_MODEL.padEnd(12) + "║");
   console.log("╚══════════════════════════════════════════════╝");
 
-  // First cycle immediately, then schedule
   await runCycle();
   cycleTimer = setInterval(runCycle, CYCLE_MS);
 }

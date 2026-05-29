@@ -7,7 +7,7 @@ pragma solidity ^0.8.20;
  * Supports parimutuel AMM trading, YES/NO liquidity pools, position tracking, and reward claims.
  */
 contract MarketFactory {
-    enum MarketStatus { ACTIVE, EXPIRED, RESOLVED }
+    enum MarketStatus { ACTIVE, EXPIRED, RESOLVED, DISPUTED }
 
     struct Market {
         uint256 id;
@@ -27,7 +27,18 @@ contract MarketFactory {
         uint256 noSharesPool;     // Total NO shares minted
     }
 
+    struct Dispute {
+        uint256 disputeEndTimestamp;
+        uint256 yesVotes;
+        uint256 noVotes;
+        bool finalized;
+    }
+
     mapping(uint256 => Market) public markets;
+    mapping(uint256 => Dispute) public disputes;
+    mapping(uint256 => mapping(address => bool)) public disputeVoted;
+    mapping(address => bool) public guardians;
+    
     uint256 public marketCount;
     address public owner;
 
@@ -39,6 +50,9 @@ contract MarketFactory {
     event MarketCreated(uint256 indexed marketId, string title, uint256 expiryTimestamp);
     event MarketExpired(uint256 indexed marketId);
     event MarketResolved(uint256 indexed marketId, bool outcome, uint256 settlementTimestamp);
+    event MarketDisputed(uint256 indexed marketId, uint256 disputeEndTimestamp);
+    event DisputeVoteCast(uint256 indexed marketId, address indexed voter, bool vote, uint256 weight);
+    event DisputeFinalized(uint256 indexed marketId, bool finalOutcome);
     
     // Trading Events
     event TradeExecuted(
@@ -60,6 +74,7 @@ contract MarketFactory {
 
     constructor() {
         owner = msg.sender;
+        guardians[msg.sender] = true; // Owner is default guardian
     }
 
     /**
@@ -118,6 +133,100 @@ contract MarketFactory {
             markets[marketId].status == MarketStatus.EXPIRED, 
             "Market already resolved"
         );
+        
+        markets[marketId].status = MarketStatus.RESOLVED;
+        markets[marketId].resolvedOutcome = outcome;
+        markets[marketId].settlementTimestamp = block.timestamp;
+
+        emit MarketResolved(marketId, outcome, block.timestamp);
+    }
+
+    /**
+     * @dev Allows anyone who holds shares in a resolved market to dispute the outcome.
+     * Transitions status to DISPUTED and starts a 24-hour dispute resolution voting window.
+     */
+    function disputeMarket(uint256 marketId) external {
+        Market storage market = markets[marketId];
+        require(market.id != 0, "Market does not exist");
+        require(market.status == MarketStatus.RESOLVED, "Market must be resolved to dispute");
+        require(block.timestamp <= market.settlementTimestamp + 1 days, "Dispute window expired");
+        
+        uint256 callerShares = userYesShares[marketId][msg.sender] + userNoShares[marketId][msg.sender];
+        require(callerShares > 0 || msg.sender == owner || guardians[msg.sender], "Must hold shares or be guardian to dispute");
+
+        market.status = MarketStatus.DISPUTED;
+        
+        Dispute storage dispute = disputes[marketId];
+        dispute.disputeEndTimestamp = block.timestamp + 1 days;
+        dispute.yesVotes = 0;
+        dispute.noVotes = 0;
+        dispute.finalized = false;
+
+        emit MarketDisputed(marketId, dispute.disputeEndTimestamp);
+    }
+
+    /**
+     * @dev Allows users to cast dispute votes, weighted by their total YES and NO shares owned.
+     */
+    function voteOnDispute(uint256 marketId, bool voteOutcome) external {
+        Market storage market = markets[marketId];
+        require(market.status == MarketStatus.DISPUTED, "Market is not in dispute");
+        require(block.timestamp < disputes[marketId].disputeEndTimestamp, "Dispute voting window closed");
+        require(!disputeVoted[marketId][msg.sender], "Already voted on this dispute");
+
+        uint256 weight = userYesShares[marketId][msg.sender] + userNoShares[marketId][msg.sender];
+        if (weight == 0) {
+            weight = 1; // Fallback minimum weight for governance participants
+        }
+
+        disputeVoted[marketId][msg.sender] = true;
+        if (voteOutcome) {
+            disputes[marketId].yesVotes += weight;
+        } else {
+            disputes[marketId].noVotes += weight;
+        }
+
+        emit DisputeVoteCast(marketId, msg.sender, voteOutcome, weight);
+    }
+
+    /**
+     * @dev Finalizes the dispute, setting the final outcome based on consensus.
+     */
+    function finalizeDispute(uint256 marketId) external {
+        Market storage market = markets[marketId];
+        require(market.status == MarketStatus.DISPUTED, "Market is not in dispute");
+        
+        Dispute storage dispute = disputes[marketId];
+        require(block.timestamp >= dispute.disputeEndTimestamp || msg.sender == owner || guardians[msg.sender], "Voting window still open");
+        require(!dispute.finalized, "Dispute already finalized");
+
+        dispute.finalized = true;
+        
+        // Determine consensus outcome (defaulting to YES if votes are equal)
+        bool finalOutcome = dispute.yesVotes >= dispute.noVotes;
+        
+        market.status = MarketStatus.RESOLVED;
+        market.resolvedOutcome = finalOutcome;
+        market.settlementTimestamp = block.timestamp;
+
+        emit DisputeFinalized(marketId, finalOutcome);
+        emit MarketResolved(marketId, finalOutcome, block.timestamp);
+    }
+
+    /**
+     * @dev Multi-sig / Guardian emergency settlement override.
+     */
+    function addGuardian(address _guardian) external onlyOwner {
+        guardians[_guardian] = true;
+    }
+
+    function removeGuardian(address _guardian) external onlyOwner {
+        guardians[_guardian] = false;
+    }
+
+    function emergencyResolveMarket(uint256 marketId, bool outcome) external {
+        require(msg.sender == owner || guardians[msg.sender], "Only owner or guardians can override");
+        require(markets[marketId].id != 0, "Market does not exist");
         
         markets[marketId].status = MarketStatus.RESOLVED;
         markets[marketId].resolvedOutcome = outcome;

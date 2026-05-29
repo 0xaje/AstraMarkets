@@ -3,22 +3,71 @@ import fs from "fs";
 import path from "path";
 import { env } from "../../config/env.js";
 
+// ─── CUSTOM STRUCTURED ERROR BOUNDARIES ─────────────────────────────
+export class BlockchainError extends Error {
+  public code: string;
+  constructor(message: string, code: string) {
+    super(message);
+    this.name = "BlockchainError";
+    this.code = code;
+  }
+}
+
+// ─── CIRCUIT BREAKER & RPC MONITORING STATE ────────────────────────
+let consecutiveFailures = 0;
+const BREAKER_THRESHOLD = 3;
+const COOLDOWN_PERIOD_MS = 30000; // 30 seconds
+let isBreakerOpen = false;
+let breakerResetTime = 0;
+
+function checkCircuitState() {
+  if (isBreakerOpen) {
+    if (Date.now() > breakerResetTime) {
+      isBreakerOpen = false;
+      consecutiveFailures = 0;
+      console.log("[Somnia L1] 🔌 Circuit Breaker: Cooldown expired. Retrying RPC health connection...");
+    } else {
+      throw new BlockchainError("RPC Circuit Breaker is OPEN. Requests blocked.", "CIRCUIT_BREAKER_OPEN");
+    }
+  }
+}
+
+function handleRpcSuccess() {
+  consecutiveFailures = 0;
+}
+
+function handleRpcFailure(err: any) {
+  consecutiveFailures++;
+  console.error(`[Somnia L1] RPC Failure registered (Attempt ${consecutiveFailures}/${BREAKER_THRESHOLD}). Error:`, err.message || err);
+  if (consecutiveFailures >= BREAKER_THRESHOLD) {
+    isBreakerOpen = true;
+    breakerResetTime = Date.now() + COOLDOWN_PERIOD_MS;
+    console.error(`[Somnia L1] 🚨 CIRCUIT BREAKER TRIPPED! Disabling Somnia L1 RPC calls for ${COOLDOWN_PERIOD_MS / 1000}s.`);
+  }
+}
+
 // ─── BLOCKCHAIN CONFIGURATION ──────────────────────────────────────
-const provider = new ethers.JsonRpcProvider(env.SOMNIA_RPC_URL);
-const wallet = new ethers.Wallet(env.SOMNIA_PRIVATE_KEY, provider);
-console.log(`[Somnia L1] 🟢 Connected wallet address: ${wallet.address}`);
+export let provider: ethers.JsonRpcProvider;
+export let wallet: ethers.Wallet;
+
+try {
+  provider = new ethers.JsonRpcProvider(env.SOMNIA_RPC_URL);
+  wallet = new ethers.Wallet(env.SOMNIA_PRIVATE_KEY, provider);
+  console.log(`[Somnia L1] 🟢 Connection established. Wallet address: ${wallet.address}`);
+} catch (err: any) {
+  console.error("[Somnia L1] ❌ Initial RPC connection config failed:", err.message || err);
+}
 
 // ─── COMPILED SMART CONTRACT PATHS ──────────────────────────────────
 const abiPath = path.resolve(process.cwd(), "contracts/build/contracts_MarketFactory_sol_MarketFactory.abi");
 const binPath = path.resolve(process.cwd(), "contracts/build/contracts_MarketFactory_sol_MarketFactory.bin");
 
 let cachedContractAddress = env.MARKET_FACTORY_ADDRESS;
-let contractPromise: Promise<any> | null = null;
+let contractPromise: Promise<ethers.Contract> | null = null;
 
-/**
- * Checks wallet balance and deploys/instantiates the MarketFactory contract.
- */
-async function getOrDeployContract(): Promise<any> {
+async function getOrDeployContract(): Promise<ethers.Contract> {
+  checkCircuitState();
+
   if (cachedContractAddress) {
     const abi = JSON.parse(fs.readFileSync(abiPath, "utf8"));
     return new ethers.Contract(cachedContractAddress, abi, wallet);
@@ -36,49 +85,64 @@ async function getOrDeployContract(): Promise<any> {
     }
 
     console.log("[Somnia L1] 🔍 Checking wallet balance for deployment...");
-    const balance = await provider.getBalance(wallet.address);
-    console.log(`[Somnia L1] 💰 Wallet balance: ${ethers.formatEther(balance)} STT`);
-
-    const abi = JSON.parse(fs.readFileSync(abiPath, "utf8"));
-    const bytecode = fs.readFileSync(binPath, "utf8").trim();
-
-    if (balance === 0n) {
-      console.warn(`
-════════════════════════════════════════════════════════════════════════
-[Somnia L1] ⚠️  WARNING: WALLET BALANCE IS 0 STT!
-To support real on-chain market creation, please fund your wallet:
-Address: ${wallet.address}
-Faucet: https://testnet.somnia.network/ ( Shannon Testnet )
-════════════════════════════════════════════════════════════════════════
-      `);
-      const dummyAddress = "0x0000000000000000000000000000000000000000";
-      return new ethers.Contract(dummyAddress, abi, wallet);
-    }
-
-    console.log("[Somnia L1] 🚀 Deploying new MarketFactory smart contract to Somnia Shannon Testnet...");
     try {
+      const balance = await provider.getBalance(wallet.address);
+      console.log(`[Somnia L1] 💰 Wallet balance: ${ethers.formatEther(balance)} STT`);
+
+      if (balance === 0n) {
+        throw new BlockchainError(`Wallet ${wallet.address} has 0 STT balance. Funding required to deploy/interact with contract.`, "INSUFFICIENT_FUNDS");
+      }
+
+      const abi = JSON.parse(fs.readFileSync(abiPath, "utf8"));
+      const bytecode = fs.readFileSync(binPath, "utf8").trim();
+
+      console.log("[Somnia L1] 🚀 Deploying new MarketFactory smart contract to Somnia Shannon Testnet...");
       const factory = new ethers.ContractFactory(abi, bytecode, wallet);
       const contract = await factory.deploy();
-      await contract.waitForDeployment();
       
+      // Deploy timeout
+      const deploymentReceipt = await contract.deploymentTransaction()?.wait(1);
+      if (!deploymentReceipt) {
+        throw new BlockchainError("Deployment receipt was not returned.", "DEPLOYMENT_NO_RECEIPT");
+      }
+
       const deployedAddress = await contract.getAddress();
       console.log(`[Somnia L1] 🎉 Smart contract successfully deployed at: ${deployedAddress}`);
-      console.log(`[Somnia L1] ℹ️  Please update MARKET_FACTORY_ADDRESS in your .env to: ${deployedAddress}`);
       
       cachedContractAddress = deployedAddress;
-      return contract;
+      handleRpcSuccess();
+      return contract as ethers.Contract;
     } catch (deployErr: any) {
-      console.error("[Somnia L1] ❌ Smart contract deployment failed:", deployErr);
-      throw deployErr;
+      handleRpcFailure(deployErr);
+      contractPromise = null; // Reset promise so it can be retried
+      throw new BlockchainError(`Smart contract deployment/access failed: ${deployErr.message || deployErr}`, "CONTRACT_ACCESS_FAILED");
     }
   })();
 
   return contractPromise;
 }
 
-/**
- * Interface representing the returned structure from real market creation on-chain.
- */
+// Transaction confirmation helper with strict timeout boundary
+async function waitWithTimeout(
+  tx: ethers.TransactionResponse,
+  timeoutMs: number = 45000
+): Promise<ethers.TransactionReceipt> {
+  const timeoutPromise = new Promise<never>((_, reject) =>
+    setTimeout(() => reject(new BlockchainError(`Transaction receipt timeout exceeded: ${timeoutMs}ms`, "TX_TIMEOUT")), timeoutMs)
+  );
+
+  const receipt = await Promise.race([
+    tx.wait(),
+    timeoutPromise
+  ]);
+
+  if (!receipt) {
+    throw new BlockchainError("Transaction completed but did not return a valid receipt.", "NO_RECEIPT");
+  }
+
+  return receipt;
+}
+
 export interface OnChainMarketResult {
   txHash: string;
   marketId?: number;
@@ -87,9 +151,6 @@ export interface OnChainMarketResult {
 
 /**
  * Creates a prediction market on the Somnia L1 blockchain.
- * Supports automated retries with exponential backoff on transaction failure.
- *
- * @param market The market proposal to deploy on-chain.
  */
 export async function createMarketOnChain(market: any): Promise<OnChainMarketResult> {
   const title = market.title;
@@ -97,17 +158,14 @@ export async function createMarketOnChain(market: any): Promise<OnChainMarketRes
   const confidence = market.confidence || 50;
   const creator = "AI_AGENT";
 
-  // Calculate duration in seconds until expiry
   const expiryDate = new Date(market.expiry);
   const now = new Date();
   let expiryDuration = Math.max(60, Math.floor((expiryDate.getTime() - now.getTime()) / 1000));
   
-  // Bound expiry duration to minimum 60 seconds if it's invalid or past
   if (isNaN(expiryDuration) || expiryDuration <= 0) {
     expiryDuration = 14 * 24 * 3600; // Default 14 days
   }
 
-  // Construct structured metadata payload inside the contract's description field
   const metadata = {
     category,
     confidence,
@@ -117,7 +175,6 @@ export async function createMarketOnChain(market: any): Promise<OnChainMarketRes
   const descriptionPayload = JSON.stringify(metadata);
 
   console.log(`[Somnia L1] 🛰️ Initiating on-chain market creation: "${title}"`);
-  console.log(`[Somnia L1] Details: duration=${expiryDuration}s, category=${category}, confidence=${confidence}%`);
 
   const MAX_RETRIES = 3;
   let attempt = 0;
@@ -125,26 +182,15 @@ export async function createMarketOnChain(market: any): Promise<OnChainMarketRes
   while (attempt < MAX_RETRIES) {
     try {
       attempt++;
+      checkCircuitState();
+      
       const contract = await getOrDeployContract();
-
-      if (contract.target === "0x0000000000000000000000000000000000000000") {
-        throw new Error(`MarketFactory contract not deployed. Wallet ${wallet.address} has 0 STT balance. Please fund it via faucet.`);
-      }
-
-      // Send the transaction
       const tx = await contract.createMarket(title, descriptionPayload, expiryDuration);
       console.log(`[Somnia L1] 💸 Transaction broadcasted! Hash: ${tx.hash} (Attempt ${attempt}/${MAX_RETRIES})`);
 
-      // Wait for confirmation
-      console.log("[Somnia L1] ⏳ Waiting for transaction confirmation...");
-      const receipt = await tx.wait();
-
-      if (!receipt) {
-        throw new Error("Transaction was confirmed but no receipt was returned.");
-      }
-
-      // Parse logs to retrieve the generated marketId
+      const receipt = await waitWithTimeout(tx);
       let marketId: number | undefined;
+
       for (const log of receipt.logs) {
         try {
           const parsedLog = contract.interface.parseLog(log);
@@ -153,10 +199,11 @@ export async function createMarketOnChain(market: any): Promise<OnChainMarketRes
             console.log(`[Somnia L1] 🎯 MarketCreated Event Captured! On-Chain Market ID: ${marketId}`);
           }
         } catch {
-          // Ignore logs from other/unrecognized events
+          // Skip unrecognized event logs
         }
       }
 
+      handleRpcSuccess();
       return {
         txHash: tx.hash,
         marketId,
@@ -164,27 +211,22 @@ export async function createMarketOnChain(market: any): Promise<OnChainMarketRes
       };
 
     } catch (err: any) {
-      console.error(`[Somnia L1] Transaction attempt ${attempt} failed:`, err.message || err);
-      
+      handleRpcFailure(err);
       if (attempt >= MAX_RETRIES) {
-        throw new Error(`Failed to create market on-chain after ${MAX_RETRIES} attempts. Error: ${err.message || err}`);
+        throw new BlockchainError(`Failed to create market on-chain after ${MAX_RETRIES} attempts. Error: ${err.message || err}`, "CREATE_MARKET_MAX_RETRIES_EXCEEDED");
       }
 
-      const backoffMs = 1000 * Math.pow(2, attempt);
-      console.log(`[Somnia L1] Retrying in ${backoffMs}ms...`);
+      const backoffMs = 1500 * Math.pow(2, attempt);
+      console.log(`[Somnia L1] Retrying market creation in ${backoffMs}ms...`);
       await new Promise((resolve) => setTimeout(resolve, backoffMs));
     }
   }
 
-  throw new Error("Unexpected end of retry loop");
+  throw new BlockchainError("Unexpected exit from retry loop", "UNEXPECTED_LOOP_EXIT");
 }
 
 /**
  * Resolves a prediction market on the Somnia L1 blockchain.
- * Supports automated retries with exponential backoff on transaction failure.
- *
- * @param onChainMarketId The ID of the market on-chain.
- * @param outcome The resolved outcome of the prediction market (true for YES, false for NO).
  */
 export async function resolveMarketOnChain(
   onChainMarketId: number,
@@ -198,37 +240,102 @@ export async function resolveMarketOnChain(
   while (attempt < MAX_RETRIES) {
     try {
       attempt++;
+      checkCircuitState();
+
       const contract = await getOrDeployContract();
-
-      if (contract.target === "0x0000000000000000000000000000000000000000") {
-        throw new Error(`MarketFactory contract not deployed. Wallet ${wallet.address} has 0 STT balance. Please fund it via faucet.`);
-      }
-
-      // Send the transaction
       const tx = await contract.resolveMarket(onChainMarketId, outcome);
       console.log(`[Somnia L1] 💸 Resolution transaction broadcasted! Hash: ${tx.hash} (Attempt ${attempt}/${MAX_RETRIES})`);
 
-      // Wait for confirmation
-      console.log("[Somnia L1] ⏳ Waiting for transaction confirmation...");
-      await tx.wait();
-
+      await waitWithTimeout(tx);
+      handleRpcSuccess();
       return {
         txHash: tx.hash,
         confirmed: true
       };
 
     } catch (err: any) {
-      console.error(`[Somnia L1] Resolution attempt ${attempt} failed:`, err.message || err);
-      
+      handleRpcFailure(err);
       if (attempt >= MAX_RETRIES) {
-        throw new Error(`Failed to resolve market on-chain after ${MAX_RETRIES} attempts. Error: ${err.message || err}`);
+        throw new BlockchainError(`Failed to resolve market on-chain after ${MAX_RETRIES} attempts. Error: ${err.message || err}`, "RESOLVE_MARKET_MAX_RETRIES_EXCEEDED");
       }
 
-      const backoffMs = 1000 * Math.pow(2, attempt);
-      console.log(`[Somnia L1] Retrying in ${backoffMs}ms...`);
+      const backoffMs = 1500 * Math.pow(2, attempt);
+      console.log(`[Somnia L1] Retrying market resolution in ${backoffMs}ms...`);
       await new Promise((resolve) => setTimeout(resolve, backoffMs));
     }
   }
 
-  throw new Error("Unexpected end of retry loop");
+  throw new BlockchainError("Unexpected exit from retry loop", "UNEXPECTED_LOOP_EXIT");
+}
+
+/**
+ * Disputes a settled market outcome on-chain.
+ */
+export async function disputeMarketOnChain(marketId: number): Promise<{ txHash: string; confirmed: boolean }> {
+  console.log(`[Somnia L1] 🛰️ Initiating on-chain market dispute: ID=${marketId}`);
+  checkCircuitState();
+  try {
+    const contract = await getOrDeployContract();
+    const tx = await contract.disputeMarket(marketId);
+    await waitWithTimeout(tx);
+    handleRpcSuccess();
+    return { txHash: tx.hash, confirmed: true };
+  } catch (err: any) {
+    handleRpcFailure(err);
+    throw new BlockchainError(`On-chain dispute initialization failed: ${err.message || err}`, "DISPUTE_FAILED");
+  }
+}
+
+/**
+ * Casts a dispute vote on-chain.
+ */
+export async function voteOnDisputeOnChain(marketId: number, voteOutcome: boolean): Promise<{ txHash: string; confirmed: boolean }> {
+  console.log(`[Somnia L1] 🛰️ Submitting on-chain dispute vote: ID=${marketId}, vote=${voteOutcome ? "YES" : "NO"}`);
+  checkCircuitState();
+  try {
+    const contract = await getOrDeployContract();
+    const tx = await contract.voteOnDispute(marketId, voteOutcome);
+    await waitWithTimeout(tx);
+    handleRpcSuccess();
+    return { txHash: tx.hash, confirmed: true };
+  } catch (err: any) {
+    handleRpcFailure(err);
+    throw new BlockchainError(`On-chain dispute vote submission failed: ${err.message || err}`, "DISPUTE_VOTE_FAILED");
+  }
+}
+
+/**
+ * Finalizes a dispute voting window on-chain.
+ */
+export async function finalizeDisputeOnChain(marketId: number): Promise<{ txHash: string; confirmed: boolean }> {
+  console.log(`[Somnia L1] 🛰️ Finalizing on-chain dispute: ID=${marketId}`);
+  checkCircuitState();
+  try {
+    const contract = await getOrDeployContract();
+    const tx = await contract.finalizeDispute(marketId);
+    await waitWithTimeout(tx);
+    handleRpcSuccess();
+    return { txHash: tx.hash, confirmed: true };
+  } catch (err: any) {
+    handleRpcFailure(err);
+    throw new BlockchainError(`On-chain dispute finalization failed: ${err.message || err}`, "DISPUTE_FINALIZE_FAILED");
+  }
+}
+
+/**
+ * Emergency guardian override resolution on-chain.
+ */
+export async function emergencyResolveMarketOnChain(marketId: number, outcome: boolean): Promise<{ txHash: string; confirmed: boolean }> {
+  console.log(`[Somnia L1] 🛰️ Guardian emergency resolve: ID=${marketId}, outcome=${outcome ? "YES" : "NO"}`);
+  checkCircuitState();
+  try {
+    const contract = await getOrDeployContract();
+    const tx = await contract.emergencyResolveMarket(marketId, outcome);
+    await waitWithTimeout(tx);
+    handleRpcSuccess();
+    return { txHash: tx.hash, confirmed: true };
+  } catch (err: any) {
+    handleRpcFailure(err);
+    throw new BlockchainError(`On-chain emergency guardian resolve failed: ${err.message || err}`, "EMERGENCY_RESOLVE_FAILED");
+  }
 }

@@ -34,7 +34,14 @@ import {
   getAgentLogs,
 } from "./agents/agentEngine.js";
 import { startSettlementOracle } from "./oracles/settlementOracle.js";
+import { computePortfolioAnalytics } from "./analytics/analyticsEngine.js";
 import { eventBus } from "./events/eventBus.js";
+import {
+  disputeMarketOnChain,
+  voteOnDisputeOnChain,
+  finalizeDisputeOnChain,
+  emergencyResolveMarketOnChain
+} from "./services/somnia/marketFactory.js";
 
 const app = express();
 const PORT = env.SIGNAL_PORT;
@@ -157,7 +164,7 @@ export function broadcastSSE(event: string, data: any) {
 }
 
 // ─── PORTFOLIO & TRADING BACKEND SYSTEM ───────────────────────────
-interface Trade {
+export interface Trade {
   marketId: string;
   marketTitle: string;
   ref: string;
@@ -169,7 +176,7 @@ interface Trade {
   txHash: string;
 }
 
-interface Position {
+export interface Position {
   marketId: string;
   marketTitle: string;
   ref: string;
@@ -180,7 +187,7 @@ interface Position {
   timestamp: number;
 }
 
-interface RewardClaim {
+export interface RewardClaim {
   marketId: string;
   marketTitle: string;
   ref: string;
@@ -189,10 +196,15 @@ interface RewardClaim {
   txHash: string;
 }
 
-let userWalletBalance = 1000.00; // Virtual native SOM balance (scaled)
-const portfolioPositions = new Map<string, Position>();
-const tradesHistory: Trade[] = [];
-const rewardClaims: RewardClaim[] = [];
+export let userWalletBalance = 1000.00; // Virtual native SOM balance (scaled)
+export const portfolioPositions = new Map<string, Position>();
+export const tradesHistory: Trade[] = [];
+export const rewardClaims: RewardClaim[] = [];
+
+export function getTradesHistory() { return tradesHistory; }
+export function getRewardClaims() { return rewardClaims; }
+export function getPortfolioPositions() { return portfolioPositions; }
+export function getUserWalletBalance() { return userWalletBalance; }
 
 // Support POST requests
 app.use(cors());
@@ -206,6 +218,15 @@ app.get("/api/portfolio", (_req: Request, res: Response) => {
     trades: tradesHistory,
     claims: rewardClaims,
     timestamp: Date.now(),
+  });
+});
+
+/** GET /api/analytics — Fetches compiled institutional-grade portfolio analytics */
+app.get("/api/analytics", (_req: Request, res: Response) => {
+  res.json({
+    ok: true,
+    analytics: computePortfolioAnalytics(),
+    timestamp: Date.now()
   });
 });
 
@@ -479,6 +500,146 @@ app.post("/api/markets/:id/claim", (req: Request, res: Response) => {
     payoutAmount: rewardPayout,
     walletBalance: userWalletBalance,
   });
+});
+
+/** POST /api/markets/:id/dispute — Dispute a resolved market outcome */
+app.post("/api/markets/:id/dispute", async (req: Request, res: Response) => {
+  const marketId = req.params["id"] || "";
+  const markets = getApprovedMarkets();
+  const market = markets.find((m: any) => m.ref === marketId);
+
+  if (!market) {
+    res.status(404).json({ ok: false, error: "Market not found." });
+    return;
+  }
+
+  if (market.status !== "RESOLVED") {
+    res.status(400).json({ ok: false, error: "Only resolved markets can be disputed." });
+    return;
+  }
+
+  try {
+    const onChainId = Number(market.onChainMarketId) || 1;
+    const result = await disputeMarketOnChain(onChainId);
+    
+    // Update local state in database/in-memory cache
+    market.status = "DISPUTED";
+    market.dispute = {
+      disputeEndTimestamp: Date.now() + 24 * 60 * 60 * 1000,
+      yesVotes: 0,
+      noVotes: 0,
+      finalized: false,
+      reason: "Conflicting data resolved across macro volatility and price streams.",
+      oracles: ["CoinGecko Standard Pricing index", "Google Trends News consensus API"]
+    };
+
+    broadcastSSE("MARKET_UPDATED", { market });
+
+    res.json({
+      ok: true,
+      message: "Market successfully disputed.",
+      txHash: result.txHash,
+      market
+    });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message || err });
+  }
+});
+
+/** POST /api/markets/:id/dispute/vote — Cast vote on disputed market */
+app.post("/api/markets/:id/dispute/vote", async (req: Request, res: Response) => {
+  const marketId = req.params["id"] || "";
+  const { voteOutcome } = req.body; // boolean
+  const markets = getApprovedMarkets();
+  const market = markets.find((m: any) => m.ref === marketId);
+
+  if (!market) {
+    res.status(404).json({ ok: false, error: "Market not found." });
+    return;
+  }
+
+  if (market.status !== "DISPUTED") {
+    res.status(400).json({ ok: false, error: "Market is not in dispute." });
+    return;
+  }
+
+  try {
+    const onChainId = Number(market.onChainMarketId) || 1;
+    const result = await voteOnDisputeOnChain(onChainId, !!voteOutcome);
+    
+    if (!market.dispute) {
+      market.dispute = {
+        disputeEndTimestamp: Date.now() + 24 * 60 * 60 * 1000,
+        yesVotes: 0,
+        noVotes: 0,
+        finalized: false,
+        reason: "Conflicting data resolved across macro volatility and price streams.",
+        oracles: ["CoinGecko Standard Pricing index", "Google Trends News consensus API"]
+      };
+    }
+
+    // Weighted votes
+    const pos = portfolioPositions.get(marketId);
+    const weight = pos ? (pos.yesShares + pos.noShares || 1) : 10; // default/sim weight
+    if (voteOutcome) {
+      market.dispute.yesVotes += weight;
+    } else {
+      market.dispute.noVotes += weight;
+    }
+
+    broadcastSSE("MARKET_UPDATED", { market });
+
+    res.json({
+      ok: true,
+      message: "Vote cast successfully.",
+      txHash: result.txHash,
+      market
+    });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message || err });
+  }
+});
+
+/** POST /api/markets/:id/dispute/finalize — Finalize dispute and resolve market outcome */
+app.post("/api/markets/:id/dispute/finalize", async (req: Request, res: Response) => {
+  const marketId = req.params["id"] || "";
+  const markets = getApprovedMarkets();
+  const market = markets.find((m: any) => m.ref === marketId);
+
+  if (!market) {
+    res.status(404).json({ ok: false, error: "Market not found." });
+    return;
+  }
+
+  if (market.status !== "DISPUTED") {
+    res.status(400).json({ ok: false, error: "Market is not in dispute." });
+    return;
+  }
+
+  try {
+    const onChainId = Number(market.onChainMarketId) || 1;
+    const result = await finalizeDisputeOnChain(onChainId);
+    
+    const finalOutcome = market.dispute ? (market.dispute.yesVotes >= market.dispute.noVotes) : true;
+    
+    market.status = "RESOLVED";
+    market.resolvedOutcome = finalOutcome;
+    market.settlementTimestamp = Date.now();
+    if (market.dispute) {
+      market.dispute.finalized = true;
+    }
+
+    broadcastSSE("MARKET_UPDATED", { market });
+
+    res.json({
+      ok: true,
+      message: "Dispute successfully finalized and settled.",
+      txHash: result.txHash,
+      market
+    });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message || err });
+  }
 });
 
 // ─── BOOT ─────────────────────────────────────────────────────────
