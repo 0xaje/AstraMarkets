@@ -42,3 +42,16 @@ lerna-debug.log*
 
 # ---- Test coverage ----
 coverage/
+
+# ---- Credentials and Keys (Secrets protection) ----
+*.pem
+*.key
+*.cert
+*.pfx
+*.p12
+*.der
+secret.json
+credentials.json
+.env*.local
+.env*.production
+.env*.development
