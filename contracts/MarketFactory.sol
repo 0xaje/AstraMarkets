@@ -12,8 +12,10 @@ contract MarketFactory {
     struct Market {
         uint256 id;
         string title;
-        string description;
+        string category;
         uint256 expiryTimestamp;
+        string creator;
+        uint256 confidence;
         MarketStatus status;
         bool resolvedOutcome;
         uint256 settlementTimestamp;
@@ -65,15 +67,22 @@ contract MarketFactory {
      */
     function createMarket(
         string memory _title, 
-        string memory _description, 
-        uint256 _expiryDuration
+        string memory _category, 
+        uint256 _expiry,
+        string memory _creator,
+        uint256 _confidence
     ) external onlyOwner returns (uint256) {
         marketCount++;
+        
+        uint256 finalExpiry = _expiry > 1000000000 ? _expiry : (block.timestamp + _expiry);
+        
         markets[marketCount] = Market({
             id: marketCount,
             title: _title,
-            description: _description,
-            expiryTimestamp: block.timestamp + _expiryDuration,
+            category: _category,
+            expiryTimestamp: finalExpiry,
+            creator: _creator,
+            confidence: _confidence,
             status: MarketStatus.ACTIVE,
             resolvedOutcome: false,
             settlementTimestamp: 0,
@@ -83,7 +92,7 @@ contract MarketFactory {
             noSharesPool: 0
         });
 
-        emit MarketCreated(marketCount, _title, block.timestamp + _expiryDuration);
+        emit MarketCreated(marketCount, _title, finalExpiry);
         return marketCount;
     }
 
