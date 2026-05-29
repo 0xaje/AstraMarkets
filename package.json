@@ -6,9 +6,27 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 3000",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "server:dev": "tsx --tsconfig tsconfig.server.json server/index.ts",
+    "server:watch": "tsx watch --tsconfig tsconfig.server.json server/index.ts",
+    "dev:all": "concurrently -n \"Frontend,SignalEngine\" -c \"cyan,magenta\" \"npm run dev\" \"npm run server:watch\""
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "eventemitter3": "^5.0.4",
+    "express": "^4.19.2",
+    "node-fetch": "^3.3.2",
+    "openai": "^6.39.1"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/eventemitter3": "^1.2.0",
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.12.12",
+    "concurrently": "^8.2.2",
+    "tsx": "^4.11.0",
+    "typescript": "^5.4.5",
     "vite": "^5.0.0"
   }
 }

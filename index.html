@@ -20,52 +20,52 @@
             extend: {
               "colors": {
                 "tertiary-fixed": "#f8e0a8",
-                "tertiary": "#705c30",
+                "tertiary": "var(--tertiary)",
                 "on-secondary-container": "#5e5548",
                 "on-tertiary-container": "#554020",
-                "primary-container": "#c8e8d0",
+                "primary-container": "var(--primary-glow)",
                 "on-tertiary-fixed-variant": "#554020",
                 "on-secondary-fixed-variant": "#4a4538",
-                "on-surface-variant": "#4a4e4a",
-                "secondary-container": "#f0e8db",
+                "on-surface-variant": "var(--text-secondary)",
+                "secondary-container": "var(--surface-container)",
                 "on-primary-fixed": "#002110",
-                "surface-dim": "#dbd7cf",
-                "inverse-primary": "#8ecf9e",
-                "surface-container-lowest": "#ffffff",
+                "surface-dim": "var(--surface-container-low)",
+                "inverse-primary": "var(--primary)",
+                "surface-container-lowest": "var(--surface-solid)",
                 "on-tertiary-fixed": "#221a05",
-                "surface-container-highest": "#e4e0d8",
+                "surface-container-highest": "var(--surface-container-high)",
                 "secondary-fixed-dim": "#d4ccbf",
-                "outline-variant": "#c4c8bc",
-                "inverse-surface": "#2e3230",
+                "outline-variant": "var(--border-color)",
+                "inverse-surface": "var(--text-primary)",
                 "on-error-container": "#690005",
                 "on-secondary-fixed": "#1e1a13",
-                "on-primary-container": "#002110",
-                "inverse-on-surface": "#f5f0e8",
-                "background": "#faf6f0",
-                "primary": "#4a7c59",
-                "on-primary-fixed-variant": "#2a6038",
+                "on-primary-container": "var(--text-primary)",
+                "inverse-on-surface": "var(--bg-primary)",
+                "background": "var(--bg-primary)",
+                "primary": "var(--primary)",
+                "on-primary-fixed-variant": "var(--primary)",
                 "on-error": "#ffffff",
-                "surface-container-high": "#eae6de",
-                "secondary": "#6b6358",
+                "surface-container-high": "var(--surface-container-high)",
+                "secondary": "var(--secondary)",
                 "error-container": "#ffdad8",
                 "on-secondary": "#ffffff",
                 "error": "#b83230",
-                "tertiary-container": "#c4a66a",
+                "tertiary-container": "var(--tertiary)",
                 "on-tertiary": "#ffffff",
-                "primary-fixed-dim": "#8ecf9e",
-                "surface-container-low": "#f5f1ea",
-                "surface-container": "#f0ece4",
-                "surface-bright": "#faf6f0",
-                "primary-fixed": "#c8e8d0",
+                "primary-fixed-dim": "var(--primary)",
+                "surface-container-low": "var(--surface-container-low)",
+                "surface-container": "var(--surface-container)",
+                "surface-bright": "var(--bg-primary)",
+                "primary-fixed": "var(--primary-glow)",
                 "tertiary-fixed-dim": "#dcc48e",
-                "on-background": "#2e3230",
-                "on-surface": "#2e3230",
-                "secondary-fixed": "#f0e8db",
-                "surface-tint": "#4a7c59",
-                "on-primary": "#ffffff",
-                "surface-variant": "#e4e0d8",
-                "surface": "#faf6f0",
-                "outline": "#74796e"
+                "on-background": "var(--text-primary)",
+                "on-surface": "var(--text-primary)",
+                "secondary-fixed": "var(--surface-container)",
+                "surface-tint": "var(--primary)",
+                "on-primary": "var(--surface-solid)",
+                "surface-variant": "var(--surface-container)",
+                "surface": "var(--surface)",
+                "outline": "var(--text-muted)"
               },
               "borderRadius": {
                 "DEFAULT": "0.5rem",
@@ -92,18 +92,22 @@
             <span class="material-symbols-outlined text-primary text-4xl group-hover:scale-110 transition-all">eco</span>
         </div>
         <nav class="flex flex-col gap-8 flex-1">
-            <!-- Feed (Active) -->
-            <button id="nav-feed" data-tab="feed" class="nav-btn relative flex items-center justify-center w-12 h-12 rounded-full text-outline border border-transparent active">
-                <span class="material-symbols-outlined">dynamic_feed</span>
-                <span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-error animate-pulse hidden" id="feed-notif"></span>
+            <!-- Portal / Home (Active) -->
+            <button id="nav-landing" data-tab="landing" class="nav-btn relative flex items-center justify-center w-12 h-12 rounded-full text-outline border border-transparent active">
+                <span class="material-symbols-outlined">home</span>
             </button>
-            <!-- Markets -->
+            <!-- Markets / Terminal -->
             <button id="nav-markets" data-tab="markets" class="nav-btn flex items-center justify-center w-12 h-12 rounded-full text-outline border border-transparent">
                 <span class="material-symbols-outlined">monitoring</span>
             </button>
-            <!-- Agents -->
+            <!-- AI Command Console -->
             <button id="nav-agents" data-tab="agents" class="nav-btn flex items-center justify-center w-12 h-12 rounded-full text-outline border border-transparent">
                 <span class="material-symbols-outlined">psychology</span>
+            </button>
+            <!-- Signal Stream Feed -->
+            <button id="nav-feed" data-tab="feed" class="nav-btn relative flex items-center justify-center w-12 h-12 rounded-full text-outline border border-transparent">
+                <span class="material-symbols-outlined">dynamic_feed</span>
+                <span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-error animate-pulse hidden" id="feed-notif"></span>
             </button>
             <!-- Portfolio -->
             <button id="nav-portfolio" data-tab="portfolio" class="nav-btn flex items-center justify-center w-12 h-12 rounded-full text-outline border border-transparent">
@@ -142,6 +146,9 @@
                     <span class="w-2 h-2 rounded-full bg-primary animate-pulse-glow" id="agents-led"></span>
                     Active Consciousness <span id="active-agents-count" class="hidden">4</span>
                 </span>
+                <span class="flex items-center gap-2 px-3 py-1 bg-surface-container-low rounded-full border border-outline-variant/30">
+                    <span id="signal-engine-status" class="text-[10px] font-bold text-outline font-mono">⏳ Signal Engine Starting...</span>
+                </span>
             </div>
         </div>
         <div class="flex items-center gap-4">
@@ -165,55 +172,403 @@
     </header>
 
     <!-- Main Content Grid -->
-    <main class="ml-20 pt-16 min-h-screen flex">
+    <main class="ml-20 pt-16 min-h-screen flex flex-col xl:flex-row">
         
         <!-- Central Column: Astra Content Tabs -->
         <section class="flex-1 max-w-4xl mx-auto px-6 md:px-12 py-12">
             
-            <!-- PAGE 1: Feed (Astra Stream) -->
-            <div id="tab-feed" class="page-tab active flex flex-col gap-8 w-full">
-                <div class="scanning-container px-4 py-2 border-l-4 border-primary/40">
-                    <div class="scanning-line"></div>
-                    <div class="flex items-center justify-between">
-                        <h2 class="font-display text-3xl text-primary font-bold">Astra Stream</h2>
-                        <div class="flex gap-4 items-center">
-                            <span class="font-label text-outline text-xs font-bold">FILTER:</span>
-                            <div class="flex gap-2">
-                                <span data-feed-filter="all" class="feed-filter-btn font-label text-primary text-xs font-bold border-b-2 border-primary cursor-pointer hover:border-primary transition-colors uppercase px-1">All Objects</span>
-                                <span data-feed-filter="crypto" class="feed-filter-btn font-label text-outline text-xs font-bold border-b-2 border-transparent cursor-pointer hover:border-primary transition-colors uppercase px-1">Crypto</span>
-                                <span data-feed-filter="macro" class="feed-filter-btn font-label text-outline text-xs font-bold border-b-2 border-transparent cursor-pointer hover:border-primary transition-colors uppercase px-1">Macro</span>
+            <!-- PAGE 0: Landing Portal (Home) -->
+            <div id="tab-landing" class="page-tab active flex flex-col gap-12 w-full">
+                <!-- HERO SECTION -->
+                <div class="relative overflow-hidden rounded-3xl border border-outline-variant/40 bg-surface-container/30 dark:bg-black/20 p-8 md:p-12 flex flex-col gap-6 backdrop-blur-xl">
+                    <!-- Elegant Synaptic Grid background decoration -->
+                    <div class="absolute top-0 right-0 w-80 h-80 bg-primary/10 rounded-full blur-3xl -z-10 pointer-events-none"></div>
+                    <div class="absolute bottom-0 left-0 w-60 h-60 bg-tertiary/10 rounded-full blur-2xl -z-10 pointer-events-none"></div>
+                    
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary text-xl animate-pulse">eco</span>
+                        <span class="font-label text-[10px] font-bold tracking-widest text-primary uppercase bg-primary/10 px-2.5 py-1 rounded-full border border-primary/20">Somnia L1 Ecosystem Portal</span>
+                    </div>
+                    
+                    <h2 class="font-display text-4xl md:text-5xl font-extrabold text-on-surface leading-tight tracking-tight">
+                        AstraMarkets <br>
+                        <span class="text-primary bg-clip-text">Autonomous Financial Intelligence</span>
+                    </h2>
+                    
+                    <p class="text-sm md:text-base text-outline leading-relaxed max-w-2xl font-semibold">
+                        A next-generation predictive liquidity protocol. Utilizing real-time continuous signal crawling and multi-agent cognitive reasoning to seed, execute, and arbitrage prediction markets instantly.
+                    </p>
+                    
+                    <div class="flex flex-wrap gap-4 mt-2">
+                        <button id="hero-launch-terminal" class="bg-primary hover:bg-on-primary-fixed-variant text-on-primary font-label text-xs font-bold px-8 py-3.5 rounded-xl uppercase tracking-wider transition-all shadow-lg hover:shadow-primary/25 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-sm">monitoring</span>
+                            Launch Terminal
+                        </button>
+                        <button id="hero-explore-ai" class="bg-surface-solid border border-outline-variant/40 hover:border-primary/50 text-on-surface font-label text-xs font-bold px-8 py-3.5 rounded-xl uppercase tracking-wider transition-all flex items-center gap-2">
+                            <span class="material-symbols-outlined text-sm">psychology</span>
+                            Explore AI Swarm
+                        </button>
+                    </div>
+                </div>
+
+                <!-- LIVE STATS TICKER BANNER -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    <div class="cosmic-card p-5 rounded-2xl border border-outline-variant/40 flex flex-col gap-1.5">
+                        <div class="flex items-center gap-1.5 text-outline">
+                            <span class="material-symbols-outlined text-sm text-primary">speed</span>
+                            <span class="text-[9px] font-bold uppercase tracking-wider">Block Settlement</span>
+                        </div>
+                        <span class="text-2xl font-bold font-display text-primary tracking-tight">&lt; 1 Second</span>
+                        <span class="text-[9px] text-outline font-semibold block">Ultra-Fast Somnia L1 EVM</span>
+                    </div>
+                    <div class="cosmic-card p-5 rounded-2xl border border-outline-variant/40 flex flex-col gap-1.5">
+                        <div class="flex items-center gap-1.5 text-outline">
+                            <span class="material-symbols-outlined text-sm text-tertiary">database</span>
+                            <span class="text-[9px] font-bold uppercase tracking-wider">Signal Velocity</span>
+                        </div>
+                        <span class="text-2xl font-bold font-display text-on-surface tracking-tight" id="landing-signal-count">12 / Min</span>
+                        <span class="text-[9px] text-outline font-semibold block">Real API Live Ingestion</span>
+                    </div>
+                    <div class="cosmic-card p-5 rounded-2xl border border-outline-variant/40 flex flex-col gap-1.5">
+                        <div class="flex items-center gap-1.5 text-outline">
+                            <span class="material-symbols-outlined text-sm text-primary">smart_toy</span>
+                            <span class="text-[9px] font-bold uppercase tracking-wider">Active Swarms</span>
+                        </div>
+                        <span class="text-2xl font-bold font-display text-primary tracking-tight">4 Autonomous</span>
+                        <span class="text-[9px] text-outline font-semibold block">Continuous 15s Reasoning</span>
+                    </div>
+                    <div class="cosmic-card p-5 rounded-2xl border border-outline-variant/40 flex flex-col gap-1.5">
+                        <div class="flex items-center gap-1.5 text-outline">
+                            <span class="material-symbols-outlined text-sm text-tertiary">payments</span>
+                            <span class="text-[9px] font-bold uppercase tracking-wider">Gas Execution Fee</span>
+                        </div>
+                        <span class="text-2xl font-bold font-display text-tertiary tracking-tight">0.001 SOM</span>
+                        <span class="text-[9px] text-outline font-semibold block">Hyper-Scalable Sub-Cent Cost</span>
+                    </div>
+                </div>
+
+                <!-- VALUE PROPOSITIONS / FEATURES GRID -->
+                <div class="flex flex-col gap-6">
+                    <div class="text-center md:text-left flex flex-col gap-1">
+                        <h3 class="font-display text-2xl text-on-surface font-bold">Protocol Architecture</h3>
+                        <p class="text-xs text-outline font-semibold">Four pillars powering the Somnia prediction core.</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Pillar 1 -->
+                        <div class="cosmic-card p-6 rounded-2xl border border-outline-variant/40 flex gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-primary text-xl">psychology</span>
                             </div>
+                            <div class="flex flex-col gap-2">
+                                <h4 class="font-display text-lg text-primary font-bold">Multi-Agent Cognitive Routing</h4>
+                                <p class="text-xs text-outline leading-relaxed">
+                                    Autonomous agents (Macro, Social, Sports, Risk) constantly digest news, reddit sentiment, and trending metrics. Through our EventEmitter EventBus, they validate and propose consensus-approved prediction markets.
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Pillar 2 -->
+                        <div class="cosmic-card p-6 rounded-2xl border border-outline-variant/40 flex gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-tertiary/10 border border-tertiary/20 flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-tertiary text-xl">dataset_linked</span>
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <h4 class="font-display text-lg text-tertiary font-bold">Dynamic Signal Ingestion Engine</h4>
+                                <p class="text-xs text-outline leading-relaxed">
+                                    Our backend continuously parses live data streams from Google Trends, CoinGecko, NewsAPI, and sports outcomes. If the engine detects a sudden velocity surge, agents react to seed prediction pools instantly.
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Pillar 3 -->
+                        <div class="cosmic-card p-6 rounded-2xl border border-outline-variant/40 flex gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-tertiary/10 border border-tertiary/20 flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-tertiary text-xl">bolt</span>
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <h4 class="font-display text-lg text-tertiary font-bold">Somnia L1 High-Fidelity Infrastructure</h4>
+                                <p class="text-xs text-outline leading-relaxed">
+                                    Deployed on Somnia L1 Testnet, AstraMarkets leverages extreme execution rates. Confirmations take less than one second, enabling continuous real-time market updates, low slippage, and tiny fractional transaction fees.
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Pillar 4 -->
+                        <div class="cosmic-card p-6 rounded-2xl border border-outline-variant/40 flex gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-primary text-xl">token</span>
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <h4 class="font-display text-lg text-primary font-bold">Self-Balancing Market Arbitrage</h4>
+                                <p class="text-xs text-outline leading-relaxed">
+                                    When signals indicate shifts, agents automatically trade YES/NO contracts on their targets, maintaining healthy liquidity bands and balancing the odds against raw mathematical volatility.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- HOT PREDICTION PREVIEW BOARD -->
+                <div class="flex flex-col gap-6">
+                    <div class="flex justify-between items-end">
+                        <div class="flex flex-col gap-1">
+                            <h3 class="font-display text-2xl text-on-surface font-bold">Featured Prediction Markets</h3>
+                            <p class="text-xs text-outline font-semibold">Active prediction boards driven by real-time signal velocity.</p>
+                        </div>
+                        <button id="landing-view-all-markets" class="text-xs font-bold text-primary hover:text-on-primary-fixed-variant border-b border-primary hover:border-on-primary-fixed-variant pb-0.5 transition-all uppercase tracking-wider flex items-center gap-1">
+                            Go to Terminal
+                            <span class="material-symbols-outlined text-xs">arrow_forward</span>
+                        </button>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="landing-featured-markets">
+                        <!-- Populated dynamically with top 3 hot markets -->
+                    </div>
+                </div>
+
+                <!-- ACTIVE AI AGENTS COMMAND OVERVIEW -->
+                <div class="flex flex-col gap-6">
+                    <div class="flex justify-between items-end">
+                        <div class="flex flex-col gap-1">
+                            <h3 class="font-display text-2xl text-on-surface font-bold">Ecosystem Cognitive Swarm</h3>
+                            <p class="text-xs text-outline font-semibold">Live status of active artificial consciousness cores.</p>
+                        </div>
+                        <button id="landing-view-all-agents" class="text-xs font-bold text-primary hover:text-on-primary-fixed-variant border-b border-primary hover:border-on-primary-fixed-variant pb-0.5 transition-all uppercase tracking-wider flex items-center gap-1">
+                            Open AI Console
+                            <span class="material-symbols-outlined text-xs">arrow_forward</span>
+                        </button>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6" id="landing-agents-roster">
+                        <!-- Populated dynamically with beautiful agent cards -->
+                    </div>
+                </div>
+
+                <!-- EXPERIMENTAL SYNAPTIC SIMULATOR GAME -->
+                <div class="cosmic-card p-8 rounded-3xl border border-outline-variant/40 bg-surface-container-low/40 dark:bg-black/10 flex flex-col md:flex-row gap-8 items-center">
+                    <div class="flex-1 flex flex-col gap-4">
+                        <div class="flex items-center gap-2 text-primary">
+                            <span class="material-symbols-outlined text-xl">science</span>
+                            <span class="font-label text-xs uppercase font-bold tracking-wider">Cognitive Lab Simulator</span>
+                        </div>
+                        <h3 class="font-display text-2xl text-on-surface font-extrabold">Simulate Synaptic Event</h3>
+                        <p class="text-xs text-outline leading-relaxed">
+                            Select a simulated market event and trigger the Astra Cognitive Swarm. You can witness in real-time how the Macro, Social, Sports, and Risk agents ingest, vote on, approve, or veto the market creation based on their strict strategies!
+                        </p>
+                        <div class="flex flex-col gap-2 mt-2">
+                            <label class="text-[10px] font-bold text-outline uppercase tracking-wider">Select Synaptic Event to Inject</label>
+                            <select id="simulator-event-select" class="glass-input px-3.5 py-2.5 rounded-lg border text-xs focus:outline-none">
+                                <option value="sports_worldcup">🏆 FIFA World Cup 2026: USA beats Germany 2-1 in early friendly (Sports & Sentiment spikes)</option>
+                                <option value="crypto_somnia">⛓ Somnia L1 EVM TVL passes 500 Million SOM in explosive yield cycle (Macro & Risk spikes)</option>
+                                <option value="tech_nvidia">🖥 NVIDIA launches new B200 Superchips with decentralized LLM orchestration (Tech & Social spikes)</option>
+                                <option value="politics_regulation">🇪🇺 EU draft bill establishes open prediction protocol legal boundary (Macro & Politics spikes)</option>
+                            </select>
+                        </div>
+                        <button id="simulator-trigger-btn" class="bg-primary hover:bg-on-primary-fixed-variant text-on-primary font-label text-xs font-bold py-3.5 rounded-xl uppercase tracking-wider transition-all shadow-md mt-2 flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined text-sm">terminal</span>
+                            Inject Synaptic Signal
+                        </button>
+                    </div>
+                    
+                    <div class="w-full md:w-80 h-72 glass-panel rounded-2xl p-6 border border-outline-variant/40 flex flex-col gap-4 overflow-hidden relative shrink-0">
+                        <div class="flex items-center justify-between border-b border-outline-variant/20 pb-2">
+                            <span class="text-[9px] font-bold text-outline uppercase tracking-wider font-mono">Cognitive Logs</span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-primary glow-green"></span>
+                        </div>
+                        
+                        <div class="flex-1 flex flex-col gap-3 overflow-y-auto text-[10px] font-mono leading-relaxed" id="simulator-console-logs">
+                            <div class="text-outline">&gt; Simulator idle. Select event and inject signal...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VALUE COMPARISON TABLE -->
+                <div class="flex flex-col gap-6">
+                    <h3 class="font-display text-2xl text-on-surface font-bold text-center md:text-left">Standard vs AstraMarkets</h3>
+                    <div class="cosmic-card rounded-2xl overflow-hidden border border-outline-variant/40">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-surface-container/60 border-b border-outline-variant/30 text-[9px] font-bold text-outline uppercase tracking-widest">
+                                        <th class="py-4 px-6">Capability / Metric</th>
+                                        <th class="py-4 px-6">Traditional Platforms</th>
+                                        <th class="py-4 px-6 text-primary font-extrabold">AstraMarkets (Somnia L1)</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-xs text-on-surface/90">
+                                    <tr class="border-b border-outline-variant/20">
+                                        <td class="py-3.5 px-6 font-semibold">Transaction Speed</td>
+                                        <td class="py-3.5 px-6 text-outline">Minutes to Hours (High slippage)</td>
+                                        <td class="py-3.5 px-6 text-primary font-bold flex items-center gap-1">
+                                            <span class="material-symbols-outlined text-xs">bolt</span>
+                                            Sub-Second (&lt;1s confirmation)
+                                        </td>
+                                    </tr>
+                                    <tr class="border-b border-outline-variant/20">
+                                        <td class="py-3.5 px-6 font-semibold">Gas / Trading Fees</td>
+                                        <td class="py-3.5 px-6 text-outline">5% - 10% standard exchange fee</td>
+                                        <td class="py-3.5 px-6 text-primary font-bold">0.001 SOM (Sub-cent)</td>
+                                    </tr>
+                                    <tr class="border-b border-outline-variant/20">
+                                        <td class="py-3.5 px-6 font-semibold">Market Seeding</td>
+                                        <td class="py-3.5 px-6 text-outline">Manual submission (requires approval)</td>
+                                        <td class="py-3.5 px-6 text-primary font-bold">Autonomous (Live Multi-Agent Consensus)</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-3.5 px-6 font-semibold">Market Intelligence</td>
+                                        <td class="py-3.5 px-6 text-outline">Static crowds (highly reactive)</td>
+                                        <td class="py-3.5 px-6 text-primary font-bold">Living Consciousness (Continuous Reasoning)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FOOTER -->
+                <footer class="border-t border-outline-variant/20 pt-8 pb-4 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] text-outline uppercase font-bold tracking-widest text-center">
+                    <span>© 2026 AstraMarkets Protocol. All rights reserved.</span>
+                    <div class="flex gap-6">
+                        <a href="https://somnia.network" target="_blank" class="hover:text-primary transition-colors">Somnia L1</a>
+                        <a href="#" class="hover:text-primary transition-colors">Documentation</a>
+                        <a href="#" class="hover:text-primary transition-colors">GitHub</a>
+                    </div>
+                </footer>
+            </div>
+            
+            <!-- PAGE 1: Feed (Astra Stream) -->
+            <div id="tab-feed" class="page-tab flex flex-col gap-8 w-full">
+                <div class="flex items-center justify-between mb-2">
+                    <h2 class="font-display text-3xl text-on-surface font-bold">Astra Stream</h2>
+                    <div class="flex gap-2 items-center">
+                        <span class="font-label text-[10px] text-outline uppercase tracking-wider">Sort by:</span>
+                        <div class="flex gap-3">
+                            <span data-feed-filter="all" class="feed-filter-btn font-label text-primary text-xs font-bold border-b-2 border-primary cursor-pointer pb-0.5 uppercase tracking-wider">All Signals</span>
+                            <span data-feed-filter="crypto" class="feed-filter-btn font-label text-outline text-xs font-bold border-b-2 border-transparent cursor-pointer hover:text-primary hover:border-primary/50 pb-0.5 transition-colors uppercase tracking-wider">Crypto</span>
+                            <span data-feed-filter="macro" class="feed-filter-btn font-label text-outline text-xs font-bold border-b-2 border-transparent cursor-pointer hover:text-primary hover:border-primary/50 pb-0.5 transition-colors uppercase tracking-wider">Macro</span>
                         </div>
                     </div>
                 </div>
                 
                 <!-- Stream Feed Container -->
-                <div class="flex flex-col gap-8" id="feed-container">
+                <div class="flex flex-col gap-6" id="feed-container">
                     <!-- Cards will be populated dynamically -->
                 </div>
             </div>
             
             <!-- PAGE 2: Markets (Prediction Board) -->
             <div id="tab-markets" class="page-tab flex-col gap-8 w-full">
-                <div class="scanning-container px-4 py-2 border-l-4 border-primary/40">
+                <!-- Header with scanning effect -->
+                <div class="scanning-container px-4 py-2 border-l-4 border-primary/40 mb-2">
                     <div class="scanning-line"></div>
                     <div class="flex items-center justify-between">
                         <h2 class="font-display text-3xl text-primary font-bold">Prediction Markets</h2>
-                        <div class="flex gap-4 items-center">
-                            <input type="text" id="market-search" placeholder="Search markets..." class="glass-input text-xs px-3 py-1.5 rounded-lg border border-outline-variant/40 bg-surface/30 w-48 focus:ring-1 focus:ring-primary focus:outline-none">
-                            <select id="market-category" class="glass-input text-xs px-3 py-1.5 rounded-lg border border-outline-variant/40 bg-surface/30 focus:outline-none">
-                                <option value="all">All Categories</option>
-                                <option value="crypto">Crypto Assets</option>
-                                <option value="macro">Macro Economics</option>
-                                <option value="tech">Tech Compute</option>
-                            </select>
-                        </div>
+                        <span class="text-xs px-3 py-1 bg-primary/10 text-primary border border-primary/20 rounded-full font-bold uppercase tracking-wider">Live Liquidity Core</span>
                     </div>
                 </div>
                 
-                <!-- Markets Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="markets-container">
-                    <!-- Populated Dynamically -->
+                <!-- Main Redesigned Content Layout: Sidebar + Grid -->
+                <div class="flex flex-col lg:flex-row gap-8 items-start w-full">
+                    
+                    <!-- Left Side: Interactive Category Sidebar -->
+                    <aside class="w-full lg:w-60 shrink-0 flex flex-col gap-5 bg-surface-container/30 border border-outline-variant/30 rounded-2xl p-5 backdrop-blur-md">
+                        <div class="flex flex-col gap-1">
+                            <span class="font-label text-[9px] font-bold text-outline uppercase tracking-[0.2em]">Filter Markets</span>
+                            <h3 class="font-display text-base font-bold text-on-surface">Categories</h3>
+                        </div>
+                        
+                        <!-- Hidden Select Input for Compatibility -->
+                        <input type="hidden" id="market-category" value="all">
+                        
+                        <!-- Category Button List -->
+                        <div class="flex flex-col gap-2" id="side-category-list">
+                            <!-- All Categories -->
+                            <button data-cat="all" class="market-cat-btn active w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 font-label text-xs font-bold border border-transparent text-left">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-sm">grid_view</span>
+                                    <span>All Categories</span>
+                                </div>
+                                <span class="cat-count text-[9px] px-2 py-0.5 rounded-full bg-outline-variant/30 text-outline-variant" id="count-all">0</span>
+                            </button>
+                            
+                            <!-- Sport -->
+                            <button data-cat="sports" class="market-cat-btn w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 font-label text-xs font-bold border border-transparent text-left">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-sm">emoji_events</span>
+                                    <span>Sport</span>
+                                </div>
+                                <span class="cat-count text-[9px] px-2 py-0.5 rounded-full bg-outline-variant/30 text-outline-variant" id="count-sports">0</span>
+                            </button>
+                            
+                            <!-- Crypto -->
+                            <button data-cat="crypto" class="market-cat-btn w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 font-label text-xs font-bold border border-transparent text-left">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-sm">currency_bitcoin</span>
+                                    <span>Crypto</span>
+                                </div>
+                                <span class="cat-count text-[9px] px-2 py-0.5 rounded-full bg-outline-variant/30 text-outline-variant" id="count-crypto">0</span>
+                            </button>
+                            
+                            <!-- Politics -->
+                            <button data-cat="politics" class="market-cat-btn w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 font-label text-xs font-bold border border-transparent text-left">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-sm">gavel</span>
+                                    <span>Politics</span>
+                                </div>
+                                <span class="cat-count text-[9px] px-2 py-0.5 rounded-full bg-outline-variant/30 text-outline-variant" id="count-politics">0</span>
+                            </button>
+                            
+                            <!-- Tech -->
+                            <button data-cat="tech" class="market-cat-btn w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 font-label text-xs font-bold border border-transparent text-left">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-sm">memory</span>
+                                    <span>Tech</span>
+                                </div>
+                                <span class="cat-count text-[9px] px-2 py-0.5 rounded-full bg-outline-variant/30 text-outline-variant" id="count-tech">0</span>
+                            </button>
+
+                            <!-- Macro -->
+                            <button data-cat="macro" class="market-cat-btn w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 font-label text-xs font-bold border border-transparent text-left">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-sm">public</span>
+                                    <span>Macro</span>
+                                </div>
+                                <span class="cat-count text-[9px] px-2 py-0.5 rounded-full bg-outline-variant/30 text-outline-variant" id="count-macro">0</span>
+                            </button>
+                        </div>
+                        
+                        <!-- Beautiful summary card inside sidebar -->
+                        <div class="mt-4 p-4 rounded-xl bg-primary/5 border border-primary/10 flex flex-col gap-2">
+                            <div class="flex items-center gap-1.5 text-[9px] font-bold text-primary uppercase tracking-wider">
+                                <span class="material-symbols-outlined text-xs animate-pulse">monitoring</span>
+                                <span>Active Pools</span>
+                            </div>
+                            <p class="text-[10px] text-outline leading-relaxed font-semibold">
+                                Markets are dynamically seeded by our AI Cognitive Swarms on the Somnia L1 Network.
+                            </p>
+                        </div>
+                    </aside>
+                    
+                    <!-- Right Side: Search and Markets list -->
+                    <div class="flex-1 w-full flex flex-col gap-6">
+                        
+                        <!-- Search and Metadata Control -->
+                        <div class="flex flex-col sm:flex-row gap-4 items-center justify-between bg-surface-container/20 border border-outline-variant/20 rounded-2xl p-4 w-full">
+                            <div class="relative w-full sm:w-72">
+                                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm">search</span>
+                                <input type="text" id="market-search" placeholder="Search active contracts..." class="glass-input text-xs pl-9 pr-4 py-2.5 rounded-xl border border-outline-variant/40 bg-surface/30 w-full focus:ring-1 focus:ring-primary focus:outline-none">
+                            </div>
+                            <div class="flex items-center gap-3 text-xs font-semibold text-outline">
+                                <span class="flex items-center gap-1">
+                                    <span id="market-result-count" class="font-bold text-primary">0</span> contracts found
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <!-- Markets Grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full" id="markets-container">
+                            <!-- Populated Dynamically -->
+                        </div>
+                    </div>
+                    
                 </div>
             </div>
             
@@ -409,18 +764,21 @@
         </section>
 
         <!-- Right Column: AI Consciousness Layer (Warm Wood Tones) -->
-        <aside class="w-96 border-l border-outline-variant/30 bg-surface-container-low/40 dark:bg-black/30 backdrop-blur-md p-8 flex flex-col shrink-0 hidden xl:flex">
+        <aside id="cognitive-aside" class="w-full xl:w-96 border-t xl:border-t-0 xl:border-l border-outline-variant/30 bg-surface-container-low/40 dark:bg-black/30 backdrop-blur-md p-8 flex flex-col shrink-0">
             
             <!-- Header consciousness -->
             <div class="flex items-center justify-between mb-6">
                 <div class="flex flex-col">
-                    <h2 class="font-display text-xl text-on-surface font-bold">AI Consciousness</h2>
-                    <p class="font-label text-[10px] text-outline uppercase font-bold">Organic Thought Process</p>
+                    <h2 class="font-display text-xl text-primary font-bold">AI Consciousness</h2>
+                    <p class="font-label text-[10px] text-outline uppercase tracking-wider">Living Intelligence Pulse</p>
                 </div>
-                <!-- Cognitive vs Chat Toggle -->
-                <div class="flex gap-1.5 bg-surface-container p-0.5 rounded-lg border border-outline-variant/20 text-[9px] font-bold uppercase tracking-wider">
-                    <button id="cog-tab-logs" class="px-2.5 py-1 rounded bg-surface-solid shadow text-primary font-extrabold cursor-pointer transition-all">Logs</button>
-                    <button id="cog-tab-chat" class="px-2.5 py-1 rounded text-outline hover:text-primary cursor-pointer transition-all">Hive Chat</button>
+                <div class="flex items-center gap-3">
+                    <!-- Cognitive vs Chat Toggle -->
+                    <div class="flex gap-1.5 bg-surface-container p-0.5 rounded-lg border border-outline-variant/20 text-[9px] font-bold uppercase tracking-wider">
+                        <button id="cog-tab-logs" class="px-2.5 py-1 rounded bg-surface-solid shadow text-primary font-extrabold cursor-pointer transition-all">Logs</button>
+                        <button id="cog-tab-chat" class="px-2.5 py-1 rounded text-outline hover:text-primary cursor-pointer transition-all">Hive Chat</button>
+                    </div>
+                    <div class="w-3 h-3 rounded-full bg-primary shadow-[0_0_12px_rgba(74,124,89,0.5)] animate-pulse"></div>
                 </div>
             </div>
 
@@ -430,24 +788,24 @@
                     <!-- Populated Dynamically with scrolling log items -->
                 </div>
                 
-                <!-- Decision Panel (Frosted Wood) -->
-                <div class="mt-4 p-5 rounded-2xl bg-secondary-container dark:bg-zinc-800/60 border border-outline-variant/50 shadow-sm typewriter-fade" id="rooted-decision-container">
+                <!-- Decision Panel (Ecosystem Event) -->
+                <div class="mt-4 p-5 rounded-xl bg-primary/10 border border-primary/20 shadow-sm typewriter-fade" id="rooted-decision-container">
                     <div class="flex items-center justify-between mb-3">
                         <div class="flex items-center gap-2">
-                            <span class="material-symbols-outlined text-sm text-tertiary">psychology</span>
-                            <span class="font-label text-xs text-tertiary dark:text-tertiary-fixed-dim uppercase font-extrabold tracking-wider">Rooted Decision</span>
+                            <span class="material-symbols-outlined text-lg text-primary">forest</span>
+                            <span class="font-label text-xs text-primary uppercase font-bold tracking-wider">Ecosystem Event</span>
                         </div>
                         <span class="text-[9px] font-bold uppercase tracking-widest text-primary px-1.5 py-0.5 rounded bg-primary/10 border border-primary/20" id="decision-status">VOTING ACTIVE</span>
                     </div>
-                    <p class="font-display text-sm text-on-secondary-container dark:text-zinc-200 font-semibold" id="rooted-decision-text">New Market 'AI Compute War' created.</p>
+                    <p class="font-body text-sm text-on-surface-variant font-semibold" id="rooted-decision-text">New Market 'AI Compute War' seeded.</p>
                     
                     <div class="mt-4 flex flex-col gap-2">
                         <div class="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider text-outline">
                             <span id="vote-yes-label">Support Yes: 68%</span>
                             <span id="vote-no-label">Against No: 32%</span>
                         </div>
-                        <div class="w-full bg-white/50 dark:bg-black/40 h-1.5 rounded-full overflow-hidden border border-black/5">
-                            <div id="rooted-decision-progress" class="bg-primary h-full w-2/3 shadow-[0_0_8px_rgba(74,124,89,0.5)] transition-all duration-1000"></div>
+                        <div class="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden">
+                            <div id="rooted-decision-progress" class="bg-primary h-full w-2/3 transition-all duration-1000"></div>
                         </div>
                         <!-- Dynamic voting interactions -->
                         <div class="flex gap-2 mt-2">
@@ -608,29 +966,8 @@
                 <p class="text-[10px] text-outline uppercase font-bold tracking-widest">Decentralized Web Wallet Simulation</p>
             </div>
             
-            <div class="flex flex-col gap-4">
-                
-                <!-- Wallet Status details -->
-                <div class="flex flex-col gap-1 bg-surface-container/60 p-4 rounded-2xl border border-outline-variant/20">
-                    <span class="text-[9px] font-bold text-outline uppercase tracking-wider block">Wallet Node Address</span>
-                    <span id="wallet-address" class="text-sm font-semibold tracking-wider font-mono text-on-surface">0x78aF92C3D3...662e</span>
-                </div>
-                
-                <div class="flex justify-between items-center bg-surface-container/60 p-4 rounded-2xl border border-outline-variant/20">
-                    <div class="flex flex-col gap-0.5">
-                        <span class="text-[9px] font-bold text-outline uppercase tracking-wider">Asset Balance</span>
-                        <span id="wallet-balance" class="text-2xl font-bold font-display text-primary tracking-tight">1,230.00 SOM</span>
-                    </div>
-                    <!-- Claim Faucet button -->
-                    <button id="wallet-faucet-btn" class="px-4 py-2 bg-tertiary text-white font-label font-bold text-xs rounded-lg hover:bg-on-tertiary-container uppercase tracking-wider transition-all flex items-center gap-1.5">
-                        <span class="material-symbols-outlined text-xs">faucet</span>
-                        Claim Faucet
-                    </button>
-                </div>
-                
-                <div class="text-[10px] text-outline text-center px-4 leading-relaxed font-semibold italic border-t border-dashed border-outline-variant/30 pt-4 mt-2">
-                    Somnia L1 offers ultra-fast processing (&lt;1s confirmation) and extremely low fees (0.001 SOM per transaction). Faucet is rate-limited to 100 SOM per request.
-                </div>
+            <div id="wallet-modal-content" class="flex flex-col gap-4">
+                <!-- Dynamically populated via renderWalletModal() in app.js -->
             </div>
             
         </div>
