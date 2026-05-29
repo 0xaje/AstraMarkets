@@ -7,6 +7,7 @@
 
 import { approvedMarkets, agentBus } from "../agents/agentEngine.js";
 import fetch from "node-fetch";
+import { resolveMarketOnChain } from "../services/somnia/marketFactory.js";
 
 const ORACLE_CYCLE_MS = 10000; // Check every 10 seconds
 let oracleActive = false;
@@ -90,8 +91,20 @@ async function resolveExpiredMarket(market: any): Promise<void> {
       resolutionReason = data.reason;
     }
 
-    // Generate simulated EVM settlement transaction on Somnia L1
-    const txHash = "0x" + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join("");
+    // Generate simulated EVM settlement transaction on Somnia L1 or execute on-chain
+    let txHash = "0x" + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join("");
+    
+    if (market.onChainMarketId !== undefined) {
+      emitLog("info", `⛓️ [ON-CHAIN SETTLING] Broadcasting real settlement for market ID: ${market.onChainMarketId} on Somnia L1...`);
+      try {
+        const result = await resolveMarketOnChain(Number(market.onChainMarketId), outcome);
+        txHash = result.txHash;
+        emitLog("info", `⛓️ [ON-CHAIN SETTLED] Market ID: ${market.onChainMarketId} resolved on-chain! Tx: ${txHash.slice(0, 16)}...`);
+      } catch (onChainErr: any) {
+        console.error(`[Oracle] On-chain settlement transaction failed for market ID ${market.onChainMarketId}:`, onChainErr);
+        emitLog("error", `❌ [ON-CHAIN SETTLEMENT FAILURE] ${onChainErr.message || onChainErr}`);
+      }
+    }
     
     // Update market status
     market.status = "RESOLVED";

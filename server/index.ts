@@ -34,6 +34,7 @@ import {
   getAgentLogs,
 } from "./agents/agentEngine.js";
 import { startSettlementOracle } from "./oracles/settlementOracle.js";
+import { eventBus } from "./events/eventBus.js";
 
 dotenv.config();
 
@@ -133,13 +134,17 @@ app.get("/api/events", (req: Request, res: Response) => {
   res.setHeader("Connection", "keep-alive");
   res.flushHeaders();
 
+  // Register with local legacy client list
   sseClients.push(res);
-  console.log(`[SSE] 🟢 Client connected. Total active connections: ${sseClients.length}`);
+  console.log(`[SSE] 🟢 Client connected locally. Total active: ${sseClients.length}`);
 
   req.on("close", () => {
     sseClients = sseClients.filter((client) => client !== res);
-    console.log(`[SSE] 🔴 Client disconnected. Active connections: ${sseClients.length}`);
+    console.log(`[SSE] 🔴 Client disconnected locally. Active: ${sseClients.length}`);
   });
+
+  // Register with the central unified EventBus
+  eventBus.registerSseClient(res);
 });
 
 export function broadcastSSE(event: string, data: any) {
@@ -303,6 +308,19 @@ app.post("/api/markets/:id/trade", (req: Request, res: Response) => {
 
   // Broadcast realtime SSE updates to all frontend connections
   broadcastSSE("TRADE_EXECUTED", { trade, market });
+  
+  // Emit TRADE_EXECUTED on the central EventBus
+  eventBus.emit("TRADE_EXECUTED", {
+    marketId: trade.marketId,
+    marketTitle: trade.marketTitle,
+    ref: trade.ref,
+    trader: trade.trader,
+    position: trade.position,
+    amountSpent: trade.amountSpent,
+    sharesMinted: trade.sharesMinted,
+    txHash: trade.txHash,
+    timestamp: trade.timestamp
+  });
   broadcastSSE("POSITION_UPDATED", {
     walletBalance: userWalletBalance,
     positions: Array.from(portfolioPositions.values()),
@@ -377,6 +395,19 @@ app.post("/api/markets/:id/sell", (req: Request, res: Response) => {
 
   // Broadcast realtime events
   broadcastSSE("TRADE_EXECUTED", { trade: sellTrade, market });
+
+  // Emit TRADE_EXECUTED on the central EventBus
+  eventBus.emit("TRADE_EXECUTED", {
+    marketId: sellTrade.marketId,
+    marketTitle: sellTrade.marketTitle,
+    ref: sellTrade.ref,
+    trader: sellTrade.trader,
+    position: sellTrade.position,
+    amountSpent: sellTrade.amountSpent,
+    sharesMinted: sellTrade.sharesMinted,
+    txHash: sellTrade.txHash,
+    timestamp: sellTrade.timestamp
+  });
   broadcastSSE("POSITION_UPDATED", {
     walletBalance: userWalletBalance,
     positions: Array.from(portfolioPositions.values()),

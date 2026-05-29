@@ -25,6 +25,8 @@ import type {
   AgentStatus,
   MarketProposal,
 } from "./agentTypes.js";
+import { createMarketOnChain } from "../services/somnia/marketFactory.js";
+import { eventBus } from "../events/eventBus.js";
 
 dotenv.config();
 
@@ -413,6 +415,25 @@ agentBus.on("marketProposed", (proposal, sourceAgent) => {
     if (!approvedMarkets.find((m) => marketFingerprint(m.title) === marketFingerprint(proposal.title))) {
       approvedMarkets.unshift(proposal);
       if (approvedMarkets.length > 30) approvedMarkets.pop();
+      
+      // Asynchronously deploy on-chain
+      createMarketOnChain(proposal)
+        .then((result) => {
+          proposal.status = "ACTIVE";
+          proposal.settlementTx = result.txHash;
+          (proposal as any).onChainMarketId = result.marketId;
+          emit("decision", "RiskAgent", `⛓️ [ON-CHAIN DEPLOYED] Market "${proposal.title.slice(0, 50)}" registered on Somnia L1. Tx: ${result.txHash.slice(0, 16)}... (ID: ${result.marketId})`);
+          
+          eventBus.emit("MARKET_CREATED", {
+            market: proposal,
+            onChainMarketId: result.marketId,
+            txHash: result.txHash,
+            timestamp: Date.now()
+          });
+        })
+        .catch((err) => {
+          emit("error", "RiskAgent", `❌ [ON-CHAIN FAILURE] Failed to deploy market: ${err.message}`);
+        });
     }
     return;
   }
@@ -435,6 +456,25 @@ agentBus.on("marketProposed", (proposal, sourceAgent) => {
     approvedMarkets.unshift(proposal);
     if (approvedMarkets.length > 30) approvedMarkets.pop();
     emit("decision", "RiskAgent", `✅ APPROVED — "${proposal.title.slice(0, 60)}" from ${sourceAgent}`);
+
+    // Asynchronously deploy on-chain
+    createMarketOnChain(proposal)
+      .then((result) => {
+        proposal.status = "ACTIVE";
+        proposal.settlementTx = result.txHash;
+        (proposal as any).onChainMarketId = result.marketId;
+        emit("decision", "RiskAgent", `⛓️ [ON-CHAIN DEPLOYED] Market "${proposal.title.slice(0, 50)}" registered on Somnia L1. Tx: ${result.txHash.slice(0, 16)}... (ID: ${result.marketId})`);
+        
+        eventBus.emit("MARKET_CREATED", {
+          market: proposal,
+          onChainMarketId: result.marketId,
+          txHash: result.txHash,
+          timestamp: Date.now()
+        });
+      })
+      .catch((err) => {
+        emit("error", "RiskAgent", `❌ [ON-CHAIN FAILURE] Failed to deploy market: ${err.message}`);
+      });
   }
 });
 
@@ -480,6 +520,25 @@ async function runCycle(): Promise<void> {
   const decisions = results
     .filter((r): r is PromiseFulfilledResult<AgentDecision> => r.status === "fulfilled")
     .map((r) => r.value);
+
+  // Emit agent decisions to the central type-safe event bus
+  decisions.forEach((decision) => {
+    eventBus.emit("AGENT_DECISION_MADE", {
+      agentName: decision.agentName,
+      decision: {
+        createMarket: decision.createMarket,
+        market: decision.market ? {
+          ...decision.market,
+          // Map to correct category union type to satisfy strict typing
+          category: decision.market.category as any
+        } : undefined,
+        reasoning: decision.reasoning,
+        agentName: decision.agentName,
+        timestamp: Date.now()
+      },
+      timestamp: Date.now()
+    });
+  });
 
   const created = decisions.filter((d) => d.createMarket).length;
   console.log(

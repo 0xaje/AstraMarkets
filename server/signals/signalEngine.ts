@@ -14,6 +14,7 @@
 
 import fetch from "node-fetch";
 import dotenv from "dotenv";
+import { eventBus } from "../events/eventBus.js";
 
 dotenv.config();
 
@@ -430,6 +431,14 @@ async function fetchAllSignals(): Promise<Signal[]> {
 
   // Rank by importance desc, then velocity desc
   fresh.sort((a, b) => b.importance - a.importance || b.velocity - a.velocity);
+
+  // Emit event on our central event bus for each newly detected signal
+  fresh.forEach((sig) => {
+    eventBus.emit("SIGNAL_DETECTED", {
+      signal: sig,
+      timestamp: Date.now()
+    });
+  });
 
   console.log(
     `[SignalEngine] Ingested ${fresh.length} fresh signals this cycle ` +

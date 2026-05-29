@@ -561,3 +561,27 @@ tbody tr td {
 .market-cat-btn span {
     line-height: 1.3 !important;
 }
+
+/* Premium Real-Time Insertion Animation */
+@keyframes flash-new {
+    0% {
+        transform: scale(0.95) translateY(12px);
+        box-shadow: 0 0 0 4px var(--primary-glow);
+        border-color: var(--primary);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.02);
+        box-shadow: 0 0 20px var(--primary-glow);
+        border-color: var(--primary);
+    }
+    100% {
+        transform: scale(1) translateY(0);
+        box-shadow: var(--shadow-premium);
+        opacity: 1;
+    }
+}
+
+.animate-flash-new {
+    animation: flash-new 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
