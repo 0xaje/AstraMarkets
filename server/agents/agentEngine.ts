@@ -404,33 +404,84 @@ const agents = [
   new RiskAgentImpl(),
 ] as const;
 
-// ─── BUS WIRING ──────────────────────────────────────────────────
+// ─── BUS WIRING & SAFE TRANSACTION WORKFLOW ────────────────────────
+
+export interface TransactionRecord {
+  title: string;
+  onChainMarketId?: number;
+  txHash?: string;
+  status: "CONFIRMED" | "FAILED";
+  error?: string;
+  timestamp: number;
+}
+
+export const transactionHistory: TransactionRecord[] = [];
+
+async function deployWithRetry(proposal: MarketProposal, maxAttempts = 3): Promise<any> {
+  let lastError: any = null;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      console.log(`[Somnia L1] ⛓️ Attempting on-chain deployment ${attempt}/${maxAttempts} for "${proposal.title.slice(0, 50)}"...`);
+      const result = await createMarketOnChain(proposal);
+      console.log(`[Somnia L1] 🎉 On-chain deployment successful on attempt ${attempt}! ID: ${result.marketId}`);
+      return result;
+    } catch (err: any) {
+      lastError = err;
+      console.warn(`[Somnia L1] ⚠️ On-chain deployment attempt ${attempt} failed: ${err.message || err}`);
+      if (attempt < maxAttempts) {
+        // Linear/exponential backoff
+        await new Promise((resolve) => setTimeout(resolve, 1500 * attempt));
+      }
+    }
+  }
+  throw lastError || new Error(`Failed to deploy after ${maxAttempts} attempts`);
+}
 
 // When any agent proposes a market, RiskAgent reviews it for quality
 agentBus.on("marketProposed", (proposal, sourceAgent) => {
+  const titleKey = marketFingerprint(proposal.title);
+  
   if (sourceAgent === "RiskAgent") {
     // RiskAgent's own proposals bypass veto
-    if (!approvedMarkets.find((m) => marketFingerprint(m.title) === marketFingerprint(proposal.title))) {
+    const alreadyApproved = approvedMarkets.some((m) => marketFingerprint(m.title) === titleKey);
+    if (!alreadyApproved) {
       approvedMarkets.unshift(proposal);
       if (approvedMarkets.length > 30) approvedMarkets.pop();
       
       // Asynchronously deploy on-chain
-      createMarketOnChain(proposal)
+      deployWithRetry(proposal, 3)
         .then((result) => {
           proposal.status = "ACTIVE";
           proposal.settlementTx = result.txHash;
           (proposal as any).onChainMarketId = result.marketId;
           emit("decision", "RiskAgent", `⛓️ [ON-CHAIN DEPLOYED] Market "${proposal.title.slice(0, 50)}" registered on Somnia L1. Tx: ${result.txHash.slice(0, 16)}... (ID: ${result.marketId})`);
           
-          eventBus.emit("MARKET_CREATED", {
+          const txResult = {
             market: proposal,
             onChainMarketId: result.marketId,
             txHash: result.txHash,
+            timestamp: Date.now()
+          };
+          
+          eventBus.emit("MARKET_CREATED", txResult);
+          
+          transactionHistory.push({
+            title: proposal.title,
+            onChainMarketId: result.marketId,
+            txHash: result.txHash,
+            status: "CONFIRMED",
             timestamp: Date.now()
           });
         })
         .catch((err) => {
           emit("error", "RiskAgent", `❌ [ON-CHAIN FAILURE] Failed to deploy market: ${err.message}`);
+          
+          transactionHistory.push({
+            title: proposal.title,
+            status: "FAILED",
+            error: err.message || String(err),
+            timestamp: Date.now()
+          });
         });
     }
     return;
@@ -450,28 +501,46 @@ agentBus.on("marketProposed", (proposal, sourceAgent) => {
   }
 
   // Approved — add to live list
-  if (!approvedMarkets.find((m) => marketFingerprint(m.title) === marketFingerprint(proposal.title))) {
+  const alreadyApproved = approvedMarkets.some((m) => marketFingerprint(m.title) === titleKey);
+  if (!alreadyApproved) {
     approvedMarkets.unshift(proposal);
     if (approvedMarkets.length > 30) approvedMarkets.pop();
     emit("decision", "RiskAgent", `✅ APPROVED — "${proposal.title.slice(0, 60)}" from ${sourceAgent}`);
 
     // Asynchronously deploy on-chain
-    createMarketOnChain(proposal)
+    deployWithRetry(proposal, 3)
       .then((result) => {
         proposal.status = "ACTIVE";
         proposal.settlementTx = result.txHash;
         (proposal as any).onChainMarketId = result.marketId;
         emit("decision", "RiskAgent", `⛓️ [ON-CHAIN DEPLOYED] Market "${proposal.title.slice(0, 50)}" registered on Somnia L1. Tx: ${result.txHash.slice(0, 16)}... (ID: ${result.marketId})`);
         
-        eventBus.emit("MARKET_CREATED", {
+        const txResult = {
           market: proposal,
           onChainMarketId: result.marketId,
           txHash: result.txHash,
+          timestamp: Date.now()
+        };
+        
+        eventBus.emit("MARKET_CREATED", txResult);
+        
+        transactionHistory.push({
+          title: proposal.title,
+          onChainMarketId: result.marketId,
+          txHash: result.txHash,
+          status: "CONFIRMED",
           timestamp: Date.now()
         });
       })
       .catch((err) => {
         emit("error", "RiskAgent", `❌ [ON-CHAIN FAILURE] Failed to deploy market: ${err.message}`);
+        
+        transactionHistory.push({
+          title: proposal.title,
+          status: "FAILED",
+          error: err.message || String(err),
+          timestamp: Date.now()
+        });
       });
   }
 });
