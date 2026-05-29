@@ -13,10 +13,8 @@
  */
 
 import fetch from "node-fetch";
-import dotenv from "dotenv";
 import { eventBus } from "../events/eventBus.js";
-
-dotenv.config();
+import { env } from "../config/env.js";
 
 // ─── CANONICAL SIGNAL TYPE ───────────────────────────────────────
 export interface Signal {
@@ -35,11 +33,11 @@ let pollingInterval: ReturnType<typeof setInterval> | null = null;
 let isPolling = false;
 
 // ─── ENV KEYS (required — set in .env) ───────────────────────────
-const NEWS_API_KEY    = process.env.NEWS_API_KEY    || "";
-const REDDIT_CLIENT_ID    = process.env.REDDIT_CLIENT_ID    || "";
-const REDDIT_CLIENT_SECRET = process.env.REDDIT_CLIENT_SECRET || "";
-const REDDIT_USER_AGENT    = process.env.REDDIT_USER_AGENT   || "AstraMarkets/1.0 by AstraBot";
-const SERP_API_KEY    = process.env.SERP_API_KEY    || "";
+const NEWS_API_KEY    = env.NEWS_API_KEY || "";
+const REDDIT_CLIENT_ID    = env.REDDIT_CLIENT_ID || "";
+const REDDIT_CLIENT_SECRET = env.REDDIT_CLIENT_SECRET || "";
+const REDDIT_USER_AGENT    = env.REDDIT_USER_AGENT;
+const SERP_API_KEY    = env.SERP_API_KEY || "";
 
 // ─── UTILS ───────────────────────────────────────────────────────
 

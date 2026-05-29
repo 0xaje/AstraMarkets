@@ -19,7 +19,7 @@
 
 import express, { Request, Response } from "express";
 import cors from "cors";
-import dotenv from "dotenv";
+import { env } from "./config/env.js";
 import {
   startSignalEngine,
   getLiveSignals,
@@ -36,10 +36,8 @@ import {
 import { startSettlementOracle } from "./oracles/settlementOracle.js";
 import { eventBus } from "./events/eventBus.js";
 
-dotenv.config();
-
 const app = express();
-const PORT = parseInt(process.env.SIGNAL_PORT ?? "4000", 10);
+const PORT = env.SIGNAL_PORT;
 
 // ─── MIDDLEWARE ───────────────────────────────────────────────────
 app.use(cors({
@@ -491,21 +489,21 @@ async function main() {
   console.log("╚══════════════════════════════════════════════╝");
 
   const configured: string[] = [];
-  if (process.env.NEWS_API_KEY)          configured.push("NewsAPI ✓");
-  if (process.env.REDDIT_CLIENT_ID)      configured.push("Reddit ✓");
-  if (process.env.SERP_API_KEY)          configured.push("SerpAPI/Trends ✓");
-  if (process.env.OPENAI_API_KEY)        configured.push("OpenAI (Agents) ✓");
+  if (env.NEWS_API_KEY)          configured.push("NewsAPI ✓");
+  if (env.REDDIT_CLIENT_ID)      configured.push("Reddit ✓");
+  if (env.SERP_API_KEY)          configured.push("SerpAPI/Trends ✓");
+  if (env.OPENAI_API_KEY)        configured.push("OpenAI (Agents) ✓");
   configured.push("CoinGecko ✓ (no key needed)");
 
   console.log("\n[Server] Active integrations:");
   configured.forEach((s) => console.log("   •", s));
 
   const missing: string[] = [];
-  if (!process.env.NEWS_API_KEY)         missing.push("NEWS_API_KEY");
-  if (!process.env.REDDIT_CLIENT_ID)     missing.push("REDDIT_CLIENT_ID");
-  if (!process.env.REDDIT_CLIENT_SECRET) missing.push("REDDIT_CLIENT_SECRET");
-  if (!process.env.SERP_API_KEY)         missing.push("SERP_API_KEY");
-  if (!process.env.OPENAI_API_KEY)       missing.push("OPENAI_API_KEY (agents will be inactive)");
+  if (!env.NEWS_API_KEY)         missing.push("NEWS_API_KEY");
+  if (!env.REDDIT_CLIENT_ID)     missing.push("REDDIT_CLIENT_ID");
+  if (!env.REDDIT_CLIENT_SECRET) missing.push("REDDIT_CLIENT_SECRET");
+  if (!env.SERP_API_KEY)         missing.push("SERP_API_KEY");
+  if (!env.OPENAI_API_KEY)       missing.push("OPENAI_API_KEY (agents will be inactive)");
 
   if (missing.length) {
     console.warn("\n[Server] ⚠ Missing env keys:");

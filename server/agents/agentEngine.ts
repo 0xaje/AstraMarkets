@@ -14,7 +14,7 @@
 
 import EventEmitter from "eventemitter3";
 import OpenAI from "openai";
-import dotenv from "dotenv";
+import { env } from "../config/env.js";
 import {
   getLiveSignals,
   type Signal,
@@ -28,14 +28,12 @@ import type {
 import { createMarketOnChain } from "../services/somnia/marketFactory.js";
 import { eventBus } from "../events/eventBus.js";
 
-dotenv.config();
-
 // ─── OPENAI CLIENT ───────────────────────────────────────────────
 
-const openai = process.env.OPENAI_API_KEY
-  ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+const openai = env.OPENAI_API_KEY
+  ? new OpenAI({ apiKey: env.OPENAI_API_KEY })
   : null;
-const LLM_MODEL = process.env.AGENT_LLM_MODEL ?? "gpt-4o-mini";
+const LLM_MODEL = env.AGENT_LLM_MODEL;
 
 // ─── EVENT BUS ───────────────────────────────────────────────────
 
@@ -494,7 +492,7 @@ agentBus.on("log", (entry) => {
 
 // ─── MAIN ENGINE LOOP ────────────────────────────────────────────
 
-const CYCLE_MS = parseInt(process.env.AGENT_CYCLE_MS ?? "15000", 10);
+const CYCLE_MS = env.AGENT_CYCLE_MS;
 let engineRunning = false;
 let cycleTimer: ReturnType<typeof setInterval> | null = null;
 let cycleCount = 0;

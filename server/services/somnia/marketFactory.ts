@@ -1,55 +1,18 @@
 import { ethers } from "ethers";
 import fs from "fs";
 import path from "path";
-import dotenv from "dotenv";
-
-dotenv.config();
-
-const envPath = path.resolve(process.cwd(), ".env");
-
-/**
- * Utility function to write or update variables in the local .env file.
- */
-function updateEnvFile(key: string, value: string) {
-  let content = "";
-  if (fs.existsSync(envPath)) {
-    content = fs.readFileSync(envPath, "utf8");
-  }
-  
-  const regex = new RegExp(`^${key}=.*`, "m");
-  if (regex.test(content)) {
-    content = content.replace(regex, `${key}=${value}`);
-  } else {
-    if (content && !content.endsWith("\n")) {
-      content += "\n";
-    }
-    content += `${key}=${value}`;
-  }
-  fs.writeFileSync(envPath, content.trim() + "\n", "utf8");
-}
+import { env } from "../../config/env.js";
 
 // ─── BLOCKCHAIN CONFIGURATION ──────────────────────────────────────
-const SOMNIA_RPC_URL = process.env.SOMNIA_RPC_URL || "https://dream-rpc.somnia.network";
-const provider = new ethers.JsonRpcProvider(SOMNIA_RPC_URL);
-
-// Load or generate wallet private key
-let privateKey = process.env.SOMNIA_PRIVATE_KEY;
-if (!privateKey) {
-  console.log("[Somnia L1] 🔑 No SOMNIA_PRIVATE_KEY found in environment. Generating a new wallet...");
-  const randomWallet = ethers.Wallet.createRandom();
-  privateKey = randomWallet.privateKey;
-  updateEnvFile("SOMNIA_PRIVATE_KEY", privateKey);
-  console.log(`[Somnia L1] 📝 Generated and saved new private key to .env`);
-}
-
-const wallet = new ethers.Wallet(privateKey, provider);
+const provider = new ethers.JsonRpcProvider(env.SOMNIA_RPC_URL);
+const wallet = new ethers.Wallet(env.SOMNIA_PRIVATE_KEY, provider);
 console.log(`[Somnia L1] 🟢 Connected wallet address: ${wallet.address}`);
 
 // ─── COMPILED SMART CONTRACT PATHS ──────────────────────────────────
 const abiPath = path.resolve(process.cwd(), "contracts/build/contracts_MarketFactory_sol_MarketFactory.abi");
 const binPath = path.resolve(process.cwd(), "contracts/build/contracts_MarketFactory_sol_MarketFactory.bin");
 
-let cachedContractAddress = process.env.SOMNIA_MARKET_FACTORY_ADDRESS;
+let cachedContractAddress = env.MARKET_FACTORY_ADDRESS;
 let contractPromise: Promise<any> | null = null;
 
 /**
@@ -66,10 +29,8 @@ async function getOrDeployContract(): Promise<any> {
   }
 
   contractPromise = (async () => {
-    // Re-check env in case it was written by another process
-    dotenv.config();
-    if (process.env.SOMNIA_MARKET_FACTORY_ADDRESS) {
-      cachedContractAddress = process.env.SOMNIA_MARKET_FACTORY_ADDRESS;
+    if (env.MARKET_FACTORY_ADDRESS) {
+      cachedContractAddress = env.MARKET_FACTORY_ADDRESS;
       const abi = JSON.parse(fs.readFileSync(abiPath, "utf8"));
       return new ethers.Contract(cachedContractAddress, abi, wallet);
     }
@@ -102,9 +63,9 @@ Faucet: https://testnet.somnia.network/ ( Shannon Testnet )
       
       const deployedAddress = await contract.getAddress();
       console.log(`[Somnia L1] 🎉 Smart contract successfully deployed at: ${deployedAddress}`);
+      console.log(`[Somnia L1] ℹ️  Please update MARKET_FACTORY_ADDRESS in your .env to: ${deployedAddress}`);
       
       cachedContractAddress = deployedAddress;
-      updateEnvFile("SOMNIA_MARKET_FACTORY_ADDRESS", deployedAddress);
       return contract;
     } catch (deployErr: any) {
       console.error("[Somnia L1] ❌ Smart contract deployment failed:", deployErr);
