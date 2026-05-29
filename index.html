@@ -117,6 +117,11 @@
             <button id="nav-activity" data-tab="activity" class="nav-btn flex items-center justify-center w-12 h-12 rounded-full text-outline border border-transparent">
                 <span class="material-symbols-outlined">history_edu</span>
             </button>
+            <!-- Cinematic Live Intelligence Radar -->
+            <button id="nav-cinematic" data-tab="cinematic" class="nav-btn relative flex items-center justify-center w-12 h-12 rounded-full text-outline border border-transparent hover:text-primary">
+                <span class="material-symbols-outlined">radar</span>
+                <span class="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-primary animate-ping"></span>
+            </button>
         </nav>
         
         <!-- Theme Toggle & Settings at Bottom -->
@@ -757,6 +762,112 @@
                                 <!-- Populated Dynamically -->
                             </tbody>
                         </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- PAGE 6: Cinematic Live Intelligence Mode -->
+            <div id="tab-cinematic" class="page-tab flex-col gap-8 w-full">
+                <!-- Neural Grid & Radar Visualization -->
+                <div class="relative w-full h-[380px] bg-black/40 rounded-3xl border border-primary/25 overflow-hidden flex flex-col justify-between p-6 group shadow-2xl backdrop-blur-2xl">
+                    <!-- Cosmic motion background SVG neural grid -->
+                    <div class="absolute inset-0 opacity-15 pointer-events-none">
+                        <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <pattern id="neural-grid-pattern" width="40" height="40" patternUnits="userSpaceOnUse">
+                                    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="var(--primary)" stroke-width="0.5" />
+                                    <circle cx="40" cy="0" r="1.5" fill="var(--primary)" />
+                                </pattern>
+                            </defs>
+                            <rect width="100%" height="100%" fill="url(#neural-grid-pattern)" />
+                        </svg>
+                    </div>
+
+                    <!-- Ambient cosmic dust glow -->
+                    <div class="absolute -top-20 -left-20 w-80 h-80 bg-primary/10 rounded-full blur-3xl animate-pulse"></div>
+                    <div class="absolute -bottom-20 -right-20 w-80 h-80 bg-tertiary/10 rounded-full blur-3xl animate-pulse" style="animation-delay: 2s"></div>
+
+                    <!-- Header with Scan Line -->
+                    <div class="z-10 flex justify-between items-start">
+                        <div class="flex flex-col gap-0.5">
+                            <span class="font-label text-[9px] font-bold text-primary uppercase tracking-[0.25em] flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-primary animate-ping"></span>
+                                Live Cognitive Swarm Status
+                            </span>
+                            <h2 class="font-display text-2xl font-bold text-on-surface">Global Intelligence Radar</h2>
+                        </div>
+                        <span class="text-[10px] font-mono font-bold text-primary border border-primary/30 px-3 py-1 rounded-full bg-primary/5 uppercase tracking-wider flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-[12px] animate-spin-slow">radar</span>
+                            System Online
+                        </span>
+                    </div>
+
+                    <!-- Global Radar Visual (Beautiful SVG Animated Map overlay) -->
+                    <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-45">
+                        <svg viewBox="0 0 800 300" class="w-full h-full max-w-[650px] max-h-[220px]">
+                            <!-- Animated Pulse rings from global hubs -->
+                            <!-- London hub -->
+                            <circle cx="380" cy="110" r="4" fill="var(--primary)"></circle>
+                            <circle cx="380" cy="110" r="25" fill="none" stroke="var(--primary)" stroke-width="0.5" class="animate-ping" style="animation-duration: 3s;"></circle>
+                            <!-- New York hub -->
+                            <circle cx="240" cy="120" r="4" fill="var(--tertiary)"></circle>
+                            <circle cx="240" cy="120" r="35" fill="none" stroke="var(--tertiary)" stroke-width="0.5" class="animate-ping" style="animation-duration: 4s; animation-delay: 1s;"></circle>
+                            <!-- Tokyo hub -->
+                            <circle cx="620" cy="130" r="4" fill="var(--primary)"></circle>
+                            <circle cx="620" cy="130" r="20" fill="none" stroke="var(--primary)" stroke-width="0.5" class="animate-ping" style="animation-duration: 2.5s; animation-delay: 0.5s;"></circle>
+                            
+                            <!-- Synaptic link paths -->
+                            <path d="M 240 120 Q 310 100 380 110" fill="none" stroke="var(--border-color)" stroke-width="0.75" stroke-dasharray="3 3"></path>
+                            <path d="M 380 110 Q 500 90 620 130" fill="none" stroke="var(--border-color)" stroke-width="0.75" stroke-dasharray="3 3"></path>
+                        </svg>
+                    </div>
+
+                    <!-- Active Ingested Signal Ticker overlay -->
+                    <div class="z-10 bg-surface-solid/80 border border-outline-variant/30 rounded-2xl p-4 backdrop-blur-md flex items-center justify-between w-full">
+                        <div class="flex items-center gap-4">
+                            <span class="w-2.5 h-2.5 rounded-full bg-primary glow-green"></span>
+                            <div class="flex flex-col">
+                                <span class="text-[9px] font-bold text-outline uppercase tracking-wider">Active Ingested Telemetry</span>
+                                <span id="cinematic-active-signal" class="text-xs font-bold text-on-surface font-mono">📡 Ingesting Google Trends momentum indexes for: "Somnia Shannon EVL Layer"</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1.5 font-mono text-[10px] text-primary font-bold">
+                            <span>VELOCITY:</span>
+                            <span id="cinematic-signal-velocity">92%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cognitive Swarm & Blockchain Deployment Visual Split -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Agent Deliberation panel -->
+                    <div class="cosmic-card p-6 rounded-2xl border border-outline-variant/40 flex flex-col gap-4 relative overflow-hidden">
+                        <div class="flex items-center justify-between border-b border-outline-variant/20 pb-2">
+                            <h3 class="font-display text-lg font-bold text-on-surface flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary">psychology</span>
+                                Swarm Deliberation Console
+                            </h3>
+                            <span class="text-[9px] px-2 py-0.5 bg-primary/10 border border-primary/25 rounded text-primary uppercase font-bold tracking-wider">4 Cores Online</span>
+                        </div>
+                        
+                        <div class="flex flex-col gap-4" id="cinematic-agents-roster">
+                            <!-- Populated with live dynamic agent reasoning -->
+                        </div>
+                    </div>
+
+                    <!-- On-Chain Mempool broadcasts & Settlement confirmations -->
+                    <div class="cosmic-card p-6 rounded-2xl border border-outline-variant/40 flex flex-col gap-4 relative overflow-hidden">
+                        <div class="flex items-center justify-between border-b border-outline-variant/20 pb-2">
+                            <h3 class="font-display text-lg font-bold text-on-surface flex items-center gap-2">
+                                <span class="material-symbols-outlined text-tertiary">dataset_linked</span>
+                                Somnia L1 Active Mempool
+                            </h3>
+                            <span class="text-[9px] px-2 py-0.5 bg-tertiary/10 border border-tertiary/25 rounded text-tertiary uppercase font-bold tracking-wider">Sub-Sec Blocktime</span>
+                        </div>
+                        
+                        <div class="flex-1 flex flex-col gap-4 overflow-y-auto max-h-[260px]" id="cinematic-chain-activities">
+                            <!-- Confirmed on-chain tx events -->
+                        </div>
                     </div>
                 </div>
             </div>

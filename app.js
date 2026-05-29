@@ -849,6 +849,8 @@ function setupNavigation() {
                 renderFeed();
             } else if (tabId === 'landing') {
                 renderLandingPage();
+            } else if (tabId === 'cinematic') {
+                renderCinematicIntelligence();
             }
             
             // Hide notification badge on feed click if it was showing
@@ -1277,6 +1279,7 @@ function renderAll() {
     renderAgentLab();
     renderPortfolio();
     renderActivityLedger();
+    renderCinematicIntelligence();
     applyCardGlowEffects();
 
     // Reset real-time new market flags after animation completes
@@ -2829,3 +2832,84 @@ window.copyToClipboard = function(text, successMsg) {
     });
 };
 window.openInsightDrawer = openInsightDrawer; // make global for dynamic html clicks
+
+// --- CINEMATIC LIVE INTELLIGENCE RENDERER ---
+function renderCinematicIntelligence() {
+    if (state.activeTab !== 'cinematic') return;
+
+    // 1. Populate Global Signal Radar with active signal
+    const activeSigEl = document.getElementById('cinematic-active-signal');
+    const activeVelocityEl = document.getElementById('cinematic-signal-velocity');
+    if (state.markets.length > 0) {
+        const topMarket = state.markets[0];
+        if (activeSigEl) {
+            activeSigEl.textContent = `📡 Swarm targeting active topic: "${topMarket.title}"`;
+        }
+        if (activeVelocityEl) {
+            activeVelocityEl.textContent = `${topMarket.confidence}%`;
+        }
+    }
+
+    // 2. Populate Swarm Deliberation Console
+    const rosterEl = document.getElementById('cinematic-agents-roster');
+    if (rosterEl) {
+        rosterEl.innerHTML = '';
+        state.agents.forEach(agent => {
+            const div = document.createElement('div');
+            div.className = 'flex flex-col gap-1.5 p-3.5 bg-surface-container/40 rounded-xl border border-outline-variant/20 hover:border-primary/30 transition-all';
+            
+            const color = agent.color || 'primary';
+            const badgeClass = `px-2 py-0.5 rounded text-[8px] font-bold uppercase bg-${color}/10 border border-${color}/20 text-${color}`;
+            
+            div.innerHTML = `
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-bold text-on-surface flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-[14px] text-${color}">spa</span>
+                        ${agent.name}
+                    </span>
+                    <span class="${badgeClass}">${agent.strategy}</span>
+                </div>
+                <p class="text-[10px] text-outline font-semibold leading-relaxed">${agent.status || 'Monitoring continuous stream...'}</p>
+                <div class="flex items-center justify-between text-[9px] text-outline font-bold mt-1 uppercase">
+                    <span>Target Focus: ${agent.target}</span>
+                    <span class="text-${color}">ROUNDS APPROVED: ${agent.trades}</span>
+                </div>
+            `;
+            rosterEl.appendChild(div);
+        });
+    }
+
+    // 3. Populate Somnia L1 Active Mempool
+    const activitiesEl = document.getElementById('cinematic-chain-activities');
+    if (activitiesEl) {
+        activitiesEl.innerHTML = '';
+        if (state.transactions.length === 0) {
+            activitiesEl.innerHTML = `
+                <div class="flex flex-col items-center justify-center py-12 text-center text-outline opacity-60">
+                    <span class="material-symbols-outlined text-3xl mb-1">link</span>
+                    <p class="text-[10px] font-semibold">Mempool listening for L1 broadcasts...</p>
+                </div>
+            `;
+        } else {
+            state.transactions.forEach(tx => {
+                const div = document.createElement('div');
+                div.className = 'flex items-start gap-3 p-3 bg-surface-container-low/60 rounded-xl border border-outline-variant/25 hover:border-primary/20 transition-all';
+                
+                div.innerHTML = `
+                    <div class="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-primary text-sm">link</span>
+                    </div>
+                    <div class="flex-1 flex flex-col gap-0.5">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] font-bold text-primary font-mono select-all cursor-copy">${tx.hash.substring(0, 16)}...</span>
+                            <span class="text-[9px] text-outline">${tx.timestamp}</span>
+                        </div>
+                        <span class="text-xs font-bold text-on-surface mt-0.5">${tx.action}</span>
+                        <p class="text-[10px] text-outline leading-relaxed mt-1 font-semibold">${tx.details}</p>
+                    </div>
+                `;
+                activitiesEl.appendChild(div);
+            });
+        }
+    }
+}
