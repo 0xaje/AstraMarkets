@@ -497,6 +497,7 @@ function startSSEListener() {
             const data = JSON.parse(e.data);
             console.log("[AstraFE SSE] Real-time signal detected:", data);
             const sig = data.signal;
+            console.log('[INTEGRATION] 📡 SIGNAL_RECEIVED: (Frontend) Received SIGNAL_DETECTED event for: "' + sig.topic + '"');
 
             const color = sig.source === 'crypto' ? 'primary'
                         : sig.source === 'news'   ? 'secondary'
@@ -581,6 +582,7 @@ function startSSEListener() {
 
             saveStateToLocalStorage();
             renderAll();
+            console.log('[INTEGRATION] 💻 UI_UPDATED: Received MARKET_CREATED event. Re-rendered live prediction board with: "' + raw.title + '"');
         } catch (err) {
             console.error("[AstraFE SSE] Error parsing market created:", err);
         }
@@ -620,6 +622,7 @@ function startSSEListener() {
 
             saveStateToLocalStorage();
             renderAll();
+            console.log('[INTEGRATION] 🧠 AGENT_DECISION: (Frontend) Live status update for ' + data.agentName + ' reasoning: "' + decision.reasoning + '"');
         } catch (err) {
             console.error("[AstraFE SSE] Error parsing agent decision:", err);
         }

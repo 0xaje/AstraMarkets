@@ -421,15 +421,14 @@ async function deployWithRetry(proposal: MarketProposal, maxAttempts = 3): Promi
   let lastError: any = null;
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
-      console.log(`[Somnia L1] ⛓️ Attempting on-chain deployment ${attempt}/${maxAttempts} for "${proposal.title.slice(0, 50)}"...`);
+      console.log(`[INTEGRATION] ⛓️ BLOCKCHAIN_TX_SENT: Sending transaction on-chain for "${proposal.title.slice(0, 50)}" | Attempt ${attempt}/${maxAttempts}`);
       const result = await createMarketOnChain(proposal);
-      console.log(`[Somnia L1] 🎉 On-chain deployment successful on attempt ${attempt}! ID: ${result.marketId}`);
+      console.log(`[INTEGRATION] ✅ BLOCKCHAIN_CONFIRMED: Smart contract confirmed on-chain on attempt ${attempt}! TxHash: ${result.txHash} | Market ID: ${result.marketId}`);
       return result;
     } catch (err: any) {
       lastError = err;
-      console.warn(`[Somnia L1] ⚠️ On-chain deployment attempt ${attempt} failed: ${err.message || err}`);
+      console.warn(`[INTEGRATION] ❌ BLOCKCHAIN_ERROR: Attempt ${attempt}/${maxAttempts} failed: ${err.message || err}`);
       if (attempt < maxAttempts) {
-        // Linear/exponential backoff
         await new Promise((resolve) => setTimeout(resolve, 1500 * attempt));
       }
     }
@@ -590,6 +589,7 @@ async function runCycle(): Promise<void> {
 
   // Emit agent decisions to the central type-safe event bus
   decisions.forEach((decision) => {
+    console.log(`[INTEGRATION] 🧠 AGENT_DECISION: agentName=${decision.agentName} | createMarket=${decision.createMarket} | reasoning="${decision.reasoning.slice(0, 120).replace(/\n/g, " ")}..."`);
     eventBus.emit("AGENT_DECISION_MADE", {
       agentName: decision.agentName,
       decision: {

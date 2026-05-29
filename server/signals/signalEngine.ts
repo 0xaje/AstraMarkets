@@ -432,6 +432,7 @@ async function fetchAllSignals(): Promise<Signal[]> {
 
   // Emit event on our central event bus for each newly detected signal
   fresh.forEach((sig) => {
+    console.log(`[INTEGRATION] 📡 SIGNAL_RECEIVED: source=${sig.source} | topic="${sig.topic}" | sentiment=${sig.sentiment} | importance=${sig.importance} | velocity=${sig.velocity}`);
     eventBus.emit("SIGNAL_DETECTED", {
       signal: sig,
       timestamp: Date.now()
