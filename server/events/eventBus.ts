@@ -92,63 +92,41 @@ class AstraEventBus extends EventEmitter<AstraEventTypes> {
 
   constructor() {
     super();
-    this.setupDebugLogging();
   }
 
-  /**
-   * Internal listener to print structured, beautiful debugging logs for every event.
-   */
-  private setupDebugLogging() {
-    this.on("SIGNAL_DETECTED", (payload) => {
-      console.log(`[EventBus] 📡 SIGNAL_DETECTED | Source: ${payload.signal.source.toUpperCase()} | Topic: "${payload.signal.topic.slice(0, 50)}..." | Sentiment: ${payload.signal.sentiment.toUpperCase()} | Importance: ${payload.signal.importance}`);
-    });
-
-    this.on("MARKET_CREATED", (payload) => {
-      console.log(`[EventBus] 🚀 MARKET_CREATED | Ref: ${payload.market.ref} | Title: "${payload.market.title.slice(0, 50)}..." | On-Chain ID: ${payload.onChainMarketId ?? "N/A"} | Tx: ${payload.txHash ? payload.txHash.slice(0, 16) + "..." : "Simulated"}`);
-    });
-
-    this.on("AGENT_DECISION_MADE", (payload) => {
-      console.log(`[EventBus] 🤖 AGENT_DECISION_MADE | Agent: ${payload.agentName} | CreateMarket: ${payload.decision.createMarket} | Reasoning: "${payload.decision.reasoning.slice(0, 60)}..."`);
-    });
-
-    this.on("TRADE_EXECUTED", (payload) => {
-      console.log(`[EventBus] 💸 TRADE_EXECUTED | Ref: ${payload.ref} | Trader: ${payload.trader} | ${payload.position ? "YES" : "NO"} shares | Spent: ${payload.amountSpent} SOM | Tx: ${payload.txHash.slice(0, 16)}...`);
-    });
-  }
 
   /**
-   * Register a new client's Express Response object to receive Server-Sent Events (SSE).
+   * Register a new client's Express Response object to receive SSE.
    */
   public registerSseClient(res: Response) {
     this.sseClients.push(res);
-    console.log(`[EventBus] 🟢 SSE Client connected. Total active connections: ${this.sseClients.length}`);
-
-    // Automatically prune connection when closed
+    // Automatically prune on disconnect
     res.on("close", () => {
       this.sseClients = this.sseClients.filter((client) => client !== res);
-      console.log(`[EventBus] 🔴 SSE Client disconnected. Active connections: ${this.sseClients.length}`);
+    });
+  }
+
+  /** Broadcast a raw (non-typed) SSE event to all connected clients. */
+  public broadcastRaw(event: string, data: unknown) {
+    const payload = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
+    this.sseClients.forEach((client) => {
+      try { client.write(payload); } catch { /* dead client */ }
     });
   }
 
   /**
-   * Overridden emit function that also automatically broadcasts the event payload to all SSE clients in real time.
+   * Overridden emit — broadcasts typed events to SSE clients in real time.
    */
   public emit<T extends keyof AstraEventTypes>(event: T, ...args: AstraEventTypes[T]): boolean {
     const success = super.emit(event, ...args as any);
-    
-    // Broadcast to SSE clients
     const payload = `event: ${event}\ndata: ${JSON.stringify(args[0])}\n\n`;
     this.sseClients.forEach((client) => {
-      try {
-        client.write(payload);
-      } catch {
-        // Suppress errors for dead client connections
-      }
+      try { client.write(payload); } catch { /* dead client */ }
     });
-
     return success;
   }
 }
+
 
 export const eventBus = new AstraEventBus();
 export default eventBus;

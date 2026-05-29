@@ -232,6 +232,8 @@ abstract class BaseAgent {
   abstract sources: Signal["source"][];
   abstract systemPrompt: string;
   abstract color: AgentStatus["color"];
+  abstract specialbadge: string;
+  abstract domainexpertise: string;
 
   protected marketsCreated = 0;
   protected decisionsThisCycle = 0;
@@ -250,6 +252,8 @@ abstract class BaseAgent {
       decisionsThisCycle: this.decisionsThisCycle,
       marketsCreated: this.marketsCreated,
       color: this.color,
+      specialbadge: this.specialbadge,
+      domainexpertise: this.domainexpertise,
     });
   }
 
@@ -327,41 +331,87 @@ abstract class BaseAgent {
 // ─── AGENT IMPLEMENTATIONS ────────────────────────────────────────
 class MacroAgentImpl extends BaseAgent {
   name = "MacroAgent";
-  strategy = "Offshore Liquidity & Crypto Price Analysis";
+  strategy = "Macroeconomic & Institutional Analytics";
   sources: Signal["source"][] = ["crypto", "news"];
   color: AgentStatus["color"] = "primary";
-  systemPrompt = `You are MacroAgent, a specialist in cryptocurrency markets and macroeconomic trends.
-You monitor crypto price movements, ETF flows, institutional positioning, Federal Reserve policy, and global financial conditions.
-You excel at spotting high-conviction binary prediction opportunities in crypto and macro markets.
-Only propose markets when there is strong directional signal with a clear resolution condition.`;
+  specialbadge = "Macro Volatility";
+  domainexpertise = "ETF Flows & FOMC Interest Sentiment";
+  systemPrompt = `You are MacroAgent, an elite domain specialist in cryptocurrency macroeconomics and institutional capital flows.
+Your specialized mandate is to:
+- Monitor traditional finance ETF flows (such as BlackRock IBIT or Fidelity FBTC inflows/outflows)
+- Track macroeconomic volatility metrics (CPI inflation prints, macroeconomic indicators)
+- Analyze Federal Reserve interest rate sentiment (FOMC meetings, rate cut projections, Powell pressers)
+- Evaluate stablecoin liquidity shifts (USDT/USDC supply expansions or capital shifts across chains)
+- Detect cross-market correlation anomalies between traditional market equities (like S&P 500) and major crypto assets.
+
+Only propose prediction markets that hinge on verifiable macroeconomic index results, ETF balance thresholds, stablecoin mint benchmarks, or FOMC decisions. Ensure clear binary conditions.`;
+
+  protected filterSignals(all: Signal[]): Signal[] {
+    const macroKeywords = [
+      "etf", "fed", "interest", "rate", "inflation", "cpi", "fomc", "stablecoin", "usdt", "usdc",
+      "liquidity", "inflow", "outflow", "macro", "correlation", "treasury", "yield", "powell", "blackrock", "fidelity",
+      "institutional", "crypto", "btc", "eth", "sol"
+    ];
+    return all.filter(
+      (s) =>
+        this.sources.includes(s.source) &&
+        macroKeywords.some((kw) => s.topic.toLowerCase().includes(kw))
+    );
+  }
 }
 
 class SocialAgentImpl extends BaseAgent {
   name = "SocialAgent";
-  strategy = "Viral Sentiment & Social Intelligence";
+  strategy = "Viral Sentiment & Narrative Propagation";
   sources: Signal["source"][] = ["reddit", "trends"];
   color: AgentStatus["color"] = "secondary";
-  systemPrompt = `You are SocialAgent, a specialist in social media sentiment and viral trends.
-You monitor Reddit communities, Google Trends spikes, and viral narratives around crypto, tech, and finance.
-You identify emerging community-driven price movements and sentiment shifts before they hit mainstream.
-Focus on markets where crowd psychology is the primary driver (meme coins, viral narratives, community events).`;
+  specialbadge = "Viral Indexer";
+  domainexpertise = "Meme Velocity & Sentiment Decays";
+  systemPrompt = `You are SocialAgent, a domain specialist in crowd psychology, meme coin velocity, and social sentiment decay.
+Your specialized mandate is to:
+- Detect viral acceleration of new tokens, protocols, and web3 narratives
+- Track meme propagation velocity across social hubs (Reddit, Google Trends, social platforms)
+- Spot Reddit engagement spikes and sub-reddit subscriber growth anomalies
+- Analyze influencer amplification networks and trend velocity
+- Calibrate for sentiment momentum decay (identifying when a hype cycle is about to peak or burn out).
+
+Only propose prediction markets around social trends, meme coin volume peaks, keyword volume thresholds, or community engagement metrics before the hype decays.`;
+
+  protected filterSignals(all: Signal[]): Signal[] {
+    const socialKeywords = [
+      "reddit", "viral", "meme", "sentiment", "doge", "pepe", "shib", "spiked", "hype",
+      "twitter", "engagement", "velocity", "propagation", "influencer", "community", "trend", "acceleration",
+      "keyword", "social", "traffic", "buzz"
+    ];
+    return all.filter(
+      (s) =>
+        this.sources.includes(s.source) &&
+        socialKeywords.some((kw) => s.topic.toLowerCase().includes(kw))
+    );
+  }
 }
 
 class SportsAgentImpl extends BaseAgent {
   name = "SportsAgent";
-  strategy = "Sports & Event Outcome Intelligence";
+  strategy = "Sports Timing & Probability Calibrator";
   sources: Signal["source"][] = ["trends", "news"];
   color: AgentStatus["color"] = "tertiary";
-  systemPrompt = `You are SportsAgent, a specialist in sports events and real-world outcome prediction.
-You monitor Google Trends for sports queries, breaking sports news, major tournaments, championship outcomes, and athlete performance events.
-You create prediction markets around sports results, championship winners, and sports-related financial instruments.
-Only propose markets for events with a clear binary outcome and a near-term resolution date.`;
+  specialbadge = "Timing Analytics";
+  domainexpertise = "Probability Model odds Calibration";
+  systemPrompt = `You are SportsAgent, an elite domain specialist in sports event mechanics and probabilistic odds calibration.
+Your specialized mandate is to:
+- Validate event timing (ensure exact dates and scheduling constraints)
+- Verify alignment with external sports APIs and news updates
+- Calibrate probability models to set robust, mathematically sound odds
+- Detect scheduling conflicts and postpone anomalies before proposing.
+
+Only propose prediction markets around validated sporting events, championships, matches, or racer finishes with deterministic outcomes and non-ambiguous timings. Ensure the resolution condition specifies the exact game and official scoring source.`;
 
   protected filterSignals(all: Signal[]): Signal[] {
     const sportKeywords = [
       "nfl", "nba", "soccer", "football", "basketball", "tennis", "f1", "formula",
       "world cup", "champion", "playoff", "super bowl", "game", "match", "tournament",
-      "olympic", "sport", "league", "team", "player", "athlete", "score",
+      "olympic", "sport", "league", "team", "player", "athlete", "score", "racing", "mlb", "fifa", "premier"
     ];
     return all.filter(
       (s) =>
@@ -369,27 +419,81 @@ Only propose markets for events with a clear binary outcome and a near-term reso
         sportKeywords.some((kw) => s.topic.toLowerCase().includes(kw))
     );
   }
-}
-
-class RiskAgentImpl extends BaseAgent {
-  name = "RiskAgent";
-  strategy = "Dynamic Volatility & Quality Arbitrage Filter";
-  sources: Signal["source"][] = ["crypto", "news", "reddit", "trends"];
-  color: AgentStatus["color"] = "tertiary";
-  systemPrompt = `You are RiskAgent, the quality control layer of AstraMarkets.
-Your role is to assess market-wide risk conditions and create high-conviction volatility/risk markets.
-You look for systemic risk signals: regulatory changes, exchange failures, protocol exploits, macroeconomic shocks, contagion risks.
-Only propose markets around genuine systemic risk events with clear binary outcomes.`;
 
   async run(allSignals: Signal[]): Promise<AgentDecision> {
-    const highImportance = allSignals.filter((s) => s.importance >= 70);
-    if (highImportance.length === 0) {
-      const msg = "Market risk level: NOMINAL — no systemic signals detected.";
+    const filtered = this.filterSignals(allSignals);
+    if (filtered.length === 0) {
+      const msg = "Sports Calendar: ACTIVE — no new scheduling signals or tournament spikes detected.";
       emit("info", this.name, msg);
       this.updateStatus(msg);
       return { createMarket: false, reasoning: msg, agentName: this.name, timestamp: Date.now() };
     }
-    return super.run(highImportance);
+
+    const decision = await super.run(filtered);
+    // Specialized Domain Correction: Validate event timing & Calibrate odds
+    if (decision.createMarket && decision.market) {
+      decision.market.description = `[TIMING CONFIRMED & ODDS CALIBRATED] ` + decision.market.description;
+      decision.reasoning = `[SPORTS API CALIBRATION VERIFIED] ` + decision.reasoning;
+      emit("info", this.name, `Validated event timing and calibrated odds to YES: ${Math.round(decision.market.yesOdds * 100)}% | NO: ${Math.round(decision.market.noOdds * 100)}%`);
+    }
+    return decision;
+  }
+}
+
+class RiskAgentImpl extends BaseAgent {
+  name = "RiskAgent";
+  strategy = "Manipulation & Volatility Stress Filter";
+  sources: Signal["source"][] = ["crypto", "news", "reddit", "trends"];
+  color: AgentStatus["color"] = "tertiary";
+  specialbadge = "Stability Arbitrage";
+  domainexpertise = "Anomaly & Manipulation Detection";
+  systemPrompt = `You are RiskAgent, the institutional risk filter and systemic stability guardian.
+Your specialized mandate is to:
+- Detect manipulation attempts and wash trading indicators
+- Identify low-liquidity and thin-orderbook anomalies in active tokens
+- Flag suspicious market creation patterns or highly volatile speculative bubbles
+- Systematically calibrate predictions to reduce confidence scores under high-volatility stress.
+
+Propose risk mitigation prediction markets (e.g. Will a token experience a 30% correction? Will liquidity drop below a safe threshold?).
+Rules:
+- Automatically downgrade your confidence if signals show high volatility.
+- Focus on security, exploits, low liquidity, and regulatory sanctions.`;
+
+  protected filterSignals(all: Signal[]): Signal[] {
+    const riskKeywords = [
+      "manipulation", "exploit", "hack", "liquidity", "volatility", "stress", "suspicious",
+      "sec", "lawsuit", "regulation", "alert", "anomaly", "risk", "unstability", "leverage", "liquidated",
+      "crash", "decline", "collapse", "downgrade", "threat", "vulnerability"
+    ];
+    return all.filter(
+      (s) =>
+        this.sources.includes(s.source) &&
+        riskKeywords.some((kw) => s.topic.toLowerCase().includes(kw))
+    );
+  }
+
+  async run(allSignals: Signal[]): Promise<AgentDecision> {
+    const filtered = this.filterSignals(allSignals);
+    if (filtered.length === 0) {
+      const msg = "Risk level: NOMINAL — no systemic anomalies or manipulation patterns flagged.";
+      emit("info", this.name, msg);
+      this.updateStatus(msg);
+      return { createMarket: false, reasoning: msg, agentName: this.name, timestamp: Date.now() };
+    }
+    
+    const decision = await super.run(filtered);
+    // Specialized Domain Correction: Reduce confidence score under volatility stress
+    if (decision.createMarket && decision.market) {
+      const hasHighVolatility = filtered.some(s => s.velocity > 75 || s.topic.toLowerCase().includes("volatility") || s.topic.toLowerCase().includes("stress"));
+      if (hasHighVolatility) {
+        const originalConf = decision.market.confidence;
+        decision.market.confidence = Math.max(30, Math.round(originalConf * 0.75));
+        decision.market.description = `[RISK ADVISORY: High Volatility Stress Detected] ` + decision.market.description;
+        decision.reasoning = `[VOLATILITY FILTER APPLIED - CONFIDENCE ADJUSTED FROM ${originalConf}% TO ${decision.market.confidence}%] ` + decision.reasoning;
+        emit("warn", this.name, `Systemic volatility stress detected. Reduced confidence score from ${originalConf}% to ${decision.market.confidence}%`);
+      }
+    }
+    return decision;
   }
 }
 

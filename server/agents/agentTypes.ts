@@ -65,6 +65,8 @@ export interface AgentStatus {
   decisionsThisCycle: number;
   marketsCreated: number;
   color: "primary" | "secondary" | "tertiary";
+  specialbadge?: string;
+  domainexpertise?: string;
 }
 
 // ─── EVENT BUS EVENTS ────────────────────────────────────────────

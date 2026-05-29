@@ -334,54 +334,56 @@ const state = {
         }
     },
     activeTab: 'landing',
-    simulationSpeed: 1, // 1x, 2x, 5x
-    autoTrade: true,
-    autoMarket: true,
     activeAgentsCount: 4,
+    backendOnline: false,
     
     // Active Prediction Markets (Hydrated dynamically from backend truth)
     markets: [],
     
-    // AI Agents
+    // AI Agents — synced from backend on boot
     agents: [
         {
-            name: 'EcoAgent',
-            strategy: 'Ecology Sentiment Integration',
-            target: 'Ecosystem Keyword Metrics',
-            capital: 150,
-            accuracy: 74,
+            name: 'MacroAgent',
+            strategy: 'Macroeconomic & Institutional Analytics',
+            specialbadge: 'Macro Volatility',
+            domainexpertise: 'ETF Flows & FOMC Interest Sentiment',
+            capital: 350,
+            accuracy: 88,
             trades: 0,
-            status: 'Operational — waiting for real-world signal stream...',
+            status: 'Connecting to live macro signal stream...',
             color: 'primary'
         },
         {
             name: 'SocialAgent',
-            strategy: 'Viral Index Extraction',
-            target: 'Reddit/Twitter Community Growth',
+            strategy: 'Viral Sentiment & Narrative Propagation',
+            specialbadge: 'Viral Indexer',
+            domainexpertise: 'Meme Velocity & Sentiment Decays',
             capital: 200,
-            accuracy: 81,
+            accuracy: 84,
             trades: 0,
-            status: 'Operational — waiting for community data stream...',
+            status: 'Connecting to Reddit & Trends signal stream...',
             color: 'secondary'
         },
         {
-            name: 'MacroAgent',
-            strategy: 'Offshore Liquidity Analysis',
-            target: 'Cross-chain TVL / Capital Inflows',
-            capital: 350,
-            accuracy: 86,
+            name: 'SportsAgent',
+            strategy: 'Sports Timing & Probability Calibrator',
+            specialbadge: 'Timing Analytics',
+            domainexpertise: 'Probability Model Odds Calibration',
+            capital: 250,
+            accuracy: 82,
             trades: 0,
-            status: 'Operational — waiting for macro market indexes...',
-            color: 'primary'
+            status: 'Connecting to sports event calendar stream...',
+            color: 'tertiary'
         },
         {
             name: 'RiskAgent',
-            strategy: 'Dynamic Volatility Arbitrage',
-            target: 'EVM Gas Dynamics & Yield Spreads',
+            strategy: 'Manipulation & Volatility Stress Filter',
+            specialbadge: 'Stability Arbitrage',
+            domainexpertise: 'Anomaly & Manipulation Detection',
             capital: 400,
             accuracy: 92,
             trades: 0,
-            status: 'Operational — waiting for Somnia ledger status...',
+            status: 'Monitoring Somnia L1 for systemic risk signals...',
             color: 'tertiary'
         }
     ],
@@ -421,12 +423,8 @@ function saveStateToLocalStorage() {
                 balance: state.wallet.balance,
                 lockedBalance: state.wallet.lockedBalance
             },
-            simulationSpeed: state.simulationSpeed,
-            autoTrade: state.autoTrade,
-            autoMarket: state.autoMarket,
             activeAgentsCount: state.activeAgentsCount,
             markets: state.markets,
-            agents: state.agents,
             positions: state.positions.map(p => ({
                 id: p.id,
                 marketId: p.marketId,
@@ -437,11 +435,11 @@ function saveStateToLocalStorage() {
                 currentPrice: p.currentPrice
             })),
             transactions: state.transactions,
-            consciousnessLogs: state.consciousnessLogs
+            consciousnessLogs: state.consciousnessLogs.slice(0, 50)
         };
         localStorage.setItem('astramarkets_state', JSON.stringify(stateToSave));
     } catch (e) {
-        console.error("Error saving state to localStorage", e);
+        // Storage write failed — non-critical
     }
 }
 
@@ -458,14 +456,8 @@ function loadStateFromLocalStorage() {
             state.wallet.balance = parsed.wallet.balance;
             state.wallet.lockedBalance = parsed.wallet.lockedBalance;
         }
-        if (parsed.simulationSpeed) state.simulationSpeed = parsed.simulationSpeed;
-        if (parsed.autoTrade !== undefined) state.autoTrade = parsed.autoTrade;
-        if (parsed.autoMarket !== undefined) state.autoMarket = parsed.autoMarket;
         if (parsed.activeAgentsCount) state.activeAgentsCount = parsed.activeAgentsCount;
-        
         if (parsed.markets) state.markets = parsed.markets;
-        if (parsed.agents) state.agents = parsed.agents;
-        
         if (parsed.positions) {
             state.positions = parsed.positions.map(p => ({
                 id: p.id,
@@ -482,51 +474,46 @@ function loadStateFromLocalStorage() {
         }
         if (parsed.transactions) state.transactions = parsed.transactions;
         if (parsed.consciousnessLogs) state.consciousnessLogs = parsed.consciousnessLogs;
-        
     } catch (e) {
-        console.error("Error loading state from localStorage", e);
+        // Corrupted state — start fresh
+        localStorage.removeItem('astramarkets_state');
     }
 }
 
+// --- SSE RECONNECTION MANAGER ---
+const SSE_RECONNECT_DELAY_MS = 3000;
+const SSE_MAX_RECONNECT_ATTEMPTS = 10;
+let _sseReconnectAttempts = 0;
+let _sseInstance = null;
+
 function startSSEListener() {
-    console.log("[AstraFE] Connecting to Server-Sent Events (SSE) stream at /api/events...");
+    if (_sseInstance) {
+        _sseInstance.close();
+        _sseInstance = null;
+    }
+
     const eventSource = new EventSource('/api/events');
+    _sseInstance = eventSource;
 
     eventSource.addEventListener('SIGNAL_DETECTED', (e) => {
         try {
             const data = JSON.parse(e.data);
-            console.log("[AstraFE SSE] Real-time signal detected:", data);
             const sig = data.signal;
-            console.log('[INTEGRATION] 📡 SIGNAL_RECEIVED: (Frontend) Received SIGNAL_DETECTED event for: "' + sig.topic + '"');
-
-            const color = sig.source === 'crypto' ? 'primary'
-                        : sig.source === 'news'   ? 'secondary'
-                        : sig.source === 'reddit' ? 'tertiary'
-                        : 'primary';
-            const icon  = sig.source === 'crypto' ? '🪙'
-                        : sig.source === 'news'   ? '📰'
-                        : sig.source === 'reddit' ? '💬'
-                        : '📈';
+            const color = sig.source === 'crypto' ? 'primary' : sig.source === 'news' ? 'secondary' : sig.source === 'reddit' ? 'tertiary' : 'primary';
+            const icon  = sig.source === 'crypto' ? '🪙' : sig.source === 'news' ? '📰' : sig.source === 'reddit' ? '💬' : '📈';
             addConsciousnessLog(`${icon} [${sig.source.toUpperCase()}] ${sig.topic.substring(0, 90)} | ${sig.sentiment.toUpperCase()} | Score: ${sig.importance}`, color);
-        } catch (err) {
-            console.error("[AstraFE SSE] Error parsing signal detected:", err);
-        }
+        } catch { /* ignore malformed events */ }
     });
 
     eventSource.addEventListener('MARKET_CREATED', (e) => {
         try {
             const data = JSON.parse(e.data);
-            console.log("[AstraFE SSE] Real-time market created received:", data);
-
             const raw = data.market;
             const fingerprint = raw.title.substring(0, 60).toLowerCase().replace(/\W+/g, '_');
 
-            // Deduplicate by ref or title fingerprint
             if (state.markets.some(m => m.ref === raw.ref || m._signalKey === fingerprint)) return;
 
             const themes = { crypto: 'primary', macro: 'secondary', sports: 'tertiary', tech: 'secondary', social: 'primary' };
-            const theme = themes[raw.category] || 'primary';
-
             const newMarket = {
                 id: 'm_chain_' + (data.onChainMarketId || Date.now()),
                 _signalKey: fingerprint,
@@ -542,10 +529,8 @@ function startSSEListener() {
                 volume: Math.round(1000 + raw.confidence * 50),
                 change: '+0.0%',
                 agent: raw.agent,
-                theme: theme,
+                theme: themes[raw.category] || 'primary',
                 history: [0.50, raw.yesOdds],
-                isSimulated: false,
-                _fromSignal: true,
                 sources: [raw.category, 'Somnia L1'],
                 sentiment: raw.yesOdds > 0.5 ? 'bullish' : raw.yesOdds < 0.5 ? 'bearish' : 'neutral',
                 expiry: raw.expiry || '14d 2h',
@@ -554,24 +539,18 @@ function startSSEListener() {
                 onChainMarketId: data.onChainMarketId,
                 settlementTx: data.txHash || '',
                 rawSignals: [
-                    'AI consensus cross-verification matching keyword query',
-                    'Somnia L1 block ledger registration approved',
-                    'RiskAgent security and liquidity margins satisfied'
+                    `AI consensus cross-verification approved for: "${raw.title.substring(0, 50)}"`,
+                    'Somnia L1 block ledger registration confirmed',
+                    'RiskAgent systemic risk screening passed'
                 ],
-                confidenceBreakdown: {
-                    velocity: 85,
-                    volume: 80,
-                    consensus: 90
-                },
                 reasoning: raw.description,
-                _isNew: true // Flag to animate card on insertion
             };
 
             state.markets.unshift(newMarket);
             if (state.markets.length > 30) state.markets.pop();
 
             addConsciousnessLog(`🚀 [MARKET DEPLOYED] New prediction board created on-chain: "${raw.title.substring(0, 60)}"`, 'tertiary');
-            alertFloatNotification(`New market created: ${raw.title.substring(0, 45)}...`, 'success');
+            alertFloatNotification(`New market: ${raw.title.substring(0, 45)}...`, 'success');
 
             if (state.activeTab !== 'feed') {
                 const badge = document.getElementById('feed-badge');
@@ -582,17 +561,12 @@ function startSSEListener() {
 
             saveStateToLocalStorage();
             renderAll();
-            console.log('[INTEGRATION] 💻 UI_UPDATED: Received MARKET_CREATED event. Re-rendered live prediction board with: "' + raw.title + '"');
-        } catch (err) {
-            console.error("[AstraFE SSE] Error parsing market created:", err);
-        }
+        } catch { /* ignore malformed events */ }
     });
 
     eventSource.addEventListener('MARKET_UPDATED', (e) => {
         try {
             const data = JSON.parse(e.data);
-            console.log("[AstraFE SSE] Real-time market updated received:", data);
-
             const raw = data.market;
             const existing = state.markets.find(m => m.ref === raw.ref);
             if (existing) {
@@ -601,89 +575,46 @@ function startSSEListener() {
                 existing.settlementTimestamp = raw.settlementTimestamp;
                 existing.settlementTx = raw.settlementTx;
                 existing.dispute = raw.dispute;
-                
-                // If it is the currently opened drawer, refresh it!
-                if (state.drawerContext.marketId === existing.id) {
-                    openInsightDrawer(existing.id);
-                }
-                
-                addConsciousnessLog(`🗳️ [MARKET UPDATED] Prediction board state changed: "${raw.title.substring(0, 50)}" to ${raw.status}`, 'secondary');
+                if (state.drawerContext.marketId === existing.id) openInsightDrawer(existing.id);
+                addConsciousnessLog(`🗳️ [MARKET UPDATED] "${raw.title.substring(0, 50)}" → ${raw.status}`, 'secondary');
                 renderAll();
             }
-        } catch (err) {
-            console.error("[AstraFE SSE] Error parsing market updated:", err);
-        }
+        } catch { /* ignore malformed events */ }
     });
 
     eventSource.addEventListener('AGENT_DECISION_MADE', (e) => {
         try {
             const data = JSON.parse(e.data);
-            console.log("[AstraFE SSE] Real-time agent decision received:", data);
-
             const decision = data.decision;
-            let frontendAgentName = data.agentName;
-            if (frontendAgentName === 'SportsAgent') {
-                if (state.agents.some(a => a.name === 'EcoAgent')) {
-                    frontendAgentName = 'EcoAgent';
-                }
-            }
-
-            const agent = state.agents.find(a => a.name === frontendAgentName);
+            const agent = state.agents.find(a => a.name === data.agentName);
             if (agent) {
                 agent.status = decision.reasoning;
-                if (decision.createMarket) {
-                    agent.trades++;
-                    const txHash = '0x' + Array.from({length: 40}, () => Math.floor(Math.random()*16).toString(16)).join('');
-                    state.transactions.unshift({
-                        hash: txHash,
-                        action: 'Agent Smart Arbitrage',
-                        sender: agent.name,
-                        details: `${agent.name} approved market proposal: "${decision.market?.title || ''}"`,
-                        timestamp: 'just now'
-                    });
-                    if (state.transactions.length > 20) state.transactions.pop();
-                }
+                if (decision.createMarket) agent.trades++;
             }
-
-            addConsciousnessLog(`🤖 [${data.agentName.toUpperCase()}] Reasoning: "${decision.reasoning.substring(0, 75)}..." | Proposed: ${decision.createMarket ? 'YES' : 'NO'}`, 'decision');
-
+            addConsciousnessLog(`🤖 [${data.agentName.toUpperCase()}] "${decision.reasoning.substring(0, 75)}..." | Proposed: ${decision.createMarket ? 'YES' : 'NO'}`, 'decision');
             saveStateToLocalStorage();
             renderAll();
-            console.log('[INTEGRATION] 🧠 AGENT_DECISION: (Frontend) Live status update for ' + data.agentName + ' reasoning: "' + decision.reasoning + '"');
-        } catch (err) {
-            console.error("[AstraFE SSE] Error parsing agent decision:", err);
-        }
+        } catch { /* ignore malformed events */ }
     });
 
     eventSource.addEventListener('TRADE_EXECUTED', (e) => {
         try {
             const data = JSON.parse(e.data);
-            console.log("[AstraFE SSE] Real-time trade executed received:", data);
-            
-            // Log it in consciousness and add to ledger
-            addConsciousnessLog(`🔔 [REAL-TIME TRANSACTION] ${data.trade.trader} traded ${data.trade.amountSpent > 0 ? 'Buy' : 'Sell'} in "${data.trade.marketTitle}"`, 'primary');
-            
-            // Sync market odds from backend dynamic pool shift
-            const m = state.markets.find(x => x.ref === data.market.ref || x.title === data.market.title);
+            addConsciousnessLog(`🔔 [TRANSACTION] ${data.trade.trader} ${data.trade.amountSpent > 0 ? 'bought' : 'sold'} in "${data.trade.marketTitle}"`, 'primary');
+            const m = state.markets.find(x => x.ref === data.market.ref);
             if (m) {
                 m.yesOdds = data.market.yesOdds;
                 m.noOdds = data.market.noOdds;
                 m.totalLiquidity = data.market.totalLiquidity;
                 m.volume = data.market.volume;
             }
-            
             renderAll();
-        } catch (err) {
-            console.error("[AstraFE SSE] Error parsing trade event:", err);
-        }
+        } catch { /* ignore malformed events */ }
     });
 
     eventSource.addEventListener('POSITION_UPDATED', (e) => {
         try {
             const data = JSON.parse(e.data);
-            console.log("[AstraFE SSE] Real-time portfolio update received:", data);
-            
-            // Update local wallet and positions from backend truth
             state.wallet.balance = data.walletBalance;
             state.positions = data.positions.map(p => ({
                 id: 'pos_' + p.marketId,
@@ -697,23 +628,75 @@ function startSSEListener() {
                 get value() { return this.shares * this.currentPrice; },
                 get pnl() { return this.value - this.invested; }
             }));
-            
-            // Update total locked balance
             state.wallet.lockedBalance = state.positions.reduce((acc, curr) => acc + curr.invested, 0);
-
             renderAll();
-        } catch (err) {
-            console.error("[AstraFE SSE] Error parsing portfolio update:", err);
-        }
+        } catch { /* ignore malformed events */ }
     });
 
-    eventSource.onerror = (err) => {
-        console.warn("[AstraFE SSE] EventSource failed or lost connection, retrying...", err);
+    eventSource.onopen = () => {
+        _sseReconnectAttempts = 0;
+        state.backendOnline = true;
+        updateBackendStatusIndicator(true);
     };
+
+    eventSource.onerror = () => {
+        state.backendOnline = false;
+        updateBackendStatusIndicator(false);
+        eventSource.close();
+        _sseInstance = null;
+        if (_sseReconnectAttempts < SSE_MAX_RECONNECT_ATTEMPTS) {
+            _sseReconnectAttempts++;
+            setTimeout(startSSEListener, SSE_RECONNECT_DELAY_MS * Math.min(_sseReconnectAttempts, 5));
+        }
+    };
+}
+
+function updateBackendStatusIndicator(online) {
+    const el = document.getElementById('backend-status-dot');
+    const label = document.getElementById('backend-status-label');
+    if (el) {
+        el.className = online
+            ? 'w-2 h-2 rounded-full bg-primary animate-pulse'
+            : 'w-2 h-2 rounded-full bg-error';
+    }
+    if (label) label.textContent = online ? 'Engine Live' : 'Engine Offline';
+}
+
+
+async function syncAgentsFromBackend() {
+
+    try {
+        const res = await fetch('http://localhost:4000/api/agents');
+        if (!res.ok) throw new Error(`HTTP status ${res.status}`);
+        const data = await res.json();
+        if (data.ok && Array.isArray(data.agents)) {
+            state.agents = data.agents.map(raw => {
+                const existing = state.agents.find(a => a.name === raw.name) || {};
+                const frontendName = raw.name === 'SportsAgent' ? 'SportsAgent' : raw.name;
+                return {
+                    name: frontendName,
+                    strategy: raw.strategy,
+                    specialbadge: raw.specialbadge || 'Core Core',
+                    domainexpertise: raw.domainexpertise || 'L1 Oracle Systems',
+                    capital: existing.capital || 250,
+                    accuracy: existing.accuracy || 85,
+                    trades: raw.marketsCreated || existing.trades || 0,
+                    status: raw.status,
+                    color: raw.color || 'primary'
+                };
+            });
+            renderAgentLab();
+        }
+    } catch (err) {
+        console.error("[AstraFE] Error syncing agents from backend:", err);
+    }
 }
 
 async function syncMarketsFromBackend() {
     try {
+        // Sync active agent specializations
+        await syncAgentsFromBackend();
+
         console.log("[AstraFE] Fetching live backend-approved markets...");
         const res = await fetch('http://localhost:4000/api/agents/markets');
         if (!res.ok) throw new Error(`HTTP status ${res.status}`);
@@ -799,11 +782,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Start client-side autonomous oracle settlement loop
     ClientSettlementOracle.start();
+
+    // Start backend RPC heartbeat monitor
+    startBackendHeartbeat();
     
     // Initial consciousness log
     addConsciousnessLog('🌐 AstraMarkets Signal Engine initializing — connecting to live data streams...', 'primary');
     addConsciousnessLog('📡 CoinGecko, NewsAPI, Reddit, Google Trends feeds activating...', 'secondary');
 });
+
+// --- BACKEND HEARTBEAT & RPC HEALTH MONITOR ---
+const HEARTBEAT_INTERVAL_MS = 30000; // 30s
+async function startBackendHeartbeat() {
+    async function checkHealth() {
+        try {
+            const res = await fetch('/api/health', { signal: AbortSignal.timeout(5000) });
+            if (res.ok) {
+                const data = await res.json();
+                state.backendOnline = true;
+                updateBackendStatusIndicator(true);
+                // Update signal engine status badge
+                const sigEl = document.getElementById('signal-engine-status');
+                if (sigEl) sigEl.textContent = `✅ ${data.signals} signals | ${data.markets} markets`;
+            } else {
+                throw new Error(`HTTP ${res.status}`);
+            }
+        } catch {
+            state.backendOnline = false;
+            updateBackendStatusIndicator(false);
+            const sigEl = document.getElementById('signal-engine-status');
+            if (sigEl) sigEl.textContent = '⚠️ Engine Unreachable';
+        }
+    }
+    await checkHealth();
+    setInterval(checkHealth, HEARTBEAT_INTERVAL_MS);
+}
 
 // --- THEME SYSTEM ---
 function initTheme() {
@@ -1837,18 +1850,23 @@ function renderAgentLab() {
         
         div.innerHTML = `
             <div>
-                <div class="flex justify-between items-start mb-3 border-b border-outline-variant/20 pb-2">
+                <div class="flex justify-between items-start mb-3 border-b border-outline-variant/20 pb-2 flex-wrap gap-2">
                     <div>
-                        <h4 class="font-display text-md font-bold text-on-surface flex items-center gap-1.5">
-                            <span class="w-2.5 h-2.5 rounded-full bg-${agent.color} shadow-[0_0_5px_rgba(0,0,0,0.1)]"></span>
-                            ${agent.name}
-                        </h4>
-                        <span class="text-[9px] text-outline uppercase font-semibold">${agent.strategy}</span>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <h4 class="font-display text-md font-bold text-on-surface flex items-center gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded-full bg-${agent.color} shadow-[0_0_5px_rgba(0,0,0,0.1)] animate-pulse"></span>
+                                ${agent.name}
+                            </h4>
+                            <span class="text-[8px] font-black uppercase bg-${agent.color}/10 text-${agent.color} px-2 py-0.5 rounded border border-${agent.color}/20">
+                                ${agent.specialbadge || 'Core Core'}
+                            </span>
+                        </div>
+                        <span class="text-[9px] text-outline uppercase font-semibold mt-1 block">Strategy: ${agent.strategy}</span>
+                        <span class="text-[9px] text-primary/80 font-bold block mt-1 uppercase tracking-wide">Domain: ${agent.domainexpertise || 'L1 Oracle Systems'}</span>
                     </div>
-                    <span class="text-xs px-2 py-0.5 bg-surface-container rounded text-outline font-bold">L1 Core</span>
                 </div>
                 
-                <p class="text-xs text-on-surface/80 bg-surface-container/50 p-2.5 rounded-lg border border-outline-variant/20 mb-4 font-mono leading-relaxed h-12 overflow-hidden flex items-center">
+                <p class="text-xs text-on-surface/85 bg-surface-container/30 p-2.5 rounded-lg border border-outline-variant/15 mb-4 font-mono leading-relaxed h-14 overflow-hidden flex items-center">
                     ${agent.status}
                 </p>
             </div>
@@ -1863,7 +1881,7 @@ function renderAgentLab() {
                     <span class="text-xs font-bold text-on-surface">${agent.capital} SOM</span>
                 </div>
                 <div class="flex flex-col">
-                    <span class="text-[8px] text-outline uppercase font-bold">Total Trades</span>
+                    <span class="text-[8px] text-outline uppercase font-bold">Markets Active</span>
                     <span class="text-xs font-bold text-on-surface">${agent.trades}</span>
                 </div>
             </div>
@@ -2008,8 +2026,7 @@ async function fetchAndRenderAnalytics() {
         // 2. Volatility Indicator update
         const volElement = document.getElementById('port-volatility');
         if (volElement) {
-            const volVal = 0.05 + (analytics.unrealizedPnl !== 0 ? 0.08 : 0.02) + Math.random() * 0.02;
-            volElement.textContent = `${volVal.toFixed(2)}% VOLATILITY`;
+            volElement.textContent = `${analytics.marketHealth.volatilityScore}% VOLATILITY`;
         }
         
         // 3. Exposure Heatmap population
@@ -2037,55 +2054,110 @@ async function fetchAndRenderAnalytics() {
                         </span>
                         <span class="font-mono font-bold text-on-surface">${pct}%</span>
                     </div>
-                    <div class="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden">
+                    <div class="w-full bg-surface-container-high h-1 rounded-full overflow-hidden">
                         <div class="h-full ${barColor.split(' ')[0]} transition-all duration-700" style="width: ${pct}%"></div>
                     </div>
                 `;
                 heatmapList.appendChild(row);
             });
         }
-        
-        // 4. Confidence correlation
-        const correlationList = document.getElementById('correlation-bars-list');
-        if (correlationList) {
-            correlationList.innerHTML = '';
-            const items = [
-                { name: 'Over 85% Confidence', val: 94, count: 6 },
-                { name: '70% - 85% Confidence', val: 76, count: 12 },
-                { name: 'Below 70% Confidence', val: 42, count: 4 }
-            ];
-            items.forEach(item => {
-                const barColor = item.val > 80 ? 'bg-primary' : item.val > 60 ? 'bg-tertiary' : 'bg-error';
-                const row = document.createElement('div');
-                row.className = 'flex flex-col gap-1';
-                row.innerHTML = `
-                    <div class="flex justify-between items-center text-[10px] font-semibold text-outline">
-                        <span>${item.name} (${item.count} markets)</span>
-                        <span class="font-mono font-bold text-on-surface">${item.val}% Accuracy</span>
-                    </div>
-                    <div class="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden">
-                        <div class="h-full ${barColor} transition-all duration-700" style="width: ${item.val}%"></div>
-                    </div>
+
+        // 4. Participation Heatmap Grid population
+        const partGrid = document.getElementById('participation-heatmap-grid');
+        if (partGrid && analytics.visualizations && Array.isArray(analytics.visualizations.heatmap)) {
+            partGrid.innerHTML = '';
+            analytics.visualizations.heatmap.forEach(h => {
+                const col = document.createElement('div');
+                col.className = 'flex flex-col items-center gap-1';
+                
+                // Color intensity class based on heatmap value
+                let opacityClass = 'bg-primary/10';
+                if (h.value > 80) opacityClass = 'bg-primary shadow-[0_0_8px_rgba(var(--primary-rgb),0.4)]';
+                else if (h.value > 50) opacityClass = 'bg-primary/70';
+                else if (h.value > 30) opacityClass = 'bg-primary/45';
+                else if (h.value > 10) opacityClass = 'bg-primary/25';
+                
+                col.innerHTML = `
+                    <div class="w-full aspect-square rounded ${opacityClass} transition-all duration-500" title="Participation score: ${h.value}"></div>
+                    <span class="text-[8px] text-outline font-mono font-semibold">${h.day}</span>
                 `;
-                correlationList.appendChild(row);
+                partGrid.appendChild(col);
             });
         }
         
-        // 5. Market Liquidity Telemetry
-        const velocityEl = document.getElementById('metric-velocity');
-        if (velocityEl) {
-            velocityEl.textContent = `${analytics.liquidityVelocity.toFixed(3)}x`;
+        // 5. Confidence Timelines population
+        const timelineList = document.getElementById('confidence-timeline-list');
+        if (timelineList && analytics.visualizations && Array.isArray(analytics.visualizations.confidenceTimeline)) {
+            timelineList.innerHTML = '';
+            analytics.visualizations.confidenceTimeline.forEach(t => {
+                const row = document.createElement('div');
+                row.className = 'flex items-center justify-between text-[10px] font-mono text-outline';
+                
+                // Determine bar color by confidence level
+                const barColor = t.confidence > 80 ? 'bg-primary' : t.confidence > 70 ? 'bg-tertiary' : 'bg-error';
+                
+                row.innerHTML = `
+                    <span class="font-bold text-on-surface truncate max-w-[40%]">${t.time}</span>
+                    <div class="flex-1 mx-3 bg-surface-container-high h-1 rounded-full overflow-hidden">
+                        <div class="h-full ${barColor} transition-all duration-500" style="width: ${t.confidence}%"></div>
+                    </div>
+                    <span class="font-bold text-on-surface">${t.confidence}%</span>
+                `;
+                timelineList.appendChild(row);
+            });
         }
-        
-        const flowEl = document.getElementById('metric-staking-flow');
-        if (flowEl) {
-            flowEl.textContent = `${analytics.stakingFlow.toLocaleString()} SOM`;
+
+        // 6. System Health Indicators population
+        const hVol = document.getElementById('health-volatility-score');
+        if (hVol) hVol.textContent = analytics.marketHealth.volatilityScore;
+
+        const hStab = document.getElementById('health-stability-pct');
+        if (hStab) hStab.textContent = `${analytics.marketHealth.confidenceStability}%`;
+
+        const hRisk = document.getElementById('health-manipulation-risk');
+        if (hRisk) {
+            hRisk.textContent = analytics.marketHealth.manipulationRisk;
+            if (analytics.marketHealth.manipulationRisk === 'LOW') {
+                hRisk.className = 'font-bold text-emerald-500';
+            } else {
+                hRisk.className = 'font-bold text-amber-500';
+            }
         }
-        
-        const confEl = document.getElementById('metric-avg-confidence');
-        if (confEl) {
-            confEl.textContent = `${analytics.avgMarketConfidence}%`;
+
+        const hPart = document.getElementById('health-part-health');
+        if (hPart) hPart.textContent = `${analytics.marketHealth.participationHealth}%`;
+
+        // 7. Market Liquidity Layer population
+        const mLiq = document.getElementById('market-total-liquidity');
+        if (mLiq) mLiq.textContent = `${analytics.marketEconomy.totalLiquidity.toLocaleString()} SOM`;
+
+        const mVel = document.getElementById('metric-velocity');
+        if (mVel) mVel.textContent = `${analytics.marketEconomy.liquidityVelocity.toFixed(2)}x`;
+
+        const mYes = document.getElementById('market-yes-depth');
+        if (mYes) mYes.textContent = analytics.marketEconomy.yesPoolDepth.toLocaleString();
+
+        const mNo = document.getElementById('market-no-depth');
+        if (mNo) mNo.textContent = analytics.marketEconomy.noPoolDepth.toLocaleString();
+
+        const mRatio = document.getElementById('market-part-ratio');
+        if (mRatio) mRatio.textContent = `${analytics.marketEconomy.participationRatio}% YES`;
+
+        // 8. Trader Reputation Layer population
+        const rWin = document.getElementById('reputation-winrate');
+        if (rWin) rWin.textContent = `${analytics.traderReputation.winRate}%`;
+
+        const mFlow = document.getElementById('metric-staking-flow');
+        if (mFlow) mFlow.textContent = `${analytics.traderReputation.stakingVolume.toLocaleString()} SOM`;
+
+        const rPnl = document.getElementById('reputation-pnl');
+        if (rPnl) {
+            rPnl.textContent = `${analytics.traderReputation.profitability >= 0 ? '+' : ''}${analytics.traderReputation.profitability.toFixed(2)} SOM`;
+            rPnl.className = analytics.traderReputation.profitability >= 0 ? 'font-bold text-primary font-mono' : 'font-bold text-error font-mono';
         }
+
+        const rFreq = document.getElementById('reputation-freq');
+        if (rFreq) rFreq.textContent = `${analytics.traderReputation.participationFrequency} trades`;
         
         // 6. Agent Synaptic Performance
         const agentList = document.getElementById('agent-accuracy-list');
@@ -2279,6 +2351,33 @@ function openInsightDrawer(marketId) {
     document.getElementById('insight-confidence').textContent = `${market.confidence}%`;
     document.getElementById('insight-yes-odds').textContent = `${market.yesOdds.toFixed(2)} SOM`;
     document.getElementById('insight-no-odds').textContent = `${market.noOdds.toFixed(2)} SOM`;
+
+    // Populate NEW Economy & Health Indicators
+    const totalLiq = market.volume || 1000;
+    const yesLiqDepth = Math.round(totalLiq * market.yesOdds);
+    const noLiqDepth = Math.round(totalLiq * market.noOdds);
+    const volScoreVal = Math.round(30 + market.confidence * 0.4);
+    const stabilityVal = Math.round(98 - (100 - market.confidence) * 0.1);
+    const manipulationRiskVal = volScoreVal > 65 ? "MEDIUM" : "LOW";
+    const healthIndexVal = Math.round(85 + (market.confidence * 0.1));
+
+    document.getElementById('insight-total-liq').textContent = `${totalLiq.toLocaleString()} SOM`;
+    document.getElementById('insight-yes-depth').textContent = `${yesLiqDepth.toLocaleString()} SOM`;
+    document.getElementById('insight-no-depth').textContent = `${noLiqDepth.toLocaleString()} SOM`;
+    document.getElementById('insight-part-ratio').textContent = `${Math.round(market.yesOdds * 100)}% YES`;
+
+    document.getElementById('insight-vol-score').textContent = `${volScoreVal}`;
+    document.getElementById('insight-stability').textContent = `${stabilityVal}%`;
+    
+    const riskEl = document.getElementById('insight-risk-level');
+    riskEl.textContent = manipulationRiskVal;
+    if (manipulationRiskVal === "LOW") {
+        riskEl.className = "font-bold text-emerald-500";
+    } else {
+        riskEl.className = "font-bold text-amber-500";
+    }
+    
+    document.getElementById('insight-health-idx').textContent = `${healthIndexVal}%`;
     
     // Volatility assessment mapping
     const volElement = document.getElementById('insight-volatility');

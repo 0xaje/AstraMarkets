@@ -131,37 +131,21 @@ app.get("/api/agents/logs/:name", (req: Request, res: Response) => {
 });
 
 // ─── SSE REALTIME EVENTS CHANNEL ──────────────────────────────────
-let sseClients: Response[] = [];
-
 app.get("/api/events", (req: Request, res: Response) => {
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache");
   res.setHeader("Connection", "keep-alive");
   res.flushHeaders();
 
-  // Register with local legacy client list
-  sseClients.push(res);
-  console.log(`[SSE] 🟢 Client connected locally. Total active: ${sseClients.length}`);
-
-  req.on("close", () => {
-    sseClients = sseClients.filter((client) => client !== res);
-    console.log(`[SSE] 🔴 Client disconnected locally. Active: ${sseClients.length}`);
-  });
-
-  // Register with the central unified EventBus
+  // Delegate entirely to the central EventBus SSE registry
   eventBus.registerSseClient(res);
 });
 
-export function broadcastSSE(event: string, data: any) {
-  const payload = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
-  sseClients.forEach((client) => {
-    try {
-      client.write(payload);
-    } catch {
-      // client connection already terminated
-    }
-  });
+/** Broadcast an arbitrary event to all active SSE clients via EventBus. */
+function broadcastSSE(event: string, data: unknown) {
+  eventBus.broadcastRaw(event, data);
 }
+
 
 // ─── PORTFOLIO & TRADING BACKEND SYSTEM ───────────────────────────
 export interface Trade {
@@ -206,9 +190,6 @@ export function getRewardClaims() { return rewardClaims; }
 export function getPortfolioPositions() { return portfolioPositions; }
 export function getUserWalletBalance() { return userWalletBalance; }
 
-// Support POST requests
-app.use(cors());
-
 /** GET /api/portfolio — Fetches user positions and trade log history */
 app.get("/api/portfolio", (_req: Request, res: Response) => {
   res.json({
@@ -227,6 +208,24 @@ app.get("/api/analytics", (_req: Request, res: Response) => {
     ok: true,
     analytics: computePortfolioAnalytics(),
     timestamp: Date.now()
+  });
+});
+
+/** GET /api/health — RPC & engine liveness check */
+app.get("/api/health", async (_req: Request, res: Response) => {
+  const signals = getLiveSignals();
+  const markets = getApprovedMarkets();
+  const agents = getAgentStatuses();
+  const uptime = process.uptime();
+  res.json({
+    ok: true,
+    status: "operational",
+    uptime: Math.round(uptime),
+    signals: signals.length,
+    markets: markets.length,
+    agents: agents.length,
+    agentStatuses: agents.map(a => ({ name: a.name, status: a.status })),
+    timestamp: Date.now(),
   });
 });
 
