@@ -1503,51 +1503,11 @@ function renderFeed(filter = 'all') {
                 </div>
             </div>
 
-            <!-- Hover Expand Reveal Layer ( Bloomberg Terminal details + ChatGPT Reasoning ) -->
-            <div class="max-h-0 group-hover:max-h-[380px] opacity-0 group-hover:opacity-100 transition-all duration-500 ease-in-out overflow-hidden flex flex-col gap-3.5 border-t border-outline-variant/10 pt-4">
-                <div class="flex flex-col gap-1">
-                    <span class="text-[9px] text-outline font-bold uppercase tracking-wider flex items-center gap-1">
-                        <span class="material-symbols-outlined text-xs text-primary">psychology</span>
-                        AI Cognitive Reasoning (GPT-4o)
-                    </span>
-                    <p class="text-[11px] text-on-surface-variant italic font-mono leading-relaxed bg-surface-container/20 p-2.5 rounded-xl border border-outline-variant/15">
-                        "${market.reasoning || `Highly validated narrative detected across multiple nodes. Projections show odds balancing near equilibrium.`}"
-                    </p>
-                </div>
-                
-                <div class="flex flex-col gap-1">
-                    <span class="text-[9px] text-outline font-bold uppercase tracking-wider flex items-center gap-1">
-                        <span class="material-symbols-outlined text-xs text-tertiary">dataset_linked</span>
-                        Raw Signal Inputs
-                    </span>
-                    <ul class="flex flex-col gap-1 text-[10px] text-outline list-disc pl-4 font-mono">
-                        ${(market.rawSignals || [
-                            `Ecosystem keyword activity spiked +${(market.confidence * 0.8).toFixed(0)}%`,
-                            `Social sentiment volume indices registered: ${sentiment.toUpperCase()}`,
-                            `Somnia L1 smart contract ledger tracking ref: ${market.ref}`
-                        ]).map(sig => `<li>${sig}</li>`).join('')}
-                    </ul>
-                </div>
-                
-                <div class="flex flex-col gap-1">
-                    <span class="text-[9px] text-outline font-bold uppercase tracking-wider flex items-center gap-1">
-                        <span class="material-symbols-outlined text-xs text-secondary">analytics</span>
-                        Metrics Breakdown
-                    </span>
-                    <div class="grid grid-cols-3 gap-2 text-center text-[9px] font-mono">
-                        <div class="bg-surface-container/40 p-2 rounded-lg border border-outline-variant/20">
-                            <span class="text-outline text-[8px] uppercase block">Velocity</span>
-                            <span class="font-bold text-primary">${market.confidenceBreakdown?.velocity || Math.round(market.confidence * 0.95)}%</span>
-                        </div>
-                        <div class="bg-surface-container/40 p-2 rounded-lg border border-outline-variant/20">
-                            <span class="text-outline text-[8px] uppercase block">Volume</span>
-                            <span class="font-bold text-secondary">${market.confidenceBreakdown?.volume || Math.round(market.confidence * 0.85)}%</span>
-                        </div>
-                        <div class="bg-surface-container/40 p-2 rounded-lg border border-outline-variant/20">
-                            <span class="text-outline text-[8px] uppercase block">Consensus</span>
-                            <span class="font-bold text-tertiary">${market.confidenceBreakdown?.consensus || market.confidence}%</span>
-                        </div>
-                    </div>
+            <!-- Simplified Premium Meta row -->
+            <div class="flex justify-between items-center text-[10px] text-outline pt-2 border-t border-outline-variant/10">
+                <div class="flex items-center gap-1">
+                    <span class="material-symbols-outlined text-xs">psychology</span>
+                    <span>AI deliberated confidence score: ${market.confidence}%</span>
                 </div>
             </div>
 
@@ -1690,17 +1650,6 @@ function renderFeed(filter = 'all') {
         
         container.appendChild(article);
     });
-    
-    // Add default Cultivating/Loading State Card
-    const loadingCard = document.createElement('article');
-    loadingCard.className = 'cosmic-card p-6 rounded-2xl relative overflow-hidden opacity-60 border-dashed border border-primary/20 flex items-center justify-center';
-    loadingCard.innerHTML = `
-        <div class="h-24 flex items-center justify-center flex-col gap-3">
-            <span class="material-symbols-outlined animate-spin text-primary">refresh</span>
-            <span class="font-label text-xs text-outline uppercase tracking-widest font-bold">Cultivating Data Stream...</span>
-        </div>
-    `;
-    container.appendChild(loadingCard);
     
     applyCardGlowEffects();
 }
