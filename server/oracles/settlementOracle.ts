@@ -1,6 +1,7 @@
 import { approvedMarkets, agentBus } from "../agents/agentEngine.js";
 import fetch from "node-fetch";
 import { resolveMarketOnChain } from "../services/somnia/marketFactory.js";
+import { recordResolutionMemory } from "../agents/agentMemory.js";
 
 const ORACLE_CYCLE_MS = 10000; // Check every 10 seconds
 let oracleActive = false;
@@ -77,6 +78,11 @@ async function resolveExpiredMarket(market: any): Promise<void> {
     market.resolvedOutcome = outcome;
     market.settlementTimestamp = Date.now();
     market.settlementTx = txHash;
+
+    // Record resolution to persistent memory
+    if (market.agent) {
+      recordResolutionMemory(market.agent, market.title, outcome);
+    }
 
     emitLog(
       "decision",

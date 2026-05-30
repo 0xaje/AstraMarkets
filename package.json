@@ -12,13 +12,15 @@
     "dev:all": "concurrently -n \"Frontend,SignalEngine\" -c \"cyan,magenta\" \"npm run dev\" \"npm run server:watch\""
   },
   "dependencies": {
+    "@types/sqlite3": "^3.1.11",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "ethers": "^6.16.0",
     "eventemitter3": "^5.0.4",
     "express": "^4.19.2",
     "node-fetch": "^3.3.2",
-    "openai": "^6.39.1"
+    "openai": "^6.39.1",
+    "sqlite3": "^6.0.1"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

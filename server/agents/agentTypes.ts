@@ -9,6 +9,13 @@ import type { Signal } from "../signals/signalEngine.js";
 
 // ─── MARKET PROPOSAL ─────────────────────────────────────────────
 
+export interface LifecycleEvent {
+  phase: "signal_detected" | "agent_deliberation" | "market_deployed" | "liquidity_entered" | "settlement_finalized";
+  label: string;
+  timestamp: number;
+  detail?: string;
+}
+
 export interface MarketProposal {
   title: string;
   category: "crypto" | "macro" | "sports" | "tech" | "social";
@@ -32,6 +39,12 @@ export interface MarketProposal {
   volume?: number;
   onChainMarketId?: number;
   dispute?: any;
+  // Transparency layer
+  createdAt?: number;                         // when market was approved
+  lifecycle?: LifecycleEvent[];               // market lifecycle event trail
+  topSignalSummary?: string;                  // strongest influencing signal summary
+  riskNote?: string;                          // risk adjustment explanation
+  reasoning?: string;                         // agent core explainable deliberation reasoning
 }
 
 // ─── AGENT DECISION ──────────────────────────────────────────────

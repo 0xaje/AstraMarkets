@@ -57,7 +57,7 @@ body {
     background-image: var(--organic-grid);
     background-size: 32px 32px;
     color: var(--text-primary);
-    transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1), color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     min-height: 100vh;
 }
 
@@ -106,7 +106,7 @@ body::before {
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid var(--border-color);
-    transition: background-color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .cosmic-card {
@@ -122,7 +122,6 @@ body::before {
 .cosmic-card:hover {
     border-color: var(--border-hover);
     box-shadow: var(--shadow-premium);
-    transform: translateY(-1px);
 }
 
 /* Card Radial Highlight Effect */
@@ -176,10 +175,10 @@ span,
 button,
 input,
 select {
-    transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-        border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-        color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-        box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+        border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+        color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+        box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Nav Button Animations */
@@ -274,7 +273,7 @@ select {
 /* Sliding Right-side Insight Drawer */
 .insight-drawer {
     transform: translateX(100%);
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .insight-drawer.open {
@@ -285,7 +284,7 @@ select {
 .modal-overlay {
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.2s ease;
 }
 
 .modal-overlay.open {
@@ -294,8 +293,8 @@ select {
 }
 
 .modal-container {
-    transform: scale(0.95) translateY(10px);
-    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform: scale(0.98) translateY(8px);
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .modal-overlay.open .modal-container {
@@ -308,24 +307,11 @@ select {
     width: 8px;
     margin-right: 2px;
     border-radius: 2px;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.2s ease;
 }
 
 .animate-led-pulse {
-    animation: led-glow 2.5s infinite alternate;
-}
-
-@keyframes led-glow {
-    from {
-        filter: brightness(1);
-        opacity: 0.6;
-    }
-
-    to {
-        filter: brightness(1.3);
-        opacity: 1;
-        box-shadow: 0 0 6px var(--primary);
-    }
+    opacity: 0.9;
 }
 
 /* Scanning Line container */
@@ -409,7 +395,7 @@ select {
     background: rgba(255, 255, 255, 0.3);
     border: 1px solid var(--border-color);
     color: var(--text-primary);
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
 }
 
 .dark .glass-input {
@@ -429,11 +415,11 @@ select {
 
 /* Glow classes for active lights */
 .glow-green {
-    box-shadow: 0 0 10px var(--led-green);
+    box-shadow: 0 0 4px var(--led-green);
 }
 
 .glow-gold {
-    box-shadow: 0 0 10px var(--led-gold);
+    box-shadow: 0 0 4px var(--led-gold);
 }
 
 /* Tab contents and transitions */
@@ -447,21 +433,19 @@ select {
     color: var(--text-secondary);
     border: 1px solid var(--border-color);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.01);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .market-cat-btn:hover {
     background: var(--surface-container-high);
     color: var(--primary);
     border-color: var(--border-hover);
-    transform: translateX(4px);
 }
 
 .market-cat-btn.active {
     background: var(--primary);
     color: var(--surface-solid) !important;
     border-color: var(--primary);
-    box-shadow: 0 4px 12px var(--primary-glow);
 }
 
 .market-cat-btn.active .cat-count {
