@@ -889,10 +889,12 @@ function initTheme() {
     setTheme(savedTheme);
     
     const themeBtn = document.getElementById('theme-toggle');
-    themeBtn.addEventListener('click', () => {
-        const nextTheme = state.theme === 'light' ? 'dark' : 'light';
-        setTheme(nextTheme);
-    });
+    if (themeBtn) {
+        themeBtn.addEventListener('click', () => {
+            const nextTheme = state.theme === 'light' ? 'dark' : 'light';
+            setTheme(nextTheme);
+        });
+    }
 }
 
 function setTheme(theme) {
@@ -906,11 +908,11 @@ function setTheme(theme) {
     if (theme === 'dark') {
         htmlElement.classList.add('dark');
         htmlElement.classList.remove('light');
-        themeIcon.textContent = 'light_mode';
+        if (themeIcon) themeIcon.textContent = 'light_mode';
     } else {
         htmlElement.classList.add('light');
         htmlElement.classList.remove('dark');
-        themeIcon.textContent = 'dark_mode';
+        if (themeIcon) themeIcon.textContent = 'dark_mode';
     }
 }
 
@@ -1131,9 +1133,9 @@ function setupEventHandlers() {
     const settingsModal = document.getElementById('settings-modal');
     const settingsClose = document.getElementById('settings-modal-close');
     
-    const openSettings = () => settingsModal.classList.add('open');
-    settingsBtn.addEventListener('click', openSettings);
-    settingsClose.addEventListener('click', () => settingsModal.classList.remove('open'));
+    const openSettings = () => { if (settingsModal) settingsModal.classList.add('open'); };
+    if (settingsBtn) settingsBtn.addEventListener('click', openSettings);
+    if (settingsClose && settingsModal) settingsClose.addEventListener('click', () => settingsModal.classList.remove('open'));
     
     // Explorer Modal Triggers
     const explorerModal = document.getElementById('explorer-modal');
