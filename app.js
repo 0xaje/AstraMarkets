@@ -1067,28 +1067,24 @@ function renderLandingPage() {
         else if (agent.color === 'tertiary') badgeColorClass = 'text-tertiary bg-tertiary/10 border-tertiary/20';
 
         const card = document.createElement('div');
-        card.className = 'cosmic-card p-5 rounded-2xl border border-outline-variant/40 flex flex-col gap-3.5 relative overflow-hidden group hover:border-primary/50 transition-all duration-300';
+        card.className = 'cosmic-card p-5 rounded-2xl border border-outline-variant/40 flex flex-col relative overflow-hidden group hover:border-primary/50 transition-all duration-300';
         card.innerHTML = `
-            <div class="flex justify-between items-center">
-                <span class="font-display font-extrabold text-sm text-on-surface">${agent.name}</span>
-                <span class="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${badgeColorClass}">${agent.color} core</span>
+            <div class="flex justify-between items-center mb-1">
+                <span class="font-display font-bold text-sm text-on-surface">${agent.name}</span>
+                <span class="text-[8px] font-bold uppercase tracking-widest px-2 py-0.5 rounded border ${badgeColorClass}">${agent.color}</span>
             </div>
-            <div class="flex flex-col gap-1 text-[11px]">
-                <div class="flex justify-between text-outline">
-                    <span>Strategy:</span>
-                    <span class="font-semibold text-on-surface text-right truncate w-24">${agent.strategy}</span>
-                </div>
-                <div class="flex justify-between text-outline">
-                    <span>Accuracy:</span>
-                    <span class="font-mono font-bold text-primary">${agent.accuracy}%</span>
-                </div>
-                <div class="flex justify-between text-outline">
-                    <span>Capital:</span>
-                    <span class="font-mono text-tertiary font-bold">${agent.capital} SOM</span>
-                </div>
+            <div class="text-[10px] text-outline font-semibold mb-4 line-clamp-1">
+                ${agent.strategy}
             </div>
-            <div class="border-t border-outline-variant/20 pt-2 text-[9px] font-mono text-outline truncate italic">
-                ● ${agent.status}
+            <div class="flex justify-between items-end border-t border-outline-variant/20 pt-3 mt-auto">
+                <div class="flex flex-col">
+                    <span class="text-[8px] uppercase tracking-widest text-outline">Win Rate</span>
+                    <span class="text-xs font-bold text-primary font-mono">${agent.accuracy}%</span>
+                </div>
+                <div class="flex flex-col text-right">
+                    <span class="text-[8px] uppercase tracking-widest text-outline">TVL</span>
+                    <span class="text-xs font-bold text-on-surface font-mono">${agent.capital} SOM</span>
+                </div>
             </div>
         `;
         rosterContainer.appendChild(card);
