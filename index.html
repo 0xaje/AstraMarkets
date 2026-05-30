@@ -392,8 +392,10 @@
                         <span class="font-label text-[10px] text-outline uppercase tracking-wider">Sort by:</span>
                         <div class="flex gap-3">
                             <span data-feed-filter="all" class="feed-filter-btn font-label text-primary text-xs font-bold border-b-2 border-primary cursor-pointer pb-0.5 uppercase tracking-wider">All Signals</span>
+                            <span data-feed-filter="sports" class="feed-filter-btn font-label text-outline text-xs font-bold border-b-2 border-transparent cursor-pointer hover:text-primary hover:border-primary/50 pb-0.5 transition-colors uppercase tracking-wider">Sports</span>
                             <span data-feed-filter="crypto" class="feed-filter-btn font-label text-outline text-xs font-bold border-b-2 border-transparent cursor-pointer hover:text-primary hover:border-primary/50 pb-0.5 transition-colors uppercase tracking-wider">Crypto</span>
-                            <span data-feed-filter="macro" class="feed-filter-btn font-label text-outline text-xs font-bold border-b-2 border-transparent cursor-pointer hover:text-primary hover:border-primary/50 pb-0.5 transition-colors uppercase tracking-wider">Macro</span>
+                            <span data-feed-filter="tech" class="feed-filter-btn font-label text-outline text-xs font-bold border-b-2 border-transparent cursor-pointer hover:text-primary hover:border-primary/50 pb-0.5 transition-colors uppercase tracking-wider">Tech</span>
+                            <span data-feed-filter="politics" class="feed-filter-btn font-label text-outline text-xs font-bold border-b-2 border-transparent cursor-pointer hover:text-primary hover:border-primary/50 pb-0.5 transition-colors uppercase tracking-wider">Politics</span>
                         </div>
                     </div>
                 </div>
@@ -475,13 +477,13 @@
                                 <span class="cat-count text-[9px] px-2 py-0.5 rounded-full bg-outline-variant/30 text-outline-variant" id="count-tech">0</span>
                             </button>
 
-                            <!-- Macro -->
-                            <button data-cat="macro" class="market-cat-btn w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 font-label text-xs font-bold border border-transparent text-left">
+                            <!-- Politics -->
+                            <button data-cat="politics" class="market-cat-btn w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 font-label text-xs font-bold border border-transparent text-left">
                                 <div class="flex items-center gap-3">
                                     <span class="material-symbols-outlined text-sm">public</span>
-                                    <span>Macro</span>
+                                    <span>Politics</span>
                                 </div>
-                                <span class="cat-count text-[9px] px-2 py-0.5 rounded-full bg-outline-variant/30 text-outline-variant" id="count-macro">0</span>
+                                <span class="cat-count text-[9px] px-2 py-0.5 rounded-full bg-outline-variant/30 text-outline-variant" id="count-politics">0</span>
                             </button>
                         </div>
                         
@@ -983,25 +985,25 @@
                 <div class="mt-4 p-5 rounded-xl bg-primary/10 border border-primary/20 shadow-sm typewriter-fade" id="rooted-decision-container">
                     <div class="flex items-center justify-between mb-3">
                         <div class="flex items-center gap-2">
-                            <span class="material-symbols-outlined text-lg text-primary">forest</span>
-                            <span class="font-label text-xs text-primary uppercase font-bold tracking-wider">Ecosystem Event</span>
+                            <span class="material-symbols-outlined text-lg text-primary">robot</span>
+                            <span class="font-label text-xs text-primary uppercase font-bold tracking-wider">Market Proposal</span>
                         </div>
-                        <span class="text-[9px] font-bold uppercase tracking-widest text-primary px-1.5 py-0.5 rounded bg-primary/10 border border-primary/20" id="decision-status">VOTING ACTIVE</span>
+                        <span class="text-[9px] font-bold uppercase tracking-widest text-primary px-1.5 py-0.5 rounded bg-primary/10 border border-primary/20" id="decision-status">AWAITING APPROVAL</span>
                     </div>
                     <p class="font-body text-sm text-on-surface-variant font-semibold" id="rooted-decision-text">New Market 'AI Compute War' seeded.</p>
                     
                     <div class="mt-4 flex flex-col gap-2">
                         <div class="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider text-outline">
-                            <span id="vote-yes-label">Support Yes: 68%</span>
-                            <span id="vote-no-label">Against No: 32%</span>
+                            <span id="vote-yes-label">Swarm Consensus: 92%</span>
+                            <span id="vote-no-label">Risk Threshold: 8%</span>
                         </div>
                         <div class="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden">
-                            <div id="rooted-decision-progress" class="bg-primary h-full w-2/3 transition-all duration-1000"></div>
+                            <div id="rooted-decision-progress" class="bg-primary h-full w-[92%] transition-all duration-1000"></div>
                         </div>
                         <!-- Dynamic voting interactions -->
                         <div class="flex gap-2 mt-2">
-                            <button id="vote-yes-btn" class="flex-1 py-1.5 border border-primary/30 hover:border-primary text-[10px] font-bold uppercase text-primary bg-primary/5 hover:bg-primary/10 rounded-lg transition-all">Vote Yes</button>
-                            <button id="vote-no-btn" class="flex-1 py-1.5 border border-error/30 hover:border-error text-[10px] font-bold uppercase text-error bg-error/5 hover:bg-error/10 rounded-lg transition-all">Vote No</button>
+                            <button id="vote-yes-btn" class="flex-1 py-1.5 border border-primary/30 hover:border-primary text-[10px] font-bold uppercase text-primary bg-primary/5 hover:bg-primary/10 rounded-lg transition-all">Execute Yes</button>
+                            <button id="vote-no-btn" class="flex-1 py-1.5 border border-error/30 hover:border-error text-[10px] font-bold uppercase text-error bg-error/5 hover:bg-error/10 rounded-lg transition-all">Reject</button>
                         </div>
                     </div>
                 </div>
@@ -1170,11 +1172,11 @@
                     
                     <div class="flex flex-col gap-1.5">
                         <div class="flex justify-between items-center text-[10px] font-semibold text-outline">
-                            <span class="flex items-center gap-1">📊 Macro Swarm Weight</span>
-                            <span id="attr-macro" class="font-mono font-bold text-outline">20%</span>
+                            <span class="flex items-center gap-1">📊 Politics Swarm Weight</span>
+                            <span id="attr-politics" class="font-mono font-bold text-outline">20%</span>
                         </div>
                         <div class="w-full bg-surface-container-high h-1 rounded-full overflow-hidden">
-                            <div id="bar-macro" class="bg-outline h-full w-[20%] transition-all duration-700"></div>
+                            <div id="bar-politics" class="bg-outline h-full w-[20%] transition-all duration-700"></div>
                         </div>
                     </div>
                 </div>

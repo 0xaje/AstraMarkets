@@ -75,8 +75,8 @@ const SignalClient = {
         // ── Update agent status messages from real signals ──────────
         if (crypto.length > 0 && state.agents.find(a => a.name === 'MacroAgent')) {
             const top = crypto[0];
-            const macro = state.agents.find(a => a.name === 'MacroAgent');
-            if (macro) macro.status = `Live: ${top.topic.substring(0, 72)}...`;
+            const politicsAgent = state.agents.find(a => a.name === 'Politics Core');
+            if (politicsAgent) politicsAgent.status = `Live: ${top.topic.substring(0, 72)}...`;
         }
         if (reddit.length > 0 && state.agents.find(a => a.name === 'SocialAgent')) {
             const top = reddit[0];
@@ -343,48 +343,52 @@ const state = {
     // AI Agents — synced from backend on boot
     agents: [
         {
-            name: 'MacroAgent',
-            strategy: 'Macroeconomic & Institutional Analytics',
-            specialbadge: 'Macro Volatility',
-            domainexpertise: 'ETF Flows & FOMC Interest Sentiment',
+            name: 'Sports Core',
+            strategy: 'Live Event Odds & Probability Tracking',
+            specialbadge: 'Sports Trends',
+            domainexpertise: 'Tournament & Match Predictions',
             capital: 350,
             accuracy: 88,
             trades: 0,
-            status: 'Connecting to live macro signal stream...',
-            color: 'primary'
+            status: 'Monitoring sports events...',
+            color: 'primary',
+            badgeTitle: 'SPORTS'
         },
         {
-            name: 'SocialAgent',
-            strategy: 'Viral Sentiment & Narrative Propagation',
-            specialbadge: 'Viral Indexer',
-            domainexpertise: 'Meme Velocity & Sentiment Decays',
-            capital: 200,
-            accuracy: 84,
-            trades: 0,
-            status: 'Connecting to Reddit & Trends signal stream...',
-            color: 'secondary'
-        },
-        {
-            name: 'SportsAgent',
-            strategy: 'Sports Timing & Probability Calibrator',
-            specialbadge: 'Timing Analytics',
-            domainexpertise: 'Probability Model Odds Calibration',
-            capital: 250,
-            accuracy: 82,
-            trades: 0,
-            status: 'Connecting to sports event calendar stream...',
-            color: 'tertiary'
-        },
-        {
-            name: 'RiskAgent',
-            strategy: 'Manipulation & Volatility Stress Filter',
-            specialbadge: 'Stability Arbitrage',
-            domainexpertise: 'Anomaly & Manipulation Detection',
+            name: 'Crypto Core',
+            strategy: 'On-chain TVL & Tokenomics Models',
+            specialbadge: 'Crypto Analytics',
+            domainexpertise: 'Market Cap & Volume Flows',
             capital: 400,
             accuracy: 92,
             trades: 0,
-            status: 'Monitoring Somnia L1 for systemic risk signals...',
-            color: 'tertiary'
+            status: 'Monitoring L1 network flows...',
+            color: 'secondary',
+            badgeTitle: 'CRYPTO'
+        },
+        {
+            name: 'Tech Core',
+            strategy: 'Silicon & AI Industry Tracking',
+            specialbadge: 'Tech Innovations',
+            domainexpertise: 'Compute & Hardware Markets',
+            capital: 250,
+            accuracy: 85,
+            trades: 0,
+            status: 'Monitoring tech sector news...',
+            color: 'tertiary',
+            badgeTitle: 'TECH'
+        },
+        {
+            name: 'Politics Core',
+            strategy: 'Global Governance & Elections Polling',
+            specialbadge: 'Political Polling',
+            domainexpertise: 'Election Outcome Probabilities',
+            capital: 200,
+            accuracy: 82,
+            trades: 0,
+            status: 'Monitoring election cycles...',
+            color: 'primary',
+            badgeTitle: 'POLITICS'
         }
     ],
     
@@ -520,7 +524,7 @@ function startSSEListener() {
 
             if (state.markets.some(m => m.ref === raw.ref || m._signalKey === fingerprint)) return;
 
-            const themes = { crypto: 'primary', macro: 'secondary', sports: 'tertiary', tech: 'secondary', social: 'primary' };
+            const themes = { crypto: 'primary', politics: 'secondary', sports: 'tertiary', tech: 'secondary' };
             const newMarket = {
                 id: 'm_chain_' + (data.onChainMarketId || Date.now()),
                 _signalKey: fingerprint,
@@ -742,7 +746,7 @@ async function syncMarketsFromBackend() {
             // Map raw backend schema to frontend application state
             const mapped = data.markets.map(raw => {
                 const fingerprint = raw.title.substring(0, 60).toLowerCase().replace(/\W+/g, '_');
-                const themes = { crypto: 'primary', macro: 'secondary', sports: 'tertiary', tech: 'secondary', social: 'primary' };
+                const themes = { crypto: 'primary', politics: 'secondary', sports: 'tertiary', tech: 'secondary' };
                 const theme = themes[raw.category] || 'primary';
                 
                 return {
@@ -1071,7 +1075,7 @@ function renderLandingPage() {
         card.innerHTML = `
             <div class="flex justify-between items-center mb-1">
                 <span class="font-display font-bold text-sm text-on-surface">${agent.name}</span>
-                <span class="text-[8px] font-bold uppercase tracking-widest px-2 py-0.5 rounded border ${badgeColorClass}">${agent.color}</span>
+                <span class="text-[8px] font-bold uppercase tracking-widest px-2 py-0.5 rounded border ${badgeColorClass}">${agent.badgeTitle || 'CORE'}</span>
             </div>
             <div class="text-[10px] text-outline font-semibold mb-4 line-clamp-1">
                 ${agent.strategy}
@@ -1699,7 +1703,7 @@ function renderMarkets() {
     const catVal = document.getElementById('market-category').value;
     
     // Dynamically update category counts in sidebar
-    const categories = ['all', 'sports', 'crypto', 'politics', 'tech', 'macro'];
+    const categories = ['all', 'sports', 'crypto', 'politics', 'tech'];
     categories.forEach(cat => {
         const countEl = document.getElementById(`count-${cat}`);
         if (countEl) {
@@ -2067,13 +2071,12 @@ async function fetchAndRenderAnalytics() {
         const heatmapList = document.getElementById('exposure-heatmap-list');
         if (heatmapList) {
             heatmapList.innerHTML = '';
-            const cats = ['crypto', 'macro', 'sports', 'tech', 'social'];
+            const cats = ['crypto', 'politics', 'sports', 'tech'];
             const colors = {
                 crypto: 'bg-primary border-primary',
-                macro: 'bg-secondary border-secondary',
+                politics: 'bg-secondary border-secondary',
                 sports: 'bg-tertiary border-tertiary',
-                tech: 'bg-secondary border-secondary',
-                social: 'bg-primary border-primary'
+                tech: 'bg-outline border-outline'
             };
             cats.forEach(cat => {
                 const pct = analytics.exposureByCategory[cat] || 0;
@@ -2576,14 +2579,14 @@ function openInsightDrawer(marketId) {
     const genesisEl = document.getElementById('insight-genesis-intent');
     const riskAdjEl = document.getElementById('insight-risk-adjustments');
     if (genesisEl) {
-        if (market.agent === 'MacroAgent') {
-            genesisEl.textContent = `Macro Swarm initiated this market targeting macro volatility indicators and liquidity shifts to seed parimutuel contract structures.`;
-        } else if (market.agent === 'SocialAgent') {
-            genesisEl.textContent = `Social Swarm tracking viral accelerations and engagement spikes proposed this contract to index public sentiment momentum.`;
-        } else if (market.agent === 'SportsAgent') {
+        if (market.agent === 'Politics Core') {
+            genesisEl.textContent = `Politics Swarm initiated this market targeting election indicators and polling shifts to seed parimutuel contract structures.`;
+        } else if (market.agent === 'Crypto Core') {
+            genesisEl.textContent = `Crypto Swarm tracking TVL accelerations and on-chain spikes proposed this contract to index market momentum.`;
+        } else if (market.agent === 'Sports Core') {
             genesisEl.textContent = `Sports Engine calibrated event scheduling details and API endpoints to seed parimutuel options on Somnia L1.`;
         } else {
-            genesisEl.textContent = `Risk Swarm established automated margin guidelines, sizing dynamic TVL pools to safeguard user capital.`;
+            genesisEl.textContent = `Tech Swarm established automated models, sizing AI compute pools to match tech sector volatility.`;
         }
     }
     if (riskAdjEl) {
@@ -2672,8 +2675,8 @@ function openInsightDrawer(marketId) {
     document.getElementById('attr-trends').textContent = `${trWeight}%`;
     document.getElementById('bar-trends').style.width = `${trWeight}%`;
 
-    document.getElementById('attr-macro').textContent = `${macWeight}%`;
-    document.getElementById('bar-macro').style.width = `${macWeight}%`;
+    document.getElementById('attr-politics').textContent = `${macWeight}%`;
+    document.getElementById('bar-politics').style.width = `${macWeight}%`;
 
     // Dynamic Multi-Source Verification Layer scoring
     const scoreBadge = document.getElementById('verification-score-badge');
@@ -3344,10 +3347,10 @@ function addConsciousnessLog(text, color = 'primary') {
 // Send interactive Hive chat message
 
 
-// Governance Vote Action
+// Market Proposal Execution
 function executeGovernanceVote(choice) {
     if (state.rootedDecision.hasVoted) {
-        alertFloatNotification('Governance weight already registered for this epoch.', 'error');
+        alertFloatNotification('You have already made a decision on this proposal.', 'error');
         return;
     }
     
@@ -3355,10 +3358,10 @@ function executeGovernanceVote(choice) {
     
     if (choice === 'YES') {
         state.rootedDecision.yesVotes += 4;
-        addConsciousnessLog("Governance vote weight registered: Support YES on L1 Gas Token Arbitrage.", "primary");
+        addConsciousnessLog("Execution command confirmed: Initiating smart contract deployment on Somnia L1.", "primary");
     } else {
         state.rootedDecision.noVotes += 4;
-        addConsciousnessLog("Governance vote weight registered: Counter NO on L1 Gas Token Arbitrage.", "error");
+        addConsciousnessLog("Proposal rejected. Diverting compute resources back to monitoring.", "error");
     }
     
     // Animate change
@@ -3368,14 +3371,16 @@ function executeGovernanceVote(choice) {
     const yesPct = (yesWeight / total) * 100;
     const noPct = (noWeight / total) * 100;
     
-    document.getElementById('vote-yes-label').textContent = `Support Yes: ${yesPct.toFixed(0)}%`;
-    document.getElementById('vote-no-label').textContent = `Against No: ${noPct.toFixed(0)}%`;
+    document.getElementById('vote-yes-label').textContent = `Swarm Consensus: ${yesPct.toFixed(0)}%`;
+    document.getElementById('vote-no-label').textContent = `Risk Threshold: ${noPct.toFixed(0)}%`;
     document.getElementById('rooted-decision-progress').style.width = `${yesPct}%`;
     
-    document.getElementById('decision-status').textContent = 'VOTE DELEGATED';
+    document.getElementById('decision-status').textContent = choice === 'YES' ? 'EXECUTED' : 'REJECTED';
     document.getElementById('decision-status').className = 'text-[9px] font-bold uppercase tracking-widest text-outline px-1.5 py-0.5 rounded bg-surface-container border border-outline-variant/30';
     
-    alertFloatNotification('Governance vote recorded successfully!', 'success');
+    if (choice === 'YES') {
+        alertFloatNotification('Market contract successfully seeded!', 'success');
+    }
 }
 
 // --- UTILITIES & SIMULATION ENGINE ---
@@ -3420,29 +3425,29 @@ setInterval(() => {
 // Governance proposal recycling
 function cycleGovernanceDecision() {
     const proposals = [
-        "Decrease L1 gas margins for autonomous transactions?",
-        "Authorize RiskAgent integration with secondary TVL pools?",
-        "Fund new computing clusters on Somnia decentralized nodes?",
-        "Authorize validation pool reward distributions?"
+        "Detecting massive World Cup final betting volume on offshore derivatives. Seed new Sports market?",
+        "Tech cluster detected a 20% spike in AI compute demand. Deploy new Tech Volatility Index market?",
+        "On-chain crypto bridging volume to Somnia L1 increased by 400%. Deploy Ecosystem TVL market?",
+        "Global polling data shows massive standard deviation shift. Initialize new Election market?"
     ];
     
     const prop = proposals[Math.floor(Math.random() * proposals.length)];
     
     state.rootedDecision.text = prop;
-    state.rootedDecision.yesVotes = 50 + Math.floor(Math.random()*20);
+    state.rootedDecision.yesVotes = 85 + Math.floor(Math.random()*12);
     state.rootedDecision.noVotes = 100 - state.rootedDecision.yesVotes;
     state.rootedDecision.hasVoted = false;
     
     // Reset visual state
     document.getElementById('rooted-decision-text').textContent = prop;
     document.getElementById('rooted-decision-progress').style.width = `${state.rootedDecision.yesVotes}%`;
-    document.getElementById('vote-yes-label').textContent = `Support Yes: ${state.rootedDecision.yesVotes}%`;
-    document.getElementById('vote-no-label').textContent = `Against No: ${state.rootedDecision.noVotes}%`;
+    document.getElementById('vote-yes-label').textContent = `Swarm Consensus: ${state.rootedDecision.yesVotes}%`;
+    document.getElementById('vote-no-label').textContent = `Risk Threshold: ${state.rootedDecision.noVotes}%`;
     
-    document.getElementById('decision-status').textContent = 'VOTING ACTIVE';
+    document.getElementById('decision-status').textContent = 'AWAITING APPROVAL';
     document.getElementById('decision-status').className = 'text-[9px] font-bold uppercase tracking-widest text-primary px-1.5 py-0.5 rounded bg-primary/10 border border-primary/20';
     
-    addConsciousnessLog(`New governance decision submitted to blockchain: '${prop}'`, 'primary');
+    addConsciousnessLog(`New autonomous market proposal generated: '${prop}'`, 'primary');
 }
 
 // Copy to clipboard helper utility
