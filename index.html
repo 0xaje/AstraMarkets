@@ -524,164 +524,81 @@
             
             <!-- PAGE 3: AI Agent Creator Lab -->
             <div id="tab-agents" class="page-tab flex-col gap-8 w-full">
-                <div class="scanning-container px-4 py-2 border-l-4 border-primary/40">
-                    <div class="scanning-line"></div>
-                    <div class="flex items-center justify-between">
-                        <h2 class="font-display text-3xl text-primary font-bold">AI Agent Creator Lab</h2>
-                        <span class="text-xs px-3 py-1 bg-tertiary/10 text-tertiary border border-tertiary/20 rounded-full font-bold uppercase tracking-wider">Autonomous Protocol</span>
+                <!-- Header -->
+                <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-outline-variant/20 pb-6">
+                    <div class="flex flex-col gap-2">
+                        <h2 class="font-display text-4xl text-on-surface font-bold tracking-tight">Swarm Core</h2>
+                        <p class="text-xs text-outline font-semibold">Deploy and monitor autonomous AI market makers</p>
+                    </div>
+                    <div class="flex items-center gap-3 bg-tertiary/10 px-4 py-2 rounded-xl border border-tertiary/20">
+                        <span class="w-2.5 h-2.5 rounded-full bg-tertiary animate-pulse"></span>
+                        <span class="text-[10px] font-bold text-tertiary uppercase tracking-widest">Protocol Active</span>
                     </div>
                 </div>
                 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-2">
                     <!-- Deploy Form -->
-                    <div class="cosmic-card p-6 rounded-2xl lg:col-span-1 border border-outline-variant/40 flex flex-col gap-6 backdrop-blur-md">
-                        <div class="flex items-center justify-between border-b border-outline-variant/20 pb-3">
-                            <span class="text-xs font-bold text-primary uppercase tracking-wider flex items-center gap-1.5">
-                                <span class="material-symbols-outlined text-sm animate-pulse">developer_board</span>
-                                Swarm Core Provisioner
+                    <div class="cosmic-card p-8 rounded-3xl lg:col-span-1 border border-outline-variant/30 flex flex-col gap-8 bg-surface-container/20 hover:border-primary/30 transition-colors relative overflow-hidden">
+                        <div class="absolute -right-20 -top-20 w-48 h-48 bg-primary/5 rounded-full blur-3xl"></div>
+                        
+                        <div class="flex flex-col gap-1">
+                            <span class="text-xs font-bold text-primary uppercase tracking-widest flex items-center gap-2">
+                                <span class="material-symbols-outlined text-sm">smart_toy</span>
+                                Provision Node
                             </span>
-                            <span class="text-[8px] px-2 py-0.5 bg-primary/10 border border-primary/20 rounded text-primary font-mono font-black">L1 CORE</span>
+                            <span class="text-[10px] text-outline font-semibold">Initialize a new cognitive agent</span>
                         </div>
                         
-                        <div class="flex flex-col gap-2">
-                            <label class="text-[10px] font-bold text-outline uppercase tracking-wider flex items-center gap-1">
-                                <span class="material-symbols-outlined text-xs text-primary">tag</span>
-                                Agent / Core Name
-                            </label>
-                            <input type="text" id="deploy-agent-name" placeholder="e.g. OracleArbitrageur" class="glass-input p-3 rounded-xl border border-outline-variant/40 text-xs bg-surface-container font-semibold w-full focus:outline-none focus:border-primary">
-                        </div>
-                        
-                        <div class="flex flex-col gap-2">
-                            <label class="text-[10px] font-bold text-outline uppercase tracking-wider flex items-center gap-1">
-                                <span class="material-symbols-outlined text-xs text-secondary">psychology</span>
-                                Directive Strategy
-                            </label>
-                            <select id="deploy-agent-strategy" class="glass-input p-3 rounded-xl border border-outline-variant/40 text-xs bg-surface-container font-semibold w-full focus:outline-none focus:border-primary">
-                                <option value="Arbitrage">Arbitrage Strategy</option>
-                                <option value="Sentiment Analysis">Sentiment Analysis</option>
-                                <option value="Macro Hedging">Macro Hedging Strategy</option>
-                                <option value="High Volatility Scalper">High Volatility Scalper</option>
-                            </select>
-                        </div>
-                        
-                        <div class="flex flex-col gap-2">
-                            <label class="text-[10px] font-bold text-outline uppercase tracking-wider flex items-center gap-1">
-                                <span class="material-symbols-outlined text-xs text-tertiary">target</span>
-                                Focus Target
-                            </label>
-                            <select id="deploy-agent-target" class="glass-input p-3 rounded-xl border border-outline-variant/40 text-xs bg-surface-container font-semibold w-full focus:outline-none focus:border-primary">
-                                <option value="Ethereum ETF">Ethereum ETF</option>
-                                <option value="Somnia L1 TVL">Somnia L1 Ecosystem</option>
-                                <option value="AI Compute War">AI Compute & Chip Tech</option>
-                                <option value="EVM Bridge TVL">Cross-chain Bridges</option>
-                            </select>
-                        </div>
-                        
-                        <div class="flex flex-col gap-2.5">
-                            <div class="flex justify-between items-center text-[10px] font-bold text-outline uppercase tracking-wider">
-                                <span class="flex items-center gap-1">
-                                    <span class="material-symbols-outlined text-xs text-primary">account_balance_wallet</span>
-                                    Capital Allocation
-                                </span>
-                                <span class="text-primary font-mono font-bold" id="deploy-capital-value">50 SOM</span>
+                        <div class="flex flex-col gap-5">
+                            <div class="flex flex-col gap-2">
+                                <label class="text-[10px] font-bold text-outline uppercase tracking-widest">Core Name</label>
+                                <input type="text" id="deploy-agent-name" placeholder="e.g. NexusOracle" class="p-3 rounded-xl border border-outline-variant/30 text-xs bg-surface-container/50 font-bold text-on-surface w-full focus:outline-none focus:border-primary transition-all">
                             </div>
-                            <div class="flex items-center gap-4">
-                                <input type="range" id="deploy-agent-capital" min="10" max="500" value="50" class="accent-primary flex-1 h-1.5 bg-surface-container rounded-lg appearance-none cursor-pointer">
+                            
+                            <div class="flex flex-col gap-2">
+                                <label class="text-[10px] font-bold text-outline uppercase tracking-widest">Directives</label>
+                                <select id="deploy-agent-strategy" class="p-3 rounded-xl border border-outline-variant/30 text-xs bg-surface-container/50 font-bold text-on-surface w-full focus:outline-none focus:border-primary transition-all appearance-none cursor-pointer">
+                                    <option value="Arbitrage">Arbitrage Strategy</option>
+                                    <option value="Sentiment Analysis">Sentiment Analysis</option>
+                                    <option value="Macro Hedging">Macro Hedging Strategy</option>
+                                    <option value="High Volatility Scalper">High Volatility Scalper</option>
+                                </select>
+                            </div>
+                            
+                            <div class="flex flex-col gap-2">
+                                <label class="text-[10px] font-bold text-outline uppercase tracking-widest">Target Vector</label>
+                                <select id="deploy-agent-target" class="p-3 rounded-xl border border-outline-variant/30 text-xs bg-surface-container/50 font-bold text-on-surface w-full focus:outline-none focus:border-primary transition-all appearance-none cursor-pointer">
+                                    <option value="Ethereum ETF">Ethereum ETF</option>
+                                    <option value="Somnia L1 TVL">Somnia L1 Ecosystem</option>
+                                    <option value="AI Compute War">AI Compute Tech</option>
+                                    <option value="EVM Bridge TVL">Cross-chain Bridges</option>
+                                </select>
+                            </div>
+                            
+                            <div class="flex flex-col gap-3 mt-2">
+                                <div class="flex justify-between items-center text-[10px] font-bold text-outline uppercase tracking-widest">
+                                    <span>Capital Allocation</span>
+                                    <span class="text-primary font-mono text-sm" id="deploy-capital-value">50 SOM</span>
+                                </div>
+                                <input type="range" id="deploy-agent-capital" min="10" max="500" value="50" class="accent-primary w-full h-1.5 bg-surface-container/50 rounded-lg appearance-none cursor-pointer">
                             </div>
                         </div>
                         
-                        <button id="deploy-agent-btn" class="w-full bg-primary hover:bg-on-primary-fixed-variant text-surface-solid font-label text-xs font-black uppercase tracking-widest py-3.5 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer mt-2">
-                            <span class="material-symbols-outlined text-sm">smart_toy</span>
-                            Deploy Core on Somnia
+                        <button id="deploy-agent-btn" class="w-full bg-primary hover:bg-primary/90 text-surface-solid font-label text-xs font-black uppercase tracking-widest py-4 rounded-xl transition-all shadow-[0_4px_14px_rgba(74,124,89,0.3)] hover:shadow-[0_6px_20px_rgba(74,124,89,0.4)] flex items-center justify-center gap-2 mt-4">
+                            Deploy to Network
+                            <span class="material-symbols-outlined text-sm">rocket_launch</span>
                         </button>
                     </div>
                     
                     <!-- Active Agents Monitor -->
                     <div class="lg:col-span-2 flex flex-col gap-6">
-                        <div class="flex justify-between items-center">
-                            <h3 class="font-display text-xl font-bold text-on-surface">Ecosystem Agents</h3>
-                            <span class="text-xs text-outline font-semibold" id="total-agents-deployed-text">4 cores active</span>
+                        <div class="flex justify-between items-center bg-surface-container/20 p-4 rounded-2xl border border-outline-variant/20">
+                            <h3 class="font-display text-lg font-bold text-on-surface">Active Swarm Registry</h3>
+                            <span class="text-[10px] bg-surface-container px-3 py-1 rounded-full text-outline font-mono uppercase tracking-widest" id="total-agents-deployed-text">0 cores active</span>
                         </div>
                         
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="agents-monitor-container">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="agents-monitor-container">
                             <!-- Populated Dynamically -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Agent Performance Intelligence Layer -->
-                <div class="cosmic-card p-6 rounded-2xl border border-outline-variant/40 flex flex-col gap-6 mt-4">
-                    <div class="flex items-center justify-between border-b border-outline-variant/20 pb-4 flex-wrap gap-4">
-                        <div class="flex flex-col gap-0.5">
-                            <h3 class="font-display text-xl text-primary font-bold flex items-center gap-2">
-                                <span class="material-symbols-outlined text-primary">analytics</span>
-                                Swarm Performance Intelligence
-                            </h3>
-                            <p class="text-[10px] text-outline uppercase tracking-wider font-semibold">Continuous Cognitive Quality Assurance & Optimization</p>
-                        </div>
-                        <!-- Key Swarm Metrics Summary -->
-                        <div class="flex gap-6 text-xs font-semibold">
-                            <div class="flex flex-col">
-                                <span class="text-[8px] text-outline uppercase tracking-wider">Best Performer</span>
-                                <span id="swarm-best-agent" class="text-sm font-bold text-primary font-mono">-</span>
-                            </div>
-                            <div class="flex flex-col">
-                                <span class="text-[8px] text-outline uppercase tracking-wider">Weakest Performer</span>
-                                <span id="swarm-weakest-agent" class="text-sm font-bold text-error font-mono">-</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <!-- Agent Live Leaderboard -->
-                        <div class="lg:col-span-1 flex flex-col gap-4">
-                            <h4 class="font-display text-sm font-bold text-on-surface flex items-center gap-1.5 border-b border-outline-variant/15 pb-2">
-                                <span class="material-symbols-outlined text-xs text-primary">emoji_events</span>
-                                Active Core Leaderboard
-                            </h4>
-                            <div class="flex flex-col gap-3" id="swarm-leaderboard-container">
-                                <!-- Populated Dynamically with Live Agent Rankings -->
-                            </div>
-                        </div>
-
-                        <!-- Detail Matrix & Historical Performance Charts -->
-                        <div class="lg:col-span-2 flex flex-col gap-4">
-                            <h4 class="font-display text-sm font-bold text-on-surface flex items-center gap-1.5 border-b border-outline-variant/15 pb-2">
-                                <span class="material-symbols-outlined text-xs text-tertiary">show_chart</span>
-                                Cognitive Drift & Accuracy Timelines
-                            </h4>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="swarm-details-container">
-                                <!-- Populated Dynamically with detailed graphs and metrics -->
-                            </div>
-                            
-                            <!-- Dedicated Swarm Calibration Index -->
-                            <div class="p-4 rounded-xl bg-primary/5 border border-primary/15 flex flex-col gap-3">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-xs font-bold text-primary flex items-center gap-1.5 uppercase tracking-wider">
-                                        <span class="material-symbols-outlined text-sm">settings_accessibility</span>
-                                        Cognitive Calibration Diagnostics
-                                    </span>
-                                    <span class="text-[9px] px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/25 rounded text-emerald-500 font-mono font-bold">CALIBRATED DELTA: 3%</span>
-                                </div>
-                                <div class="grid grid-cols-3 gap-4 text-center">
-                                    <div class="flex flex-col bg-surface-container/20 p-3 rounded-lg border border-outline-variant/10">
-                                        <span class="text-[8px] uppercase tracking-wider text-outline font-bold">Predicted Confidence</span>
-                                        <span class="text-lg font-black text-on-surface font-mono mt-1" id="calib-predicted">82%</span>
-                                    </div>
-                                    <div class="flex flex-col bg-surface-container/20 p-3 rounded-lg border border-outline-variant/10">
-                                        <span class="text-[8px] uppercase tracking-wider text-outline font-bold">Actual Outcome Accuracy</span>
-                                        <span class="text-lg font-black text-on-surface font-mono mt-1" id="calib-actual">79%</span>
-                                    </div>
-                                    <div class="flex flex-col bg-surface-container/20 p-3 rounded-lg border border-outline-variant/10">
-                                        <span class="text-[8px] uppercase tracking-wider text-outline font-bold">Calibration Error</span>
-                                        <span class="text-lg font-black text-primary font-mono mt-1" id="calib-error">3%</span>
-                                    </div>
-                                </div>
-                                <div class="text-[9px] text-outline font-semibold flex items-center gap-1 bg-surface-container/30 px-3 py-1.5 rounded-lg border border-outline-variant/10">
-                                    <span class="material-symbols-outlined text-xs text-primary">verified</span>
-                                    <span>Calibration Index verified: Swarm nodes demonstrate high introspection metrics — <strong>"Our agents know when they don't know."</strong></span>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
