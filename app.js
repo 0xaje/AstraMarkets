@@ -3348,38 +3348,123 @@ function addConsciousnessLog(text, color = 'primary') {
 
 
 // Market Proposal Execution
-function executeGovernanceVote(choice) {
+async function executeGovernanceVote(choice) {
     if (state.rootedDecision.hasVoted) {
         alertFloatNotification('You have already made a decision on this proposal.', 'error');
         return;
     }
     
-    state.rootedDecision.hasVoted = true;
-    
-    if (choice === 'YES') {
-        state.rootedDecision.yesVotes += 4;
-        addConsciousnessLog("Execution command confirmed: Initiating smart contract deployment on Somnia L1.", "primary");
-    } else {
+    if (choice === 'NO') {
+        state.rootedDecision.hasVoted = true;
         state.rootedDecision.noVotes += 4;
         addConsciousnessLog("Proposal rejected. Diverting compute resources back to monitoring.", "error");
+        
+        const yesWeight = state.rootedDecision.yesVotes;
+        const noWeight = state.rootedDecision.noVotes;
+        const total = yesWeight + noWeight;
+        const yesPct = (yesWeight / total) * 100;
+        const noPct = (noWeight / total) * 100;
+        
+        document.getElementById('vote-yes-label').textContent = `Swarm Consensus: ${yesPct.toFixed(0)}%`;
+        document.getElementById('vote-no-label').textContent = `Risk Threshold: ${noPct.toFixed(0)}%`;
+        document.getElementById('rooted-decision-progress').style.width = `${yesPct}%`;
+        
+        document.getElementById('decision-status').textContent = 'REJECTED';
+        document.getElementById('decision-status').className = 'text-[9px] font-bold uppercase tracking-widest text-outline px-1.5 py-0.5 rounded bg-surface-container border border-outline-variant/30';
+        return;
     }
     
-    // Animate change
-    const yesWeight = state.rootedDecision.yesVotes;
-    const noWeight = state.rootedDecision.noVotes;
-    const total = yesWeight + noWeight;
-    const yesPct = (yesWeight / total) * 100;
-    const noPct = (noWeight / total) * 100;
-    
-    document.getElementById('vote-yes-label').textContent = `Swarm Consensus: ${yesPct.toFixed(0)}%`;
-    document.getElementById('vote-no-label').textContent = `Risk Threshold: ${noPct.toFixed(0)}%`;
-    document.getElementById('rooted-decision-progress').style.width = `${yesPct}%`;
-    
-    document.getElementById('decision-status').textContent = choice === 'YES' ? 'EXECUTED' : 'REJECTED';
-    document.getElementById('decision-status').className = 'text-[9px] font-bold uppercase tracking-widest text-outline px-1.5 py-0.5 rounded bg-surface-container border border-outline-variant/30';
-    
-    if (choice === 'YES') {
+    // User chose 'YES' - Execute on-chain!
+    if (typeof window.ethereum === 'undefined') {
+        alertFloatNotification("No Web3 wallet detected. Please install MetaMask or Rabby.", "error");
+        return;
+    }
+
+    try {
+        state.rootedDecision.hasVoted = true;
+        document.getElementById('decision-status').textContent = 'AWAITING SIGNATURE...';
+        document.getElementById('decision-status').className = 'text-[9px] font-bold uppercase tracking-widest text-primary px-1.5 py-0.5 rounded bg-primary/10 border border-primary/20 animate-pulse';
+
+        addConsciousnessLog("Prompting wallet signature for market deployment on Somnia L1...", "primary");
+        
+        const browserProvider = new ethers.BrowserProvider(window.ethereum);
+        await browserProvider.send("eth_requestAccounts", []);
+        const signer = await browserProvider.getSigner();
+
+        // Target the factory address (Update this to your deployed address if different)
+        const MARKET_FACTORY_ADDRESS = "0x8f03762Eaa55bE11A8DF5A16e1075d97d7f724DE"; 
+        const MARKET_FACTORY_ABI = [
+            "function createMarket(string _title, string _category, uint256 _expiry, string _creator, uint256 _confidence) external returns (uint256)",
+            "event MarketCreated(uint256 indexed marketId, string title, uint256 expiryTimestamp)"
+        ];
+
+        const contract = new ethers.Contract(MARKET_FACTORY_ADDRESS, MARKET_FACTORY_ABI, signer);
+
+        const fullProposalText = state.rootedDecision.text;
+        let category = "crypto";
+        if (fullProposalText.toLowerCase().includes("sports")) category = "sports";
+        if (fullProposalText.toLowerCase().includes("tech")) category = "tech";
+        if (fullProposalText.toLowerCase().includes("election")) category = "politics";
+        
+        const expiry = Math.floor(Date.now() / 1000) + (14 * 24 * 60 * 60); 
+        
+        const tx = await contract.createMarket(fullProposalText, category, expiry, "AI_SWARM_EXECUTOR", 85);
+        
+        document.getElementById('decision-status').textContent = 'MINING TX...';
+        document.getElementById('decision-status').className = 'text-[9px] font-bold uppercase tracking-widest text-secondary px-1.5 py-0.5 rounded bg-secondary/10 border border-secondary/20 animate-pulse';
+        
+        addConsciousnessLog(`Transaction submitted: ${tx.hash.substring(0,10)}... waiting for block confirmation.`, "secondary");
+        alertFloatNotification('Transaction submitted to Somnia L1!', 'success');
+        
+        const receipt = await tx.wait();
+        
+        state.rootedDecision.yesVotes += 4;
+        
+        // Parse event to get market ID
+        let newMarketId = "?";
+        for (const log of receipt.logs) {
+            try {
+                const parsed = contract.interface.parseLog(log);
+                if (parsed && parsed.name === 'MarketCreated') {
+                    newMarketId = parsed.args[0].toString();
+                }
+            } catch (e) {}
+        }
+        
+        addConsciousnessLog(`Market seeded successfully! On-chain ID: ${newMarketId} in block ${receipt.blockNumber}`, "primary");
         alertFloatNotification('Market contract successfully seeded!', 'success');
+        
+        // Update UI
+        const yesWeight = state.rootedDecision.yesVotes;
+        const noWeight = state.rootedDecision.noVotes;
+        const total = yesWeight + noWeight;
+        const yesPct = (yesWeight / total) * 100;
+        const noPct = (noWeight / total) * 100;
+        
+        document.getElementById('vote-yes-label').textContent = `Swarm Consensus: ${yesPct.toFixed(0)}%`;
+        document.getElementById('vote-no-label').textContent = `Risk Threshold: ${noPct.toFixed(0)}%`;
+        document.getElementById('rooted-decision-progress').style.width = `${yesPct}%`;
+        
+        document.getElementById('decision-status').textContent = 'EXECUTED';
+        document.getElementById('decision-status').className = 'text-[9px] font-bold uppercase tracking-widest text-primary px-1.5 py-0.5 rounded bg-primary/10 border border-primary/20';
+        
+        const explorerLink = `https://shannon-explorer.somnia.network/tx/${tx.hash}`;
+        const containerText = document.getElementById('rooted-decision-text');
+        containerText.innerHTML = `
+            ${fullProposalText} <br><br>
+            <a href="${explorerLink}" target="_blank" class="text-primary text-xs flex items-center gap-1 border-b border-primary/30 inline-flex pb-0.5 mt-1 hover:border-primary transition-all">
+                <span class="material-symbols-outlined text-[12px]">open_in_new</span>
+                View Verified Transaction
+            </a>
+        `;
+        
+    } catch (err) {
+        console.error("Execution failed:", err);
+        state.rootedDecision.hasVoted = false; // allow retry
+        document.getElementById('decision-status').textContent = 'FAILED';
+        document.getElementById('decision-status').className = 'text-[9px] font-bold uppercase tracking-widest text-error px-1.5 py-0.5 rounded bg-error/10 border border-error/20';
+        addConsciousnessLog(`Execution rejected or failed: ${err.shortMessage || err.message}`, "error");
+        alertFloatNotification('Execution failed. User rejected or network error.', 'error');
     }
 }
 
