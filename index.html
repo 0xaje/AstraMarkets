@@ -537,57 +537,61 @@
                 </div>
                 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-2">
-                    <!-- Deploy Form -->
-                    <div class="cosmic-card p-8 rounded-3xl lg:col-span-1 border border-outline-variant/30 flex flex-col gap-8 bg-surface-container/20 hover:border-primary/30 transition-colors relative overflow-hidden">
-                        <div class="absolute -right-20 -top-20 w-48 h-48 bg-primary/5 rounded-full blur-3xl"></div>
+                    <!-- Autonomous Core Engine Status -->
+                    <div class="cosmic-card p-8 rounded-3xl lg:col-span-1 border border-outline-variant/30 flex flex-col justify-between gap-8 bg-surface-container/20 relative overflow-hidden group">
+                        <div class="absolute -right-20 -top-20 w-48 h-48 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/20 transition-all duration-700"></div>
+                        <div class="absolute -left-10 -bottom-10 w-32 h-32 bg-secondary/10 rounded-full blur-2xl group-hover:bg-secondary/20 transition-all duration-700"></div>
                         
-                        <div class="flex flex-col gap-1">
+                        <div class="flex flex-col gap-1 relative z-10">
                             <span class="text-xs font-bold text-primary uppercase tracking-widest flex items-center gap-2">
-                                <span class="material-symbols-outlined text-sm">smart_toy</span>
-                                Provision Node
+                                <span class="material-symbols-outlined text-sm animate-spin-slow">cyclone</span>
+                                Autonomous Engine
                             </span>
-                            <span class="text-[10px] text-outline font-semibold">Initialize a new cognitive agent</span>
+                            <span class="text-[10px] text-outline font-semibold">Self-learning prediction protocol</span>
                         </div>
                         
-                        <div class="flex flex-col gap-5">
+                        <div class="flex flex-col gap-6 relative z-10 my-4">
+                            <!-- Unique visual metric 1 -->
                             <div class="flex flex-col gap-2">
-                                <label class="text-[10px] font-bold text-outline uppercase tracking-widest">Core Name</label>
-                                <input type="text" id="deploy-agent-name" placeholder="e.g. NexusOracle" class="p-3 rounded-xl border border-outline-variant/30 text-xs bg-surface-container/50 font-bold text-on-surface w-full focus:outline-none focus:border-primary transition-all">
-                            </div>
-                            
-                            <div class="flex flex-col gap-2">
-                                <label class="text-[10px] font-bold text-outline uppercase tracking-widest">Directives</label>
-                                <select id="deploy-agent-strategy" class="p-3 rounded-xl border border-outline-variant/30 text-xs bg-surface-container/50 font-bold text-on-surface w-full focus:outline-none focus:border-primary transition-all appearance-none cursor-pointer">
-                                    <option value="Arbitrage">Arbitrage Strategy</option>
-                                    <option value="Sentiment Analysis">Sentiment Analysis</option>
-                                    <option value="Macro Hedging">Macro Hedging Strategy</option>
-                                    <option value="High Volatility Scalper">High Volatility Scalper</option>
-                                </select>
-                            </div>
-                            
-                            <div class="flex flex-col gap-2">
-                                <label class="text-[10px] font-bold text-outline uppercase tracking-widest">Target Vector</label>
-                                <select id="deploy-agent-target" class="p-3 rounded-xl border border-outline-variant/30 text-xs bg-surface-container/50 font-bold text-on-surface w-full focus:outline-none focus:border-primary transition-all appearance-none cursor-pointer">
-                                    <option value="Ethereum ETF">Ethereum ETF</option>
-                                    <option value="Somnia L1 TVL">Somnia L1 Ecosystem</option>
-                                    <option value="AI Compute War">AI Compute Tech</option>
-                                    <option value="EVM Bridge TVL">Cross-chain Bridges</option>
-                                </select>
-                            </div>
-                            
-                            <div class="flex flex-col gap-3 mt-2">
-                                <div class="flex justify-between items-center text-[10px] font-bold text-outline uppercase tracking-widest">
-                                    <span>Capital Allocation</span>
-                                    <span class="text-primary font-mono text-sm" id="deploy-capital-value">50 SOM</span>
+                                <div class="flex justify-between items-end">
+                                    <span class="text-[9px] font-bold text-outline uppercase tracking-widest">Network Synchronization</span>
+                                    <span class="text-primary font-mono text-sm font-bold">100%</span>
                                 </div>
-                                <input type="range" id="deploy-agent-capital" min="10" max="500" value="50" class="accent-primary w-full h-1.5 bg-surface-container/50 rounded-lg appearance-none cursor-pointer">
+                                <div class="w-full h-1 bg-surface-container rounded-full overflow-hidden">
+                                    <div class="h-full bg-primary w-full animate-pulse"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Unique visual metric 2 -->
+                            <div class="flex flex-col gap-2">
+                                <div class="flex justify-between items-end">
+                                    <span class="text-[9px] font-bold text-outline uppercase tracking-widest">Cognitive Load</span>
+                                    <span class="text-secondary font-mono text-sm font-bold">42.8%</span>
+                                </div>
+                                <div class="w-full h-1 bg-surface-container rounded-full overflow-hidden">
+                                    <div class="h-full bg-secondary w-[42.8%]"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Status Badges -->
+                            <div class="grid grid-cols-2 gap-3 mt-2">
+                                <div class="bg-surface-container/40 border border-outline-variant/20 p-3 rounded-2xl flex flex-col gap-1 items-center text-center backdrop-blur-sm">
+                                    <span class="material-symbols-outlined text-tertiary text-lg">admin_panel_settings</span>
+                                    <span class="text-[8px] font-bold text-outline uppercase tracking-wider">Protocol</span>
+                                    <span class="text-[10px] font-bold text-on-surface">SECURED</span>
+                                </div>
+                                <div class="bg-surface-container/40 border border-outline-variant/20 p-3 rounded-2xl flex flex-col gap-1 items-center text-center backdrop-blur-sm">
+                                    <span class="material-symbols-outlined text-primary text-lg">bolt</span>
+                                    <span class="text-[8px] font-bold text-outline uppercase tracking-wider">Latency</span>
+                                    <span class="text-[10px] font-bold text-on-surface font-mono">12ms</span>
+                                </div>
                             </div>
                         </div>
                         
-                        <button id="deploy-agent-btn" class="w-full bg-primary hover:bg-primary/90 text-surface-solid font-label text-xs font-black uppercase tracking-widest py-4 rounded-xl transition-all shadow-[0_4px_14px_rgba(74,124,89,0.3)] hover:shadow-[0_6px_20px_rgba(74,124,89,0.4)] flex items-center justify-center gap-2 mt-4">
-                            Deploy to Network
-                            <span class="material-symbols-outlined text-sm">rocket_launch</span>
-                        </button>
+                        <div class="w-full bg-surface-container/30 border border-outline-variant/20 text-outline font-label text-[9px] font-bold uppercase tracking-widest py-4 rounded-2xl flex items-center justify-center gap-2 relative z-10 cursor-not-allowed">
+                            <span class="material-symbols-outlined text-xs">lock</span>
+                            Manual Deployment Locked
+                        </div>
                     </div>
                     
                     <!-- Active Agents Monitor -->
