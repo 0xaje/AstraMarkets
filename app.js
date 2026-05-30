@@ -916,7 +916,7 @@ function setTheme(theme) {
 
 // --- NAVIGATION SYSTEM ---
 function setupNavigation() {
-    const navButtons = document.querySelectorAll('aside nav button');
+    const navButtons = document.querySelectorAll('.nav-btn');
     
     navButtons.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -1340,15 +1340,21 @@ function renderAll() {
 
 function renderHeaders() {
     // Wallet Status
-    const btnText = document.getElementById('wallet-btn-text');
     const connectBtn = document.getElementById('wallet-connect-btn');
-    if (connectBtn && btnText) {
+    if (connectBtn) {
         if (state.wallet.isConnected) {
-            const addr = state.wallet.address;
-            btnText.textContent = `${addr.slice(0, 6)}...${addr.slice(-4)}`;
+            const addr = state.wallet.address || '';
+            const shortAddr = addr.length > 10 ? `${addr.slice(0, 6)}...${addr.slice(-4)}` : addr;
+            connectBtn.innerHTML = `
+                <span class="material-symbols-outlined text-xs text-primary animate-pulse">verified</span>
+                <span id="wallet-btn-text">${shortAddr}</span>
+            `;
             connectBtn.className = "bg-surface-container/60 text-primary hover:text-primary-container px-6 py-1.5 font-label text-xs font-bold rounded-full transition-all uppercase shadow-sm flex items-center gap-2 border border-outline-variant/40 hover:border-primary/50 cursor-pointer";
         } else {
-            btnText.textContent = "CONNECT";
+            connectBtn.innerHTML = `
+                <span class="material-symbols-outlined text-xs">account_balance_wallet</span>
+                <span id="wallet-btn-text">CONNECT</span>
+            `;
             connectBtn.className = "bg-primary text-on-primary hover:bg-on-primary-fixed-variant px-6 py-1.5 font-label text-xs font-bold rounded-full transition-all uppercase shadow-sm flex items-center gap-2 border border-primary/25 cursor-pointer";
         }
     }
@@ -3176,9 +3182,9 @@ function renderWalletModal() {
             <!-- Wallet Status details -->
             <div class="flex flex-col gap-1 bg-surface-container/60 p-4 rounded-2xl border border-outline-variant/20">
                 <span class="text-[9px] font-bold text-outline uppercase tracking-wider block">Wallet Node Address</span>
-                <div class="flex items-center justify-between mt-0.5">
-                    <span id="wallet-address" class="text-xs font-semibold tracking-wider font-mono text-on-surface select-all">${state.wallet.address}</span>
-                    <span class="material-symbols-outlined text-[12px] text-outline cursor-pointer hover:text-primary transition-all select-none" onclick="navigator.clipboard.writeText('${state.wallet.address}'); alertFloatNotification('Address copied!', 'success');">content_copy</span>
+                <div class="flex items-center justify-between mt-0.5 gap-2">
+                    <span id="wallet-address" class="text-xs font-semibold tracking-wider font-mono text-on-surface truncate flex-1" title="${state.wallet.address}">${state.wallet.address}</span>
+                    <span class="material-symbols-outlined text-[12px] text-outline cursor-pointer hover:text-primary transition-all select-none flex-shrink-0" onclick="navigator.clipboard.writeText('${state.wallet.address}'); alertFloatNotification('Address copied!', 'success');">content_copy</span>
                 </div>
             </div>
             
