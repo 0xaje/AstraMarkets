@@ -3099,9 +3099,14 @@ async function connectWallet(provider) {
     } finally {
         if (connectBtn) connectBtn.disabled = false;
         
-        renderAll();
-        renderWalletModal();
-        saveStateToLocalStorage();
+        try { renderAll(); } catch(e) { console.error("renderAll error:", e); }
+        try { renderWalletModal(); } catch(e) { console.error("renderWalletModal error:", e); }
+        
+        try { saveStateToLocalStorage(); } catch(e) {}
+        
+        if (state.wallet.isConnected && walletModal) {
+            walletModal.classList.remove('open');
+        }
     }
 }
 
@@ -3119,6 +3124,9 @@ function disconnectWallet() {
     renderAll();
     renderWalletModal();
     saveStateToLocalStorage();
+    
+    const walletModal = document.getElementById('wallet-modal');
+    if (walletModal) walletModal.classList.remove('open');
 }
 
 function renderWalletModal() {
