@@ -55,4 +55,3 @@ credentials.json
 .env*.local
 .env*.production
 .env*.development
-contracts/build/
