@@ -3064,14 +3064,43 @@ async function connectWallet(provider) {
             alertFloatNotification(`Authenticating ${email}...`, 'info');
             await new Promise(r => setTimeout(r, 800));
             address = '0xPr1vY' + Math.floor(Math.random() * 100000).toString(16) + '...';
-            balance = 5.00;
+            balance = 0.00;
         } else if (provider === 'walletconnect') {
             alertFloatNotification("Waiting for WalletConnect Mobile Scan...", "info");
             await new Promise(r => setTimeout(r, 2000)); // Simulate time to scan QR
             address = '0xWcMobile' + Math.floor(Math.random() * 100000).toString(16) + '...';
-            balance = 10.00;
+            balance = 0.00;
         } else if (provider === 'injected') {
             if (window.ethereum) {
+                // Enforce Somnia L1 Network switch
+                const somniaChainId = '0xc488'; // 50312 in hex
+                try {
+                    await window.ethereum.request({
+                        method: 'wallet_switchEthereumChain',
+                        params: [{ chainId: somniaChainId }],
+                    });
+                } catch (switchError) {
+                    // Code 4902 means the chain has not been added to MetaMask
+                    if (switchError.code === 4902) {
+                        try {
+                            await window.ethereum.request({
+                                method: 'wallet_addEthereumChain',
+                                params: [{
+                                    chainId: somniaChainId,
+                                    chainName: 'Somnia Network',
+                                    rpcUrls: ['https://dream-rpc.somnia.network'],
+                                    nativeCurrency: { name: 'Somnia', symbol: 'STT', decimals: 18 },
+                                    blockExplorerUrls: ['https://somnia-testnet.socialscan.io']
+                                }]
+                            });
+                        } catch (addError) {
+                            console.error('Failed to add Somnia network', addError);
+                        }
+                    } else {
+                        console.error('Failed to switch to Somnia network', switchError);
+                    }
+                }
+
                 const browserProvider = new ethers.BrowserProvider(window.ethereum);
                 await browserProvider.send("eth_requestAccounts", []);
                 const signer = await browserProvider.getSigner();
@@ -3092,7 +3121,7 @@ async function connectWallet(provider) {
         state.wallet.isConnected = true;
         state.wallet.provider = provider;
         state.wallet.address = address;
-        state.wallet.balance = balance > 0 ? balance : 1000.00; 
+        state.wallet.balance = balance; 
         
         addConsciousnessLog(`[Web3 Success] Connected successfully via ${provider.toUpperCase()} signature. Node Address: ${state.wallet.address}`, 'decision');
         alertFloatNotification(`Connected via ${provider.toUpperCase()}`, 'success');
