@@ -123,10 +123,6 @@ const SignalClient = {
  : sig.source === 'news' ? 'secondary'
  : sig.source === 'reddit' ? 'tertiary'
  : 'primary';
- 
- : sig.source === 'news' ? ''
- 
- : '';
  // addSystemLog(`[${sig.source.toUpperCase()}] ${sig.topic.substring(0, 90)} | ${sig.sentiment.toUpperCase()} | Score: ${sig.importance}`, color);
  });
 
