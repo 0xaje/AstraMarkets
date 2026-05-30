@@ -3121,12 +3121,17 @@ function disconnectWallet() {
     addConsciousnessLog('Web3 connection disconnected from Somnia L1.', 'warn');
     alertFloatNotification('Wallet disconnected.', 'info');
     
-    renderAll();
-    renderWalletModal();
-    saveStateToLocalStorage();
+    try { renderAll(); } catch(e) { console.error('renderAll error on disconnect:', e); }
+    try { renderWalletModal(); } catch(e) { console.error('renderWalletModal error on disconnect:', e); }
+    try { saveStateToLocalStorage(); } catch(e) {}
     
+    // Auto-close modal
     const walletModal = document.getElementById('wallet-modal');
     if (walletModal) walletModal.classList.remove('open');
+    
+    // Go back to landing page
+    const navLanding = document.getElementById('nav-landing');
+    if (navLanding) navLanding.click();
 }
 
 function renderWalletModal() {
