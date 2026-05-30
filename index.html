@@ -968,9 +968,8 @@
                     <!-- Tab Toggle -->
                     <div class="flex gap-1.5 bg-surface-container p-0.5 rounded-lg border border-outline-variant/20 text-[9px] font-bold uppercase tracking-wider">
                         <button id="cog-tab-logs" class="px-2.5 py-1 rounded bg-surface-solid shadow text-primary font-extrabold cursor-pointer transition-all">Logs</button>
-                        <button id="cog-tab-chat" class="px-2.5 py-1 rounded text-outline hover:text-primary cursor-pointer transition-all">Protocol Q&A</button>
                     </div>
-                    <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
+                    <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
                 </div>
             </div>
 
@@ -1005,25 +1004,6 @@
                             <button id="vote-no-btn" class="flex-1 py-1.5 border border-error/30 hover:border-error text-[10px] font-bold uppercase text-error bg-error/5 hover:bg-error/10 rounded-lg transition-all">Vote No</button>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- HIVE CHAT VIEW -->
-            <div id="consciousness-chat-panel" class="flex-1 flex flex-col gap-4 overflow-hidden hidden">
-                <div class="flex-1 flex flex-col gap-4 overflow-y-auto pr-1 text-xs" id="chat-messages-container">
-                    <!-- Default message -->
-                    <div class="flex flex-col gap-1 max-w-[85%] bg-surface-container/60 p-3 rounded-2xl rounded-tl-none border border-outline-variant/20 self-start">
-                        <span class="font-bold text-primary text-[10px] uppercase font-label">Astra Protocol Registry</span>
-                        <p class="leading-relaxed">Greetings. I am the authoritative Decisional Registry Coordinator for AstraMarkets. You may query our current market indexes, ask about specific active trading agents, or ask how Somnia L1 affects transaction latency.</p>
-                    </div>
-                </div>
-                
-                <!-- Chat input -->
-                <div class="flex gap-2 border-t border-outline-variant/30 pt-3 mt-auto">
-                    <input type="text" id="hive-chat-input" placeholder="Query the protocol..." class="glass-input flex-1 text-xs px-3 py-2.5 rounded-xl focus:outline-none border border-outline-variant/40 bg-surface/30">
-                    <button id="hive-chat-send" class="w-9 h-9 rounded-xl bg-primary text-white flex items-center justify-center hover:bg-on-primary-fixed-variant transition-all shrink-0">
-                        <span class="material-symbols-outlined text-sm">send</span>
-                    </button>
                 </div>
             </div>
 

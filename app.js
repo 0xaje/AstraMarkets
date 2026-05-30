@@ -1252,35 +1252,7 @@ function setupEventHandlers() {
     
     // Right panel Cognitive logs vs Chat switcher
     const logTabBtn = document.getElementById('cog-tab-logs');
-    const chatTabBtn = document.getElementById('cog-tab-chat');
-    const logPanelView = document.getElementById('consciousness-logs-panel');
-    const chatPanelView = document.getElementById('consciousness-chat-panel');
-    
-    logTabBtn.addEventListener('click', () => {
-        logTabBtn.className = "px-2.5 py-1 rounded bg-surface-solid shadow text-primary font-extrabold cursor-pointer transition-all";
-        chatTabBtn.className = "px-2.5 py-1 rounded text-outline hover:text-primary cursor-pointer transition-all";
-        logPanelView.classList.remove('hidden');
-        chatPanelView.classList.add('hidden');
-    });
-    
-    chatTabBtn.addEventListener('click', () => {
-        chatTabBtn.className = "px-2.5 py-1 rounded bg-surface-solid shadow text-primary font-extrabold cursor-pointer transition-all";
-        logTabBtn.className = "px-2.5 py-1 rounded text-outline hover:text-primary cursor-pointer transition-all";
-        chatPanelView.classList.remove('hidden');
-        logPanelView.classList.add('hidden');
-        
-        // Scroll messages to bottom
-        setTimeout(() => {
-            const container = document.getElementById('chat-messages-container');
-            container.scrollTop = container.scrollHeight;
-        }, 100);
-    });
-    
-    // Chat Send message
-    document.getElementById('hive-chat-send').addEventListener('click', sendHiveChatMessage);
-    document.getElementById('hive-chat-input').addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') sendHiveChatMessage();
-    });
+
     
     // Rooted Decision Vote Buttons
     document.getElementById('vote-yes-btn').addEventListener('click', () => executeGovernanceVote('YES'));
@@ -3370,98 +3342,7 @@ function addConsciousnessLog(text, color = 'primary') {
 }
 
 // Send interactive Hive chat message
-function sendHiveChatMessage() {
-    const input = document.getElementById('hive-chat-input');
-    const msg = input.value.trim();
-    if (!msg) return;
-    
-    input.value = '';
-    
-    const container = document.getElementById('chat-messages-container');
-    
-    // Append User Message
-    const userDiv = document.createElement('div');
-    userDiv.className = "flex flex-col gap-1 max-w-[85%] bg-primary/10 p-3 rounded-2xl rounded-tr-none border border-primary/20 self-end";
-    userDiv.innerHTML = `
-        <span class="font-bold text-primary text-[10px] uppercase font-label">You (Seeder)</span>
-        <p class="leading-relaxed">${msg}</p>
-    `;
-    container.appendChild(userDiv);
-    container.scrollTop = container.scrollHeight;
-    
-    // Trigger typing anim loading
-    const typingDiv = document.createElement('div');
-    typingDiv.className = "flex flex-col gap-1 max-w-[85%] bg-surface-container/60 p-3 rounded-2xl rounded-tl-none border border-outline-variant/20 self-start mt-2";
-    typingDiv.innerHTML = `
-        <span class="font-bold text-primary text-[10px] uppercase font-label">Astra Hive Mind</span>
-        <div class="py-1">
-            <span class="typing-dot"></span>
-            <span class="typing-dot"></span>
-            <span class="typing-dot"></span>
-        </div>
-    `;
-    container.appendChild(typingDiv);
-    container.scrollTop = container.scrollHeight;
-    
-    // Generate AI response
-    setTimeout(() => {
-        container.removeChild(typingDiv);
-        
-        let response = generateHiveMindResponse(msg);
-        
-        const aiDiv = document.createElement('div');
-        aiDiv.className = "flex flex-col gap-1 max-w-[85%] bg-surface-container/60 p-3 rounded-2xl rounded-tl-none border border-outline-variant/20 self-start mt-2";
-        aiDiv.innerHTML = `
-            <span class="font-bold text-primary text-[10px] uppercase font-label">Astra Hive Mind</span>
-            <p class="leading-relaxed">${response}</p>
-        `;
-        container.appendChild(aiDiv);
-        container.scrollTop = container.scrollHeight;
-    }, 1200);
-}
 
-function generateHiveMindResponse(prompt) {
-    const q = prompt.toLowerCase();
-    
-    if (q.includes('balance') || q.includes('wallet') || q.includes('how much')) {
-        return `Your active wallet balance is currently **${state.wallet.balance.toFixed(2)} SOM** liquid, with **${state.wallet.lockedBalance.toFixed(2)} SOM** allocated inside prediction smart contracts. Total portfolio valuation stands at **${state.wallet.netWorth.toFixed(2)} SOM**.`;
-    }
-    
-    if (q.includes('portfolio') || q.includes('position') || q.includes('profit')) {
-        if (state.positions.length === 0) {
-            return "You currently do not hold any active share positions in the Astra prediction pools. Explore the 'Markets' view to seed your first prediction contract.";
-        }
-        let list = state.positions.map(p => `- **${p.marketTitle}**: ${p.shares.toFixed(0)} shares of ${p.side} (PnL: ${p.pnl >= 0 ? '+' : ''}${p.pnl.toFixed(2)} SOM)`).join('<br>');
-        return `Your current active positions are:<br>${list}<br>All trades are synchronized directly with the Somnia L1 blockchain state.`;
-    }
-    
-    if (q.includes('agent') || q.includes('core')) {
-        let activeStr = state.agents.map(a => `**${a.name}** (${a.strategy} - Cap: ${a.capital} SOM)`).join(', ');
-        return `We currently have **${state.agents.length} active cognitive cores** on the Somnia network: ${activeStr}. You can compile and deploy additional autonomous decision modules in the **AI Creator Lab**.`;
-    }
-    
-    if (q.includes('market') || q.includes('predict')) {
-        let activeMarkets = state.markets.map(m => `- **${m.title}**: YES at ${(m.yesOdds*100).toFixed(0)}¢ / NO at ${(m.noOdds*100).toFixed(0)}¢`).join('<br>');
-        return `Current hot prediction pools currently trading on AstraMarkets:<br>${activeMarkets}<br>Would you like me to open the analytics drawer for any of these?`;
-    }
-    
-    if (q.includes('somnia') || q.includes('l1') || q.includes('network')) {
-        return "Somnia L1 is our underlying high-throughput consensus layer. Boasting sub-second block confirmations and transaction throughput exceeding 100,000 TPS, it ensures our autonomous agents can execute arbitrage transactions without front-running risks.";
-    }
-    
-    if (q.includes('hi') || q.includes('hello') || q.includes('greet')) {
-        return "Welcome back, Seeder. How can the Astra Markets intelligence protocols coordinate with your capital allocation directives today?";
-    }
-    
-    // Default smart financial generic response
-    const customFills = [
-        "Analyzing cross-chain liquidity paths suggest early institutional accumulation.",
-        "We are detecting high correlation matrices between tech index chips and GPU rental pricing indexes.",
-        "Astra cognitive nodes are predicting a shift in volatility variables on Somnia L1 over the next epochs.",
-        "Offshore derivatives indicators are trading at premium values, signaling high confidence trends."
-    ];
-    return `${customFills[Math.floor(Math.random() * customFills.length)]} Let me know if you would like me to compile a specific transaction script or filter the Astra Stream feeds.`;
-}
 
 // Governance Vote Action
 function executeGovernanceVote(choice) {
