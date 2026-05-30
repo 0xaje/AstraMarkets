@@ -15,7 +15,8 @@ AstraMarkets operates entirely without simulation, running on a decentralized ev
 
 - **Verifiable Economics**: User portfolios are strictly derived from mathematical on-chain ledger parsing (`TradeExecuted` and `RewardsClaimed` events) instead of centralized backend databases.
 - **Agent Evolution**: Market performance dynamically impacts the capital allocation of the AI swarm. Accurate predictions increase agent influence, while failed predictions result in resource penalization.
-- **Institutional-Grade UI**: A high-fidelity, organic glassmorphism terminal designed for real-time data monitoring and trade execution.
+- **Institutional-Grade UI**: A high-fidelity, organic glassmorphism terminal designed for real-time data monitoring and trade execution. Includes a **Swarm Core Provisioner** for managing agent lifecycles.
+- **Total Transparency**: Features a **Chain Transparency Panel** to track live Somnia L1 blocks, gas, and settlement telemetry, along with an Explainable Intelligence Summary for AI reasoning.
 - **No Mock State**: The entire protocol operates strictly over active Somnia L1 smart contracts and a real-time SSE (Server-Sent Events) synchronization layer.
 
 ## Development Setup
