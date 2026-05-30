@@ -3070,7 +3070,7 @@ async function connectWallet(provider) {
             await new Promise(r => setTimeout(r, 2000)); // Simulate time to scan QR
             address = '0xWcMobile' + Math.floor(Math.random() * 100000).toString(16) + '...';
             balance = 10.00;
-        } else if (provider === 'metamask') {
+        } else if (provider === 'injected') {
             if (window.ethereum) {
                 const browserProvider = new ethers.BrowserProvider(window.ethereum);
                 await browserProvider.send("eth_requestAccounts", []);
@@ -3078,6 +3078,11 @@ async function connectWallet(provider) {
                 address = await signer.getAddress();
                 const balanceWei = await browserProvider.getBalance(address);
                 balance = parseFloat(ethers.formatEther(balanceWei));
+                
+                // Determine true wallet name for UI
+                if (window.ethereum.isRabby) provider = 'Rabby';
+                else if (window.ethereum.isMetaMask) provider = 'MetaMask';
+                else provider = 'Web3 Wallet';
             } else {
                 alertFloatNotification('No Web3 wallet found. Falling back to mock.', 'warn');
                 address = '0x78aF92C3D3a5C9f83a48e7B1D0b2C34566E7662e';
@@ -3153,12 +3158,12 @@ function renderWalletModal() {
                         </div>
                         <span class="text-[9px] text-primary font-bold uppercase tracking-wider bg-primary/10 px-2 py-0.5 rounded">Sleek</span>
                     </button>
-                    <button class="wallet-provider-btn bg-surface-container/60 hover:bg-orange-500/10 border border-outline-variant/30 hover:border-orange-500/50 p-4 rounded-2xl flex items-center justify-between transition-all group cursor-pointer" data-provider="metamask">
+                    <button class="wallet-provider-btn bg-surface-container/60 hover:bg-orange-500/10 border border-outline-variant/30 hover:border-orange-500/50 p-4 rounded-2xl flex items-center justify-between transition-all group cursor-pointer" data-provider="injected">
                         <div class="flex items-center gap-3">
                             <span class="material-symbols-outlined text-orange-500 text-xl">blur_on</span>
                             <div class="text-left flex flex-col">
-                                <span class="font-bold text-xs text-on-surface">MetaMask Extension</span>
-                                <span class="text-[9px] text-outline">Connect via browser extension</span>
+                                <span class="font-bold text-xs text-on-surface">Web3 Extension</span>
+                                <span class="text-[9px] text-outline">MetaMask, Rabby, or Trust Wallet</span>
                             </div>
                         </div>
                         <span class="text-[9px] text-outline font-bold uppercase tracking-wider bg-surface-container-high px-2 py-0.5 rounded">Browser</span>
