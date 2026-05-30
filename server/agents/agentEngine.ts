@@ -348,231 +348,91 @@ abstract class BaseAgent {
 }
 
 // ─── AGENT IMPLEMENTATIONS ────────────────────────────────────────
-class MacroAgentImpl extends BaseAgent {
-  name = "MacroAgent";
-  strategy = "Macroeconomic & Institutional Analytics";
-  sources: Signal["source"][] = ["crypto", "news"];
-  color: AgentStatus["color"] = "primary";
-  specialbadge = "Macro Volatility";
-  domainexpertise = "ETF Flows & FOMC Interest Sentiment";
-  systemPrompt = `You are MacroAgent, an elite domain specialist in cryptocurrency macroeconomics and institutional capital flows.
-Your specialized mandate is to:
-- Monitor traditional finance ETF flows (such as BlackRock IBIT or Fidelity FBTC inflows/outflows)
-- Track macroeconomic volatility metrics (CPI inflation prints, macroeconomic indicators)
-- Analyze Federal Reserve interest rate sentiment (FOMC meetings, rate cut projections, Powell pressers)
-- Evaluate stablecoin liquidity shifts (USDT/USDC supply expansions or capital shifts across chains)
-- Detect cross-market correlation anomalies between traditional market equities (like S&P 500) and major crypto assets.
-
-Only propose prediction markets that hinge on verifiable macroeconomic index results, ETF balance thresholds, stablecoin mint benchmarks, or FOMC decisions. Ensure clear binary conditions.`;
-
-  protected filterSignals(all: Signal[]): Signal[] {
-    const macroKeywords = [
-      "etf", "fed", "interest", "rate", "inflation", "cpi", "fomc", "stablecoin", "usdt", "usdc",
-      "liquidity", "inflow", "outflow", "macro", "correlation", "treasury", "yield", "powell", "blackrock", "fidelity",
-      "institutional", "crypto", "btc", "eth", "sol"
-    ];
-    return all.filter(
-      (s) =>
-        this.sources.includes(s.source) &&
-        macroKeywords.some((kw) => s.topic.toLowerCase().includes(kw))
-    );
-  }
-
-  async run(allSignals: Signal[]): Promise<AgentDecision> {
-    const filtered = this.filterSignals(allSignals);
-    if (filtered.length === 0) {
-      const msg = "Macro Registry: STEADY — no macroeconomic volatility prints or stablecoin anomalies detected.";
-      emit("info", this.name, msg);
-      this.updateStatus(msg);
-      return { createMarket: false, reasoning: msg, agentName: this.name, timestamp: Date.now() };
-    }
-
-    const decision = await super.run(filtered);
-    // Specialized Domain Correction: Analyze institutional ETF flows & Stablecoin supply expansions
-    if (decision.createMarket && decision.market) {
-      const hasEtfFlows = filtered.some(s => s.topic.toLowerCase().includes("etf") || s.topic.toLowerCase().includes("inflow") || s.topic.toLowerCase().includes("outflow"));
-      const hasFedSentiment = filtered.some(s => s.topic.toLowerCase().includes("fed") || s.topic.toLowerCase().includes("rate") || s.topic.toLowerCase().includes("fomc") || s.topic.toLowerCase().includes("powell"));
-      const hasStablecoinSupply = filtered.some(s => s.topic.toLowerCase().includes("stablecoin") || s.topic.toLowerCase().includes("usdt") || s.topic.toLowerCase().includes("usdc") || s.topic.toLowerCase().includes("mint"));
-      
-      let tags = [];
-      if (hasEtfFlows) tags.push("ETF Capital Flows");
-      if (hasFedSentiment) tags.push("FOMC Rate Projections");
-      if (hasStablecoinSupply) tags.push("Stablecoin Liquidity");
-      if (tags.length === 0) tags.push("Cross-market Correlation Anomalies");
-
-      decision.market.description = `[MACRO REGISTRY VERIFIED: ${tags.join(" & ")}] ` + decision.market.description;
-      decision.market.reasoning = `[MACRO LIQUIDITY SWARM CALIBRATED: Institutional flow parameters verified on Somnia L1.] ` + (decision.market.reasoning || "");
-      decision.reasoning = `[MACRO LIQUIDITY SWARM CALIBRATED] ` + decision.reasoning;
-      emit("info", this.name, `Analyzed macro flows and calibrated cross-market correlation parameters. Verified: ${tags.join(", ")}`);
-    }
-    return decision;
-  }
-}
-
-class SocialAgentImpl extends BaseAgent {
-  name = "SocialAgent";
-  strategy = "Viral Sentiment & Narrative Propagation";
-  sources: Signal["source"][] = ["reddit", "trends"];
-  color: AgentStatus["color"] = "secondary";
-  specialbadge = "Viral Indexer";
-  domainexpertise = "Meme Velocity & Sentiment Decays";
-  systemPrompt = `You are SocialAgent, a domain specialist in crowd psychology, meme coin velocity, and social sentiment decay.
-Your specialized mandate is to:
-- Detect viral acceleration of new tokens, protocols, and web3 narratives
-- Track meme propagation velocity across social hubs (Reddit, Google Trends, social platforms)
-- Spot Reddit engagement spikes and sub-reddit subscriber growth anomalies
-- Analyze influencer amplification networks and trend velocity
-- Calibrate for sentiment momentum decay (identifying when a hype cycle is about to peak or burn out).
-
-Only propose prediction markets around social trends, meme coin volume peaks, keyword volume thresholds, or community engagement metrics before the hype decays.`;
-
-  protected filterSignals(all: Signal[]): Signal[] {
-    const socialKeywords = [
-      "reddit", "viral", "meme", "sentiment", "doge", "pepe", "shib", "spiked", "hype",
-      "twitter", "engagement", "velocity", "propagation", "influencer", "community", "trend", "acceleration",
-      "keyword", "social", "traffic", "buzz"
-    ];
-    return all.filter(
-      (s) =>
-        this.sources.includes(s.source) &&
-        socialKeywords.some((kw) => s.topic.toLowerCase().includes(kw))
-    );
-  }
-
-  async run(allSignals: Signal[]): Promise<AgentDecision> {
-    const filtered = this.filterSignals(allSignals);
-    if (filtered.length === 0) {
-      const msg = "Social trends: STABLE — no meme velocity spikes or Reddit engagement anomalies detected.";
-      emit("info", this.name, msg);
-      this.updateStatus(msg);
-      return { createMarket: false, reasoning: msg, agentName: this.name, timestamp: Date.now() };
-    }
-
-    const decision = await super.run(filtered);
-    // Specialized Domain Correction: Detect viral acceleration and apply sentiment decay multiplier
-    if (decision.createMarket && decision.market) {
-      const topVelocity = Math.max(...filtered.map(s => s.velocity || 0));
-      const isViral = topVelocity > 70;
-      
-      if (isViral) {
-        // Apply viral acceleration decay factor to avoid late entry on fading trends
-        const originalConf = decision.market.confidence;
-        decision.market.confidence = Math.max(40, Math.round(originalConf * 0.85));
-        decision.market.description = `[VIRAL MOMENTUM CALIBRATED: Peak Social Engagement Vetted] ` + decision.market.description;
-        decision.market.reasoning = `[HYPE DECAY FILTER APPLIED: Signal speed indexing at ${topVelocity} velocity. Confidence calibrated from ${originalConf}% to ${decision.market.confidence}%] ` + (decision.market.reasoning || "");
-        decision.reasoning = `[HYPE DECAY FILTER APPLIED] ` + decision.reasoning;
-        emit("info", this.name, `Viral social engagement acceleration detected at velocity ${topVelocity}. Calibrated momentum decay filter.`);
-      } else {
-        decision.market.description = `[SOCIAL REGISTRY: Reddit Engagement Spike Verified] ` + decision.market.description;
-        decision.market.reasoning = `[COMMUNITY AMPLIFICATION ACCELERATION INDEXED: Hype decay rate under threshold.] ` + (decision.market.reasoning || "");
-        decision.reasoning = `[COMMUNITY AMPLIFICATION ACCELERATION INDEXED] ` + decision.reasoning;
-      }
-    }
-    return decision;
-  }
-}
-
-class SportsAgentImpl extends BaseAgent {
-  name = "SportsAgent";
-  strategy = "Sports Timing & Probability Calibrator";
-  sources: Signal["source"][] = ["trends", "news"];
-  color: AgentStatus["color"] = "tertiary";
-  specialbadge = "Timing Analytics";
-  domainexpertise = "Probability Model odds Calibration";
-  systemPrompt = `You are SportsAgent, an elite domain specialist in sports event mechanics and probabilistic odds calibration.
-Your specialized mandate is to:
-- Validate event timing (ensure exact dates and scheduling constraints)
-- Verify alignment with external sports APIs and news updates
-- Calibrate probability models to set robust, mathematically sound odds
-- Detect scheduling conflicts and postpone anomalies before proposing.
-
-Only propose prediction markets around validated sporting events, championships, matches, or racer finishes with deterministic outcomes and non-ambiguous timings. Ensure the resolution condition specifies the exact game and official scoring source.`;
-
-  protected filterSignals(all: Signal[]): Signal[] {
-    const sportKeywords = [
-      "nfl", "nba", "soccer", "football", "basketball", "tennis", "f1", "formula",
-      "world cup", "champion", "playoff", "super bowl", "game", "match", "tournament",
-      "olympic", "sport", "league", "team", "player", "athlete", "score", "racing", "mlb", "fifa", "premier"
-    ];
-    return all.filter(
-      (s) =>
-        this.sources.includes(s.source) &&
-        sportKeywords.some((kw) => s.topic.toLowerCase().includes(kw))
-    );
-  }
-
-  async run(allSignals: Signal[]): Promise<AgentDecision> {
-    const filtered = this.filterSignals(allSignals);
-    if (filtered.length === 0) {
-      const msg = "Sports Calendar: ACTIVE — no new scheduling signals or tournament spikes detected.";
-      emit("info", this.name, msg);
-      this.updateStatus(msg);
-      return { createMarket: false, reasoning: msg, agentName: this.name, timestamp: Date.now() };
-    }
-
-    const decision = await super.run(filtered);
-    // Specialized Domain Correction: Validate event timing & Calibrate odds
-    if (decision.createMarket && decision.market) {
-      decision.market.description = `[TIMING CONFIRMED & ODDS CALIBRATED] ` + decision.market.description;
-      decision.reasoning = `[SPORTS API CALIBRATION VERIFIED] ` + decision.reasoning;
-      emit("info", this.name, `Validated event timing and calibrated odds to YES: ${Math.round(decision.market.yesOdds * 100)}% | NO: ${Math.round(decision.market.noOdds * 100)}%`);
-    }
-    return decision;
-  }
-}
-
-class RiskAgentImpl extends BaseAgent {
-  name = "RiskAgent";
-  strategy = "Manipulation & Volatility Stress Filter";
+class CryptoAgentImpl extends BaseAgent {
+  name = "CryptoAgent";
+  strategy = "Crypto & On-Chain Analytics";
   sources: Signal["source"][] = ["crypto", "news", "reddit", "trends"];
-  color: AgentStatus["color"] = "tertiary";
-  specialbadge = "Stability Arbitrage";
-  domainexpertise = "Anomaly & Manipulation Detection";
-  systemPrompt = `You are RiskAgent, the institutional risk filter and systemic stability guardian.
+  color: AgentStatus["color"] = "primary";
+  specialbadge = "CRYPTO";
+  domainexpertise = "Asset Trends & On-Chain Momentum";
+  systemPrompt = `You are CryptoAgent, a domain specialist in cryptocurrency markets.
 Your specialized mandate is to:
-- Detect manipulation attempts and wash trading indicators
-- Identify low-liquidity and thin-orderbook anomalies in active tokens
-- Flag suspicious market creation patterns or highly volatile speculative bubbles
-- Systematically calibrate predictions to reduce confidence scores under high-volatility stress.
+- Identify trending digital assets and significant price momentum
+- Detect regulatory news, ETF flows, and institutional adoption narratives
+- Generate highly contextual prediction opportunities based on verifiable crypto events.
 
-Propose risk mitigation prediction markets (e.g. Will a token experience a 30% correction? Will liquidity drop below a safe threshold?).
-Rules:
-- Automatically downgrade your confidence if signals show high volatility.
-- Focus on security, exploits, low liquidity, and regulatory sanctions.`;
+Only propose prediction markets that can be resolved via verifiable public block explorers, major CEX listings, or CoinGecko data.`;
 
   protected filterSignals(all: Signal[]): Signal[] {
-    const riskKeywords = [
-      "manipulation", "exploit", "hack", "liquidity", "volatility", "stress", "suspicious",
-      "sec", "lawsuit", "regulation", "alert", "anomaly", "risk", "unstability", "leverage", "liquidated",
-      "crash", "decline", "collapse", "downgrade", "threat", "vulnerability"
+    const cryptoKeywords = [
+      "crypto", "bitcoin", "btc", "ethereum", "eth", "solana", "sol", "etf", "defi",
+      "token", "listing", "binance", "coinbase", "sec", "regulation", "stablecoin"
     ];
     return all.filter(
       (s) =>
         this.sources.includes(s.source) &&
-        riskKeywords.some((kw) => s.topic.toLowerCase().includes(kw))
+        (s.source === "crypto" || s.source === "reddit" || cryptoKeywords.some((kw) => s.topic.toLowerCase().includes(kw)))
     );
   }
 
   async run(allSignals: Signal[]): Promise<AgentDecision> {
     const filtered = this.filterSignals(allSignals);
     if (filtered.length === 0) {
-      const msg = "Risk level: NOMINAL — no systemic anomalies or manipulation patterns flagged.";
+      const msg = "Crypto Registry: STEADY — no major asset spikes or regulatory news detected.";
       emit("info", this.name, msg);
       this.updateStatus(msg);
       return { createMarket: false, reasoning: msg, agentName: this.name, timestamp: Date.now() };
     }
-    
+
     const decision = await super.run(filtered);
-    // Specialized Domain Correction: Reduce confidence score under volatility stress
     if (decision.createMarket && decision.market) {
-      const hasHighVolatility = filtered.some(s => s.velocity > 75 || s.topic.toLowerCase().includes("volatility") || s.topic.toLowerCase().includes("stress"));
-      if (hasHighVolatility) {
-        const originalConf = decision.market.confidence;
-        decision.market.confidence = Math.max(30, Math.round(originalConf * 0.75));
-        decision.market.description = `[RISK ADVISORY: High Volatility Stress Detected] ` + decision.market.description;
-        decision.reasoning = `[VOLATILITY FILTER APPLIED - CONFIDENCE ADJUSTED FROM ${originalConf}% TO ${decision.market.confidence}%] ` + decision.reasoning;
-        emit("warn", this.name, `Systemic volatility stress detected. Reduced confidence score from ${originalConf}% to ${decision.market.confidence}%`);
-      }
+      decision.market.description = `[CRYPTO PROTOCOL VERIFIED] ` + decision.market.description;
+      decision.reasoning = `[ON-CHAIN DATA CALIBRATED] ` + decision.reasoning;
+    }
+    return decision;
+  }
+}
+
+class TechAgentImpl extends BaseAgent {
+  name = "TechAgent";
+  strategy = "Emerging Tech & AI Narratives";
+  sources: Signal["source"][] = ["hackernews", "news", "trends"];
+  color: AgentStatus["color"] = "secondary";
+  specialbadge = "TECH";
+  domainexpertise = "AI, Developer Ecosystem & Tech Launches";
+  systemPrompt = `You are TechAgent, a domain specialist in emerging technologies, AI, and developer ecosystems.
+Your specialized mandate is to:
+- Detect emerging technology narratives and AI breakthroughs
+- Identify major software launches, hardware announcements, or developer adoption trends
+- Generate highly contextual prediction opportunities based on tech events.
+
+Only propose prediction markets around major tech company earnings, product launches, or verifiable open-source milestones.`;
+
+  protected filterSignals(all: Signal[]): Signal[] {
+    const techKeywords = [
+      "ai", "artificial intelligence", "openai", "claude", "gpu", "compute", "nvidia",
+      "apple", "microsoft", "google", "meta", "launch", "release", "developer", "open source"
+    ];
+    return all.filter(
+      (s) =>
+        this.sources.includes(s.source) &&
+        (s.source === "hackernews" || techKeywords.some((kw) => s.topic.toLowerCase().includes(kw)))
+    );
+  }
+
+  async run(allSignals: Signal[]): Promise<AgentDecision> {
+    const filtered = this.filterSignals(allSignals);
+    if (filtered.length === 0) {
+      const msg = "Tech Registry: STEADY — no major tech launches or AI breakthroughs detected.";
+      emit("info", this.name, msg);
+      this.updateStatus(msg);
+      return { createMarket: false, reasoning: msg, agentName: this.name, timestamp: Date.now() };
+    }
+
+    const decision = await super.run(filtered);
+    if (decision.createMarket && decision.market) {
+      decision.market.description = `[TECH ECOSYSTEM VERIFIED] ` + decision.market.description;
+      decision.reasoning = `[NARRATIVE TREND CALIBRATED] ` + decision.reasoning;
     }
     return decision;
   }
@@ -580,10 +440,8 @@ Rules:
 
 // ─── AGENT INSTANCES ─────────────────────────────────────────────
 const agents = [
-  new MacroAgentImpl(),
-  new SocialAgentImpl(),
-  new SportsAgentImpl(),
-  new RiskAgentImpl(),
+  new CryptoAgentImpl(),
+  new TechAgentImpl(),
 ] as const;
 
 // ─── DEPLOYMENT WITH AUTOMATED RETRY WORKFLOW ──────────────────────
@@ -606,55 +464,10 @@ async function deployWithRetry(proposal: MarketProposal, maxAttempts = 3): Promi
   throw lastError || new Error(`Failed to deploy after ${maxAttempts} attempts`);
 }
 
-// When any agent proposes a market, RiskAgent reviews it for quality
+// When an agent proposes a market, broadcast it to the frontend via SSE instead of auto-deploying
 agentBus.on("marketProposed", (proposal, sourceAgent) => {
   const titleKey = marketFingerprint(proposal.title);
   
-  if (sourceAgent === "RiskAgent") {
-    const alreadyApproved = approvedMarkets.some((m) => marketFingerprint(m.title) === titleKey);
-    if (!alreadyApproved) {
-      approvedMarkets.unshift(proposal);
-      if (approvedMarkets.length > 30) approvedMarkets.pop();
-      
-      // Asynchronously deploy on-chain
-      deployWithRetry(proposal, 3)
-        .then((result) => {
-          proposal.status = "ACTIVE";
-          proposal.settlementTx = result.txHash;
-          (proposal as any).onChainMarketId = result.marketId;
-          emit("decision", "RiskAgent", `⛓️ [ON-CHAIN DEPLOYED] Market "${proposal.title.slice(0, 50)}" registered on Somnia L1. Tx: ${result.txHash.slice(0, 16)}... (ID: ${result.marketId})`);
-          
-          const txResult = {
-            market: proposal,
-            onChainMarketId: result.marketId,
-            txHash: result.txHash,
-            timestamp: Date.now()
-          };
-          
-          eventBus.emit("MARKET_CREATED", txResult);
-          
-          transactionHistory.push({
-            title: proposal.title,
-            onChainMarketId: result.marketId,
-            txHash: result.txHash,
-            status: "CONFIRMED",
-            timestamp: Date.now()
-          });
-        })
-        .catch((err) => {
-          emit("error", "RiskAgent", `❌ [ON-CHAIN FAILURE] Failed to deploy market: ${err.message}`);
-          
-          transactionHistory.push({
-            title: proposal.title,
-            status: "FAILED",
-            error: err.message || String(err),
-            timestamp: Date.now()
-          });
-        });
-    }
-    return;
-  }
-
   // Quality gate: confidence must be >= 60 and odds must not be degenerate
   const tooLowConfidence = proposal.confidence < 60;
   const degenerateOdds = proposal.yesOdds < 0.1 || proposal.yesOdds > 0.9;
@@ -664,7 +477,7 @@ agentBus.on("marketProposed", (proposal, sourceAgent) => {
       ? `Confidence too low (${proposal.confidence}% < 60% threshold)`
       : `Odds out of range (YES=${(proposal.yesOdds * 100).toFixed(0)}%)`;
     agentBus.emit("proposalVetoed", proposal.title, reason);
-    emit("warn", "RiskAgent", `🚫 VETO — "${proposal.title.slice(0, 60)}" — ${reason}`);
+    emit("warn", "System", `🚫 VETO — "${proposal.title.slice(0, 60)}" — ${reason}`);
     return;
   }
 
@@ -672,43 +485,10 @@ agentBus.on("marketProposed", (proposal, sourceAgent) => {
   if (!alreadyApproved) {
     approvedMarkets.unshift(proposal);
     if (approvedMarkets.length > 30) approvedMarkets.pop();
-    emit("decision", "RiskAgent", `✅ APPROVED — "${proposal.title.slice(0, 60)}" from ${sourceAgent}`);
+    emit("decision", "System", `✅ APPROVED & PROPOSED TO FRONTEND — "${proposal.title.slice(0, 60)}" from ${sourceAgent}`);
 
-    // Asynchronously deploy on-chain
-    deployWithRetry(proposal, 3)
-      .then((result) => {
-        proposal.status = "ACTIVE";
-        proposal.settlementTx = result.txHash;
-        (proposal as any).onChainMarketId = result.marketId;
-        emit("decision", "RiskAgent", `⛓️ [ON-CHAIN DEPLOYED] Market "${proposal.title.slice(0, 50)}" registered on Somnia L1. Tx: ${result.txHash.slice(0, 16)}... (ID: ${result.marketId})`);
-        
-        const txResult = {
-          market: proposal,
-          onChainMarketId: result.marketId,
-          txHash: result.txHash,
-          timestamp: Date.now()
-        };
-        
-        eventBus.emit("MARKET_CREATED", txResult);
-        
-        transactionHistory.push({
-          title: proposal.title,
-          onChainMarketId: result.marketId,
-          txHash: result.txHash,
-          status: "CONFIRMED",
-          timestamp: Date.now()
-        });
-      })
-      .catch((err) => {
-        emit("error", "RiskAgent", `❌ [ON-CHAIN FAILURE] Failed to deploy market: ${err.message}`);
-        
-        transactionHistory.push({
-          title: proposal.title,
-          status: "FAILED",
-          error: err.message || String(err),
-          timestamp: Date.now()
-        });
-      });
+    // Emit the PROPOSAL_CREATED event for SSE broadcasting
+    eventBus.emit("PROPOSAL_CREATED", proposal);
   }
 });
 
@@ -753,10 +533,8 @@ async function runCycle(): Promise<void> {
     .filter((r): r is PromiseFulfilledResult<AgentDecision> => r.status === "fulfilled")
     .map((r) => r.value);
 
-  // Emit agent decisions
-  decisions.forEach((decision) => {
-    console.log(`[INTEGRATION] 🧠 AGENT_DECISION: agentName=${decision.agentName} | createMarket=${decision.createMarket} | reasoning="${decision.reasoning.slice(0, 120).replace(/\n/g, " ")}..."`);
-    eventBus.emit("AGENT_DECISION_MADE", {
+    // Emit agent decisions
+    eventBus.emit("AGENT_ANALYZED", {
       agentName: decision.agentName,
       decision: {
         createMarket: decision.createMarket,
@@ -770,7 +548,6 @@ async function runCycle(): Promise<void> {
       },
       timestamp: Date.now()
     });
-  });
 
   const created = decisions.filter((d) => d.createMarket).length;
   console.log(

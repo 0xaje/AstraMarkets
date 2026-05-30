@@ -17,9 +17,9 @@ const SignalClient = {
      * Falls back to CoinGecko directly from browser if the server is offline.
      */
     async start() {
-        console.log('[AstraFE] Starting signal client — polling every 15s...');
-        await this._poll();
-        this._pollerRef = setInterval(() => this._poll(), this.POLL_INTERVAL_MS);
+        console.log('[AstraFE] Signal client ready — listening via SSE stream...');
+        // Polling removed in favor of real-time SSE SIGNAL_DETECTED events.
+        await this._poll(); // One initial fetch to hydrate UI
     },
 
     stop() {
@@ -200,126 +200,11 @@ const SignalClient = {
                     });
             }
 
-            if (signals.length > 0) {
-                console.log(`[AstraFE] CoinGecko fallback: got ${signals.length} signals.`);
-                this._ingestSignals(signals);
-            }
         } catch (err) {
             console.error('[AstraFE] CoinGecko fallback also failed:', err);
         }
     }
 };
-
-// --- CLIENT-SIDE SETTLEMENT ORACLE ---
-const ClientSettlementOracle = {
-    POLL_INTERVAL_MS: 5000, // Check every 5 seconds
-    _timerRef: null,
-
-    start() {
-        console.log('[AstraFE] Client Settlement Oracle running...');
-        this._poll();
-        this._timerRef = setInterval(() => this._poll(), this.POLL_INTERVAL_MS);
-    },
-
-    stop() {
-        if (this._timerRef) clearInterval(this._timerRef);
-    },
-
-    async _poll() {
-        const now = Date.now();
-        let changed = false;
-
-        for (let market of state.markets) {
-            if (!market.status) market.status = 'ACTIVE';
-
-            // Check if market has expired based on expiryTimestamp (Mock markets only)
-            if (market.status === 'ACTIVE' && !market.onChainMarketId && market.expiryTimestamp && now >= market.expiryTimestamp) {
-                console.log(`[AstraFE Oracle] Mock Market expired: "${market.title}"`);
-                market.status = 'EXPIRED';
-                
-                // Add a consciousness log entry
-                addConsciousnessLog(`⏳ [MARKET EXPIRED] Market reached expiry contract bounds: "${market.title}"`, 'warn');
-                
-                // Settle outcome
-                await this._resolveMarket(market);
-                changed = true;
-            }
-        }
-
-        if (changed) {
-            renderAll();
-            saveStateToLocalStorage();
-        }
-    },
-
-    async _resolveMarket(market) {
-        addConsciousnessLog(`🔍 [ORACLE RESOLVING] Fetching real-world outcome consensus for: "${market.title}"`, 'primary');
-        
-        let outcome = Math.random() >= 0.45; // default random consensus fallback
-        let reason = "Consensus nodes verified successful benchmark event completion.";
-
-        // Real API outcome resolution attempt
-        try {
-            if (market.category === 'crypto') {
-                const coinId = market.title.toLowerCase().includes('ethereum') || market.title.toLowerCase().includes('eth') ? 'ethereum'
-                             : market.title.toLowerCase().includes('solana') || market.title.toLowerCase().includes('sol') ? 'solana'
-                             : 'bitcoin';
-                
-                const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd`);
-                if (res.ok) {
-                    const data = await res.json();
-                    const currentPrice = data[coinId]?.usd || 92500;
-                    
-                    let targetPrice = 90000;
-                    const matches = market.title.match(/\\b\\d+[,.]?\\d*\\b/g);
-                    if (matches && matches.length > 0) {
-                        targetPrice = parseFloat(matches[matches.length - 1].replace(/,/g, ''));
-                        if (market.title.toLowerCase().includes(`${matches[matches.length - 1]}k`)) {
-                            targetPrice *= 1000;
-                        }
-                    }
-                    outcome = currentPrice >= targetPrice;
-                    reason = `CoinGecko reports ${coinId.toUpperCase()} actual price: $${currentPrice.toLocaleString()} (Target: $${targetPrice.toLocaleString()})`;
-                }
-            } else if (market.category === 'sports') {
-                if (market.title.toLowerCase().includes('brazil')) {
-                    outcome = true;
-                    reason = "SportsAPI verified: Brazil secured the FIFA World Cup slot with aggregate score advantage.";
-                } else if (market.title.toLowerCase().includes('usa')) {
-                    outcome = false;
-                    reason = "SportsAPI verified: USA eliminated in play-offs by aggregate score deficit.";
-                } else {
-                    const scoreA = Math.floor(Math.random() * 4);
-                    const scoreB = Math.floor(Math.random() * 4);
-                    outcome = scoreA > scoreB;
-                    reason = `SportsAPI verified event completion. Score outcome: Team A ${scoreA} - ${scoreB} Team B.`;
-                }
-            } else {
-                // macro, tech, social
-                if (market.title.toLowerCase().includes('bitcoin reserve')) {
-                    outcome = true;
-                    reason = "NewsAPI verified: Digital asset strategic reserve bill approved by Senate committee.";
-                } else if (market.title.toLowerCase().includes('apple')) {
-                    outcome = true;
-                    reason = "Google Trends reports extreme search index spike confirming successful Apple launch.";
-                }
-            }
-        } catch (e) {
-            console.warn("[AstraFE Oracle] Real API resolution error, falling back to consensus:", e.message);
-        }
-
-        const txHash = '0x' + Array.from({length: 64}, () => Math.floor(Math.random()*16).toString(16)).join('');
-        
-        market.status = 'RESOLVED';
-        market.resolvedOutcome = outcome;
-        market.settlementTimestamp = Date.now();
-        market.settlementTx = txHash;
-
-        addConsciousnessLog(`✅ [SETTLEMENT CONFIRMED] Market "${market.title}" resolved to ${outcome ? 'YES' : 'NO'} | ${reason} | Tx: ${txHash.slice(0, 16)}...`, 'decision');
-        alertFloatNotification(`Market Settled: ${outcome ? 'YES' : 'NO'}`, 'success');
-    }
-};
-
 // --- GLOBAL STATE ---
 const state = {
     theme: 'light',
@@ -430,16 +315,6 @@ function saveStateToLocalStorage() {
             },
             activeAgentsCount: state.activeAgentsCount,
             markets: state.markets,
-            positions: state.positions.map(p => ({
-                id: p.id,
-                marketId: p.marketId,
-                marketTitle: p.marketTitle,
-                side: p.side,
-                shares: p.shares,
-                avgPrice: p.avgPrice,
-                currentPrice: p.currentPrice
-            })),
-            transactions: state.transactions,
             consciousnessLogs: state.consciousnessLogs.slice(0, 50)
         };
         localStorage.setItem('astramarkets_state', JSON.stringify(stateToSave));
@@ -469,21 +344,6 @@ function loadStateFromLocalStorage() {
         }
         if (parsed.activeAgentsCount) state.activeAgentsCount = parsed.activeAgentsCount;
         if (parsed.markets) state.markets = parsed.markets;
-        if (parsed.positions) {
-            state.positions = parsed.positions.map(p => ({
-                id: p.id,
-                marketId: p.marketId,
-                marketTitle: p.marketTitle,
-                side: p.side,
-                shares: p.shares,
-                avgPrice: p.avgPrice,
-                currentPrice: p.currentPrice,
-                get invested() { return this.shares * this.avgPrice; },
-                get value() { return this.shares * this.currentPrice; },
-                get pnl() { return this.value - this.invested; }
-            }));
-        }
-        if (parsed.transactions) state.transactions = parsed.transactions;
         if (parsed.consciousnessLogs) state.consciousnessLogs = parsed.consciousnessLogs;
     } catch (e) {
         // Corrupted state — start fresh
@@ -512,8 +372,33 @@ function startSSEListener() {
             const sig = data.signal;
             const color = sig.source === 'crypto' ? 'primary' : sig.source === 'news' ? 'secondary' : sig.source === 'reddit' ? 'tertiary' : 'primary';
             const icon  = sig.source === 'crypto' ? '🪙' : sig.source === 'news' ? '📰' : sig.source === 'reddit' ? '💬' : '📈';
-            // addConsciousnessLog(`${icon} [${sig.source.toUpperCase()}] ${sig.topic.substring(0, 90)} | ${sig.sentiment.toUpperCase()} | Score: ${sig.importance}`, color);
+            SignalClient._ingestSignals([sig]);
         } catch { /* ignore malformed events */ }
+    });
+
+    eventSource.addEventListener('PROPOSAL_CREATED', (e) => {
+        try {
+            const proposal = JSON.parse(e.data);
+            
+            // Populate the right sidebar proposal box
+            state.rootedDecision.text = proposal.title;
+            state.rootedDecision.category = proposal.category;
+            state.rootedDecision.agent = proposal.agent;
+            state.rootedDecision.expiry = proposal.expiry;
+            state.rootedDecision.yesVotes = proposal.confidence;
+            state.rootedDecision.noVotes = 100 - proposal.confidence;
+            state.rootedDecision.hasVoted = false;
+            
+            document.getElementById('rooted-decision-text').textContent = proposal.title;
+            document.getElementById('rooted-decision-progress').style.width = `${proposal.confidence}%`;
+            document.getElementById('vote-yes-label').textContent = `Swarm Consensus: ${proposal.confidence}%`;
+            document.getElementById('vote-no-label').textContent = `Risk Threshold: ${100 - proposal.confidence}%`;
+            
+            document.getElementById('decision-status').textContent = 'AWAITING APPROVAL';
+            document.getElementById('decision-status').className = 'text-[9px] font-bold uppercase tracking-widest text-primary px-1.5 py-0.5 rounded bg-primary/10 border border-primary/20';
+            
+            addConsciousnessLog(`New autonomous market proposal from ${proposal.agent}: '${proposal.title}'`, 'primary');
+        } catch (err) { console.error("Error parsing PROPOSAL_CREATED:", err); }
     });
 
     eventSource.addEventListener('MARKET_CREATED', (e) => {
@@ -576,6 +461,65 @@ function startSSEListener() {
         } catch { /* ignore malformed events */ }
     });
 
+    eventSource.addEventListener('MARKET_SETTLED', (e) => {
+        try {
+            const data = JSON.parse(e.data);
+            const market = state.markets.find(m => (m.onChainMarketId === data.marketId || m.ref === data.ref));
+            if (market) {
+                market.status = 'RESOLVED';
+                market.resolvedOutcome = data.outcome;
+                market.settlementTx = data.txHash;
+                market.statusText = data.outcome ? 'Resolved YES' : 'Resolved NO';
+                addConsciousnessLog(`✅ [SETTLEMENT CONFIRMED] Market "${market.title.substring(0, 50)}..." resolved. Tx: ${data.txHash.slice(0, 10)}...`, 'success');
+                updateAgentEvolution(market, 'SETTLEMENT', data);
+                renderAll();
+                saveStateToLocalStorage();
+            }
+        } catch (err) { console.error("Error parsing MARKET_SETTLED:", err); }
+    });
+
+    eventSource.addEventListener('CHAIN_TRANSPARENCY', (e) => {
+        try {
+            const data = JSON.parse(e.data);
+            const { chain, protocol } = data;
+
+            if (chain.blockNumber) {
+                const blockEl = document.getElementById('transparency-block-num');
+                if (blockEl) {
+                    blockEl.innerHTML = `
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        ${chain.blockNumber.toLocaleString()}
+                    `;
+                }
+            }
+
+            if (chain.gasPrice) {
+                const gasEl = document.getElementById('transparency-gas-metrics');
+                if (gasEl) gasEl.textContent = `${chain.gasPrice} Gwei | Limit: 30M`;
+            }
+
+            const transparencyRpcStatus = document.getElementById('rpc-transparency-status');
+            if (transparencyRpcStatus) {
+                transparencyRpcStatus.textContent = chain.rpcStatus === 'healthy' ? `HEALTHY | ${chain.rpcLatencyMs}ms` : "OFFLINE";
+                transparencyRpcStatus.className = chain.rpcStatus === 'healthy' ? 
+                    "text-[9px] px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/25 rounded text-emerald-500 font-mono font-bold" :
+                    "text-[9px] px-2 py-0.5 bg-error/10 border border-error/25 rounded text-error font-mono font-bold animate-pulse";
+            }
+
+            const healthCreatedEl = document.getElementById('health-markets-created');
+            if (healthCreatedEl) healthCreatedEl.textContent = protocol.activeMarkets + protocol.resolvedMarkets;
+
+            const healthSettledEl = document.getElementById('health-markets-settled');
+            if (healthSettledEl) healthSettledEl.textContent = protocol.resolvedMarkets;
+
+            const healthAccuracyEl = document.getElementById('health-settlement-accuracy');
+            if (healthAccuracyEl) healthAccuracyEl.textContent = `${protocol.settlementSuccessRate}%`;
+
+            const healthVolumeEl = document.getElementById('health-total-volume');
+            if (healthVolumeEl) healthVolumeEl.textContent = `${protocol.totalVolumeSOM.toFixed(2)} STT`;
+        } catch (err) {}
+    });
+
     eventSource.addEventListener('MARKET_UPDATED', (e) => {
         try {
             const data = JSON.parse(e.data);
@@ -613,34 +557,28 @@ function startSSEListener() {
         try {
             const data = JSON.parse(e.data);
             addConsciousnessLog(`🔔 [TRANSACTION] ${data.trade.trader} ${data.trade.amountSpent > 0 ? 'bought' : 'sold'} in "${data.trade.marketTitle}"`, 'primary');
-            const m = state.markets.find(x => x.ref === data.market.ref);
+            const m = state.markets.find(x => x.ref === data.market.ref || x.onChainMarketId === data.market.marketId);
             if (m) {
                 m.yesOdds = data.market.yesOdds;
                 m.noOdds = data.market.noOdds;
                 m.totalLiquidity = data.market.totalLiquidity;
                 m.volume = data.market.volume;
+                updateAgentEvolution(m, 'TRADE', data.trade);
+            }
+            if (data.trade.trader === state.wallet.address) {
+                syncOnChainPortfolio();
             }
             renderAll();
         } catch { /* ignore malformed events */ }
     });
 
-    eventSource.addEventListener('POSITION_UPDATED', (e) => {
+    eventSource.addEventListener('REWARD_CLAIMED', (e) => {
         try {
             const data = JSON.parse(e.data);
-            state.wallet.balance = data.walletBalance;
-            state.positions = data.positions.map(p => ({
-                id: 'pos_' + p.marketId,
-                marketId: p.marketId,
-                marketTitle: p.marketTitle,
-                side: p.yesShares > 0 ? 'YES' : 'NO',
-                shares: p.yesShares > 0 ? p.yesShares : p.noShares,
-                avgPrice: p.averagePrice,
-                currentPrice: p.averagePrice,
-                get invested() { return this.shares * this.avgPrice; },
-                get value() { return this.shares * this.currentPrice; },
-                get pnl() { return this.value - this.invested; }
-            }));
-            state.wallet.lockedBalance = state.positions.reduce((acc, curr) => acc + curr.invested, 0);
+            addConsciousnessLog(`🎉 [PAYOUT] ${data.claimant.slice(0, 6)}... claimed rewards!`, 'success');
+            if (data.claimant === state.wallet.address) {
+                syncOnChainPortfolio();
+            }
             renderAll();
         } catch { /* ignore malformed events */ }
     });
@@ -1291,6 +1229,30 @@ function applyCardGlowEffects() {
 
 // --- RENDERERS ---
 
+function updateAgentEvolution(market, type, data) {
+    if (!market || !market.agent) return;
+    const agent = state.agents.find(a => a.name === market.agent || a.badgeTitle.toLowerCase() === market.category?.toLowerCase() || a.name.includes(market.category?.charAt(0).toUpperCase() + market.category?.slice(1)));
+    if (!agent) return;
+
+    if (type === 'TRADE') {
+        const spent = data.amountSpent || 0;
+        agent.capital += (spent * 0.05); // 5% fee equivalent goes to agent allocation
+        agent.trades++;
+    } else if (type === 'SETTLEMENT') {
+        const wasBullish = market.history[1] > 0.5; // Initial odds bias
+        const predictedCorrectly = (wasBullish && data.outcome) || (!wasBullish && !data.outcome);
+        
+        // Update accuracy moving average
+        agent.accuracy = (agent.accuracy * 0.9) + (predictedCorrectly ? 10 : 0);
+        
+        if (predictedCorrectly) {
+            agent.capital += 50; // Bonus for correct prediction
+        } else {
+            agent.capital = Math.max(50, agent.capital - 20); // Penalty
+        }
+    }
+}
+
 function renderAll() {
     renderHeaders();
     renderLandingPage();
@@ -1933,6 +1895,155 @@ function renderAgentLab() {
 }
 
 // Tab 4: Portfolio
+// Claim Rewards System
+window.claimRewards = async function(marketId) {
+    if (typeof window.ethereum === 'undefined') {
+        alertFloatNotification("No Web3 wallet detected.", "error");
+        return;
+    }
+    const market = state.markets.find(m => m.id === marketId);
+    if (!market || !market.onChainMarketId) return;
+
+    try {
+        const browserProvider = new ethers.BrowserProvider(window.ethereum);
+        const signer = await browserProvider.getSigner();
+        const MARKET_FACTORY_ADDRESS = "0x8f03762Eaa55bE11A8DF5A16e1075d97d7f724DE"; 
+        const MARKET_FACTORY_ABI = [
+            "function claimRewards(uint256 marketId) external",
+            "event RewardsClaimed(uint256 indexed marketId, address indexed claimant, uint256 amountClaimed)"
+        ];
+        const contract = new ethers.Contract(MARKET_FACTORY_ADDRESS, MARKET_FACTORY_ABI, signer);
+        
+        addConsciousnessLog(`Initiating reward claim for market ${market.onChainMarketId}...`, 'primary');
+        const tx = await contract.claimRewards(market.onChainMarketId);
+        alertFloatNotification('Claim submitted to network!', 'success');
+        
+        await tx.wait();
+        addConsciousnessLog(`✅ Rewards successfully claimed!`, 'success');
+        alertFloatNotification('Rewards claimed successfully!', 'success');
+        
+        // Notify backend to broadcast REWARD_CLAIMED
+        fetch('/api/markets/claimed', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ marketId: market.onChainMarketId, txHash: tx.hash, claimant: state.wallet.address })
+        }).catch(() => {});
+
+        await syncOnChainPortfolio();
+    } catch (err) {
+        console.error("Claim failed:", err);
+        alertFloatNotification('Claim failed or you have no winning shares.', 'error');
+    }
+};
+
+async function syncOnChainPortfolio() {
+    if (!state.wallet.isConnected || typeof window.ethereum === 'undefined') return;
+    try {
+        const browserProvider = new ethers.BrowserProvider(window.ethereum);
+        const signer = await browserProvider.getSigner();
+        const address = await signer.getAddress();
+        
+        // Get native balance
+        const balance = await browserProvider.getBalance(address);
+        state.wallet.balance = Number(ethers.formatEther(balance));
+
+        const MARKET_FACTORY_ADDRESS = "0x8f03762Eaa55bE11A8DF5A16e1075d97d7f724DE"; 
+        const MARKET_FACTORY_ABI = [
+            "event TradeExecuted(uint256 indexed marketId, address indexed trader, bool position, uint256 amountSpent, uint256 sharesMinted, uint256 newYesOdds, uint256 newNoOdds)",
+            "event RewardsClaimed(uint256 indexed marketId, address indexed claimant, uint256 amountClaimed)"
+        ];
+        const contract = new ethers.Contract(MARKET_FACTORY_ADDRESS, MARKET_FACTORY_ABI, browserProvider);
+
+        // Fetch logs for this user
+        const tradeFilter = contract.filters.TradeExecuted(null, address);
+        const tradeLogs = await contract.queryFilter(tradeFilter, 0, "latest");
+        
+        const claimFilter = contract.filters.RewardsClaimed(null, address);
+        const claimLogs = await contract.queryFilter(claimFilter, 0, "latest");
+
+        const positionsMap = {};
+        state.transactions = [];
+
+        for (const log of tradeLogs) {
+            const parsed = contract.interface.parseLog(log);
+            if (!parsed) continue;
+            
+            const [mId, trader, pos, amountSpent, sharesMinted] = parsed.args;
+            const marketIdNum = Number(mId);
+            const sideStr = pos ? "YES" : "NO";
+            const spent = Number(ethers.formatEther(amountSpent));
+            const shares = Number(ethers.formatEther(sharesMinted));
+
+            const m = state.markets.find(x => x.onChainMarketId === marketIdNum);
+            const marketTitle = m ? m.title : `Market #${marketIdNum}`;
+
+            if (!positionsMap[marketIdNum]) {
+                positionsMap[marketIdNum] = { YES: { shares: 0, invested: 0 }, NO: { shares: 0, invested: 0 }, title: marketTitle };
+            }
+            
+            positionsMap[marketIdNum][sideStr].shares += shares;
+            positionsMap[marketIdNum][sideStr].invested += spent;
+
+            state.transactions.push({
+                type: 'BUY',
+                marketTitle,
+                action: pos ? 'Bought YES' : 'Bought NO',
+                amount: `${spent.toFixed(2)} STT`,
+                timestamp: 'Past block',
+                status: 'Confirmed'
+            });
+        }
+
+        for (const log of claimLogs) {
+            const parsed = contract.interface.parseLog(log);
+            if (!parsed) continue;
+            const mId = Number(parsed.args.marketId);
+            if (positionsMap[mId]) {
+                positionsMap[mId].YES.shares = 0;
+                positionsMap[mId].NO.shares = 0;
+            }
+            state.transactions.push({
+                type: 'REWARD',
+                marketTitle: `Market #${mId}`,
+                action: 'Claimed Rewards',
+                amount: `${Number(ethers.formatEther(parsed.args.amountClaimed)).toFixed(2)} STT`,
+                timestamp: 'Past block',
+                status: 'Confirmed'
+            });
+        }
+
+        // Build state.positions array
+        state.positions = [];
+        let locked = 0;
+        for (const [mId, posData] of Object.entries(positionsMap)) {
+            const m = state.markets.find(x => x.onChainMarketId === Number(mId));
+            ['YES', 'NO'].forEach(side => {
+                const p = posData[side];
+                if (p.shares > 0) {
+                    const currentOdds = m ? (side === 'YES' ? m.yesOdds : m.noOdds) : 0.5;
+                    const val = p.shares * currentOdds;
+                    locked += val;
+                    state.positions.push({
+                        id: 'pos_' + mId + '_' + side,
+                        marketId: m ? m.id : mId,
+                        marketTitle: posData.title,
+                        side: side,
+                        shares: p.shares,
+                        invested: p.invested,
+                        currentPrice: currentOdds,
+                        value: val,
+                        pnl: val - p.invested
+                    });
+                }
+            });
+        }
+        state.wallet.lockedBalance = locked;
+        
+        renderPortfolio();
+        renderActivityLedger();
+    } catch (err) { console.error("Error syncing on-chain portfolio:", err); }
+}
+
 function renderPortfolio() {
     // Top headers updates
     document.getElementById('port-net-worth').textContent = `${state.wallet.netWorth.toFixed(2)} SOM`;
@@ -1989,7 +2100,7 @@ function renderPortfolio() {
                 const isWinner = market.resolvedOutcome === (pos.side === 'YES');
                 if (isWinner) {
                     actionButtonHTML = `
-                        <button class="w-full mt-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white font-label text-[9px] font-bold rounded-lg uppercase tracking-wider transition-all flex items-center justify-center gap-1 shadow-sm" onclick="claimWinningRewards('${pos.marketId}')">
+                        <button class="w-full mt-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white font-label text-[9px] font-bold rounded-lg uppercase tracking-wider transition-all flex items-center justify-center gap-1 shadow-sm" onclick="claimRewards('${pos.marketId}')">
                             <span class="material-symbols-outlined text-[10px]">celebrate</span>
                             Claim Winnings
                         </button>
@@ -2923,89 +3034,85 @@ async function executeTradePrediction() {
     const amt = parseFloat(document.getElementById('trade-amount').value);
     const market = state.markets.find(m => m.id === state.drawerContext.marketId);
     
-    if (!market) return;
+    if (!market || !market.onChainMarketId) {
+        alertFloatNotification('Invalid market or not on-chain.', 'error');
+        return;
+    }
     
     if (isNaN(amt) || amt <= 0) {
         alertFloatNotification('Please enter a valid investment amount.', 'error');
         return;
     }
     
-    if (amt > state.wallet.balance) {
-        alertFloatNotification('Insufficient available SOM tokens.', 'error');
+    if (typeof window.ethereum === 'undefined') {
+        alertFloatNotification("No Web3 wallet detected. Please install MetaMask.", "error");
         return;
     }
     
-    addConsciousnessLog(`📡 Broadcaster transmitting prediction signature to Somnia contract factory...`, 'secondary');
+    addConsciousnessLog(`📡 Broadcaster transmitting trade signature to Somnia L1...`, 'secondary');
 
-    // Attempt backend trade
     try {
-        const response = await fetchWithTimeout(`/api/markets/${market.ref}/trade`, {
+        const browserProvider = new ethers.BrowserProvider(window.ethereum);
+        const signer = await browserProvider.getSigner();
+
+        const MARKET_FACTORY_ADDRESS = "0x8f03762Eaa55bE11A8DF5A16e1075d97d7f724DE"; 
+        const MARKET_FACTORY_ABI = [
+            "function buyShares(uint256 marketId, bool position) payable",
+            "event TradeExecuted(uint256 indexed marketId, address indexed trader, bool position, uint256 amountSpent, uint256 sharesMinted, uint256 newYesOdds, uint256 newNoOdds)"
+        ];
+
+        const contract = new ethers.Contract(MARKET_FACTORY_ADDRESS, MARKET_FACTORY_ABI, signer);
+        const positionBool = state.drawerContext.side === 'YES';
+        const txAmount = ethers.parseEther(amt.toString()); 
+        
+        addConsciousnessLog(`Prompting wallet signature for trade execution on-chain...`, "primary");
+        const tx = await contract.buyShares(market.onChainMarketId, positionBool, { value: txAmount });
+        
+        addConsciousnessLog(`Trade submitted: ${tx.hash.substring(0,10)}... waiting for block confirmation.`, "secondary");
+        alertFloatNotification('Trade submitted to Somnia L1!', 'success');
+        
+        const receipt = await tx.wait();
+        
+        let sharesMinted = 0;
+        for (const log of receipt.logs) {
+            try {
+                const parsed = contract.interface.parseLog(log);
+                if (parsed && parsed.name === 'TradeExecuted') {
+                    sharesMinted = Number(ethers.formatEther(parsed.args.sharesMinted));
+                    market.yesOdds = Number(parsed.args.newYesOdds) / 100;
+                    market.noOdds = Number(parsed.args.newNoOdds) / 100;
+                }
+            } catch (e) {}
+        }
+        
+        addConsciousnessLog(`✅ Trade Executed on-chain in block ${receipt.blockNumber}`, 'success');
+        alertFloatNotification('Trade confirmed on-chain!', 'success');
+
+        // Notify backend to broadcast trade globally
+        fetch('/api/markets/traded', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                position: state.drawerContext.side === 'YES',
-                amount: amt
-            }),
-            timeout: 8000
-        });
+                marketId: market.onChainMarketId,
+                ref: market.ref,
+                title: market.title,
+                position: positionBool,
+                amount: amt,
+                sharesMinted: sharesMinted,
+                txHash: tx.hash,
+                trader: state.wallet.address
+            })
+        }).catch(() => {});
 
-        if (response.ok) {
-            const result = await response.json();
-            
-            // Sync balance and positions from backend truth
-            state.wallet.balance = result.portfolio.walletBalance;
-            
-            // Record position
-            const key = market.ref;
-            const existingPos = state.positions.find(p => p.marketId === key);
-            if (existingPos) {
-                existingPos.shares = state.drawerContext.side === 'YES' ? result.portfolio.position.yesShares : result.portfolio.position.noShares;
-                existingPos.avgPrice = result.portfolio.position.averagePrice;
-            } else {
-                state.positions.push({
-                    id: 'pos_' + key,
-                    marketId: key,
-                    marketTitle: market.title,
-                    side: state.drawerContext.side,
-                    shares: state.drawerContext.side === 'YES' ? result.portfolio.position.yesShares : result.portfolio.position.noShares,
-                    avgPrice: result.portfolio.position.averagePrice,
-                    currentPrice: result.portfolio.position.averagePrice,
-                    get invested() { return this.shares * this.avgPrice; },
-                    get value() { return this.shares * this.currentPrice; },
-                    get pnl() { return this.value - this.invested; }
-                });
-            }
-
-            state.wallet.lockedBalance = state.positions.reduce((acc, curr) => acc + curr.invested, 0);
-
-            // Record trade in explorer ledger
-            state.transactions.unshift({
-                hash: result.trade.txHash,
-                action: 'Prediction Contract Execution',
-                sender: state.wallet.address,
-                details: `Purchased ${result.trade.sharesMinted.toFixed(2)} ${state.drawerContext.side} shares of '${market.title}' at ${result.trade.amountSpent.toFixed(2)} SOM`,
-                timestamp: 'just now'
-            });
-
-            // Recalculate dynamic odds on local copy
-            market.yesOdds = result.marketOdds.yes;
-            market.noOdds = result.marketOdds.no;
-            market.volume += amt;
-
-            addConsciousnessLog(`✅ [BLOCK CONFIRMED] Backend prediction oracle synced. Purchased ${result.trade.sharesMinted.toFixed(2)} shares.`, 'decision');
-            alertFloatNotification(`Bought ${result.trade.sharesMinted.toFixed(2)} shares!`, 'success');
-            document.getElementById('insight-drawer').classList.remove('open');
-            renderAll();
-            saveStateToLocalStorage();
-        } else {
-            throw new Error('Backend trade execution failed.');
-        }
-    } catch (e) {
-        console.error(e);
-        alertFloatNotification('Transaction failed: No simulation fallback allowed.', 'error');
-        addConsciousnessLog(`❌ Transaction failed. Mock/simulation is disabled on mainnet build.`, 'error');
+        closeInsightDrawer();
+        await syncOnChainPortfolio(); // Refresh portfolio from chain
+    } catch (err) {
+        console.error("Trade execution failed:", err);
+        addConsciousnessLog(`Trade rejected or failed: ${err.shortMessage || err.message}`, "error");
+        alertFloatNotification('Trade failed.', 'error');
     }
 }
+
 
 // Faucet free claim minting mock removed
 
@@ -3225,73 +3332,44 @@ function renderWalletModal() {
 }
 
 // --- AMM TRADING & STAKING ENGINE FUNCTIONS ---
-async function sellPositionShares(marketId) {
-    const pos = state.positions.find(p => p.marketId === marketId);
-    if (!pos) return;
+window.sellPositionShares = async function(marketId) {
+    if (typeof window.ethereum === 'undefined') {
+        alertFloatNotification("No Web3 wallet detected.", "error");
+        return;
+    }
+    const market = state.markets.find(m => m.id === marketId || m.ref === marketId);
+    if (!market || !market.onChainMarketId) return;
 
-    addConsciousnessLog(`🔄 Initiating AMM exit request: selling prediction shares for ${pos.marketTitle}...`, 'primary');
-    
-    // REST API call attempt to backend
     try {
-        const response = await fetchWithTimeout(`/api/markets/${marketId}/sell`, {
+        const browserProvider = new ethers.BrowserProvider(window.ethereum);
+        const signer = await browserProvider.getSigner();
+        const MARKET_FACTORY_ADDRESS = "0x8f03762Eaa55bE11A8DF5A16e1075d97d7f724DE"; 
+        const MARKET_FACTORY_ABI = [
+            "function sellShares(uint256 marketId) external"
+        ];
+        const contract = new ethers.Contract(MARKET_FACTORY_ADDRESS, MARKET_FACTORY_ABI, signer);
+        
+        addConsciousnessLog(`Initiating AMM exit for market ${market.onChainMarketId}...`, 'primary');
+        const tx = await contract.sellShares(market.onChainMarketId);
+        alertFloatNotification('Sell submitted to network!', 'success');
+        
+        await tx.wait();
+        addConsciousnessLog(`✅ Position successfully closed on-chain!`, 'success');
+        alertFloatNotification('Position closed successfully!', 'success');
+        
+        // Notify backend to broadcast TRADE_EXECUTED
+        fetch('/api/markets/traded', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            timeout: 8000
-        });
-        if (response.ok) {
-            const result = await response.json();
-            state.wallet.balance = result.walletBalance;
-            // Filter out sold position
-            state.positions = state.positions.filter(p => p.marketId !== marketId);
-            state.wallet.lockedBalance = state.positions.reduce((acc, curr) => acc + curr.invested, 0);
-            
-            addConsciousnessLog(`✅ Position sold on backend oracle. Received payout refund.`, 'decision');
-            alertFloatNotification('Position successfully closed!', 'success');
-            renderAll();
-            saveStateToLocalStorage();
-        } else {
-            throw new Error('Backend sell execution failed.');
-        }
-    } catch (e) {
-        console.error(e);
-        alertFloatNotification('Transaction failed: No simulation fallback allowed.', 'error');
-        addConsciousnessLog(`❌ AMM Sell failed. Mock/simulation is disabled on mainnet build.`, 'error');
+            body: JSON.stringify({ marketId: market.onChainMarketId, txHash: tx.hash, claimant: state.wallet.address })
+        }).catch(() => {});
+
+        await syncOnChainPortfolio();
+    } catch (err) {
+        console.error("Sell failed:", err);
+        alertFloatNotification('Sell failed.', 'error');
     }
-}
-
-async function claimWinningRewards(marketId) {
-    const pos = state.positions.find(p => p.marketId === marketId);
-    if (!pos) return;
-
-    addConsciousnessLog(`🏆 Claiming parimutuel reward allocation for resolved contract: ${pos.marketTitle}...`, 'primary');
-
-    // REST API call attempt to backend
-    try {
-        const response = await fetchWithTimeout(`/api/markets/${marketId}/claim`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            timeout: 8000
-        });
-        if (response.ok) {
-            const result = await response.json();
-            state.wallet.balance = result.walletBalance;
-            // Filter out claimed position
-            state.positions = state.positions.filter(p => p.marketId !== marketId);
-            state.wallet.lockedBalance = state.positions.reduce((acc, curr) => acc + curr.invested, 0);
-            
-            addConsciousnessLog(`✅ Rewards successfully claimed and credited on backend.`, 'decision');
-            alertFloatNotification('Winnings claimed!', 'success');
-            renderAll();
-            saveStateToLocalStorage();
-        } else {
-            throw new Error('Backend claim execution failed.');
-        }
-    } catch (e) {
-        console.error(e);
-        alertFloatNotification('Transaction failed: No simulation fallback allowed.', 'error');
-        addConsciousnessLog(`❌ Rewards claim failed. Mock/simulation is disabled on mainnet build.`, 'error');
-    }
-}
+};
 
 // Make functions globally available in window for inline onclick handlers
 window.sellPositionShares = sellPositionShares;
@@ -3401,14 +3479,18 @@ async function executeGovernanceVote(choice) {
         const contract = new ethers.Contract(MARKET_FACTORY_ADDRESS, MARKET_FACTORY_ABI, signer);
 
         const fullProposalText = state.rootedDecision.text;
-        let category = "crypto";
-        if (fullProposalText.toLowerCase().includes("sports")) category = "sports";
-        if (fullProposalText.toLowerCase().includes("tech")) category = "tech";
-        if (fullProposalText.toLowerCase().includes("election")) category = "politics";
+        const category = state.rootedDecision.category || "crypto";
+        const confidence = state.rootedDecision.yesVotes || 85;
+        const agentName = state.rootedDecision.agent || "AI_SWARM_EXECUTOR";
         
-        const expiry = Math.floor(Date.now() / 1000) + (14 * 24 * 60 * 60); 
+        let expiry;
+        if (state.rootedDecision.expiry) {
+            expiry = Math.floor(new Date(state.rootedDecision.expiry).getTime() / 1000);
+        } else {
+            expiry = Math.floor(Date.now() / 1000) + (14 * 24 * 60 * 60);
+        }
         
-        const tx = await contract.createMarket(fullProposalText, category, expiry, "AI_SWARM_EXECUTOR", 85);
+        const tx = await contract.createMarket(fullProposalText, category, expiry, agentName, confidence);
         
         document.getElementById('decision-status').textContent = 'MINING TX...';
         document.getElementById('decision-status').className = 'text-[9px] font-bold uppercase tracking-widest text-secondary px-1.5 py-0.5 rounded bg-secondary/10 border border-secondary/20 animate-pulse';
@@ -3444,6 +3526,27 @@ async function executeGovernanceVote(choice) {
         document.getElementById('vote-yes-label').textContent = `Swarm Consensus: ${yesPct.toFixed(0)}%`;
         document.getElementById('vote-no-label').textContent = `Risk Threshold: ${noPct.toFixed(0)}%`;
         document.getElementById('rooted-decision-progress').style.width = `${yesPct}%`;
+        
+        // Notify backend to broadcast to all clients
+        try {
+            await fetch('/api/markets/executed', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    title: fullProposalText,
+                    category,
+                    expiry: new Date(expiry * 1000).toISOString(),
+                    yesOdds: confidence / 100,
+                    noOdds: (100 - confidence) / 100,
+                    confidence,
+                    agentName,
+                    txHash: tx.hash,
+                    onChainMarketId: newMarketId
+                })
+            });
+        } catch (err) {
+            console.error("Failed to notify backend of execution:", err);
+        }
         
         document.getElementById('decision-status').textContent = 'EXECUTED';
         document.getElementById('decision-status').className = 'text-[9px] font-bold uppercase tracking-widest text-primary px-1.5 py-0.5 rounded bg-primary/10 border border-primary/20';
@@ -3498,42 +3601,7 @@ function alertFloatNotification(message, type = 'success') {
     }, 3000);
 }
 
-// ── Governance decision cycling (still needed for governance panel) ──────────
-// Triggered every 5 minutes independently of signal polling
-setInterval(() => {
-    if (Math.random() > 0.5) cycleGovernanceDecision();
-}, 5 * 60 * 1000);
-
-// generateAutonomousMarket is now replaced by SignalClient._generateMarketFromSignal()
-// which creates markets from REAL signal data instead of hardcoded templates.
-
-// Governance proposal recycling
-function cycleGovernanceDecision() {
-    const proposals = [
-        "Detecting massive World Cup final betting volume on offshore derivatives. Seed new Sports market?",
-        "Tech cluster detected a 20% spike in AI compute demand. Deploy new Tech Volatility Index market?",
-        "On-chain crypto bridging volume to Somnia L1 increased by 400%. Deploy Ecosystem TVL market?",
-        "Global polling data shows massive standard deviation shift. Initialize new Election market?"
-    ];
-    
-    const prop = proposals[Math.floor(Math.random() * proposals.length)];
-    
-    state.rootedDecision.text = prop;
-    state.rootedDecision.yesVotes = 85 + Math.floor(Math.random()*12);
-    state.rootedDecision.noVotes = 100 - state.rootedDecision.yesVotes;
-    state.rootedDecision.hasVoted = false;
-    
-    // Reset visual state
-    document.getElementById('rooted-decision-text').textContent = prop;
-    document.getElementById('rooted-decision-progress').style.width = `${state.rootedDecision.yesVotes}%`;
-    document.getElementById('vote-yes-label').textContent = `Swarm Consensus: ${state.rootedDecision.yesVotes}%`;
-    document.getElementById('vote-no-label').textContent = `Risk Threshold: ${state.rootedDecision.noVotes}%`;
-    
-    document.getElementById('decision-status').textContent = 'AWAITING APPROVAL';
-    document.getElementById('decision-status').className = 'text-[9px] font-bold uppercase tracking-widest text-primary px-1.5 py-0.5 rounded bg-primary/10 border border-primary/20';
-    
-    addConsciousnessLog(`New autonomous market proposal generated: '${prop}'`, 'primary');
-}
+// generateAutonomousMarket is now replaced by REAL signal data via SSE PROPOSAL_CREATED.
 
 // Copy to clipboard helper utility
 window.copyToClipboard = function(text, successMsg) {

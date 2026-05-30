@@ -2,6 +2,7 @@ import { approvedMarkets, agentBus } from "../agents/agentEngine.js";
 import fetch from "node-fetch";
 import { resolveMarketOnChain } from "../services/somnia/marketFactory.js";
 import { recordResolutionMemory } from "../agents/agentMemory.js";
+import { eventBus } from "../events/eventBus.js";
 
 const ORACLE_CYCLE_MS = 10000; // Check every 10 seconds
 let oracleActive = false;
@@ -88,6 +89,15 @@ async function resolveExpiredMarket(market: any): Promise<void> {
       "decision",
       `✅ [SETTLEMENT CONFIRMED] Market "${market.title}" resolved to: ${outcome ? "YES" : "NO"}. Tx: ${txHash.slice(0, 18)}... | ${resolutionReason}`
     );
+
+    eventBus.emit("MARKET_SETTLED", {
+      marketId: market.onChainMarketId,
+      ref: market.ref,
+      outcome,
+      txHash,
+      reason: resolutionReason,
+      timestamp: Date.now()
+    });
 
     console.log(`[Oracle] Settled market ${market.ref} as ${outcome ? "YES" : "NO"}. TxHash: ${txHash}`);
 

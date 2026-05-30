@@ -19,7 +19,7 @@ import { env } from "../config/env.js";
 // ─── CANONICAL SIGNAL TYPE ───────────────────────────────────────
 export interface Signal {
   topic: string;
-  source: "crypto" | "news" | "reddit" | "trends";
+  source: "crypto" | "news" | "reddit" | "trends" | "hackernews";
   sentiment: "bullish" | "bearish" | "neutral";
   velocity: number;   // relative speed / urgency [0–100]
   importance: number; // ranked signal strength  [0–100]
@@ -390,16 +390,59 @@ async function fetchTrendsSignals(): Promise<Signal[]> {
   return signals;
 }
 
+// ─── HACKER NEWS ─────────────────────────────────────────────────
+
+async function fetchHackerNewsSignals(): Promise<Signal[]> {
+  const signals: Signal[] = [];
+  const now = Date.now();
+  
+  try {
+    const topRes = await fetch("https://hacker-news.firebaseio.com/v0/topstories.json", { signal: AbortSignal.timeout(8000) });
+    if (!topRes.ok) return [];
+    
+    const topIds = (await topRes.json()) as number[];
+    const idsToFetch = topIds.slice(0, 10);
+    
+    for (const id of idsToFetch) {
+      const itemRes = await fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json`, { signal: AbortSignal.timeout(5000) });
+      if (!itemRes.ok) continue;
+      
+      const item = (await itemRes.json()) as any;
+      if (!item || item.type !== "story") continue;
+      
+      const score = item.score || 0;
+      const descendants = item.descendants || 0;
+      const ageHours = ((now / 1000) - (item.time || 0)) / 3600;
+      
+      const topic = item.title;
+      const sentiment = scoreSentiment(topic);
+      
+      const velocity = clamp(Math.round((score / Math.max(ageHours, 1)) * 2), 10, 100);
+      const importance = scoreImportance(55, [
+        Math.min(score / 5, 25),
+        Math.min(descendants / 10, 20)
+      ]);
+      
+      signals.push({ topic, source: "hackernews", sentiment, velocity, importance, timestamp: now });
+    }
+  } catch (err) {
+    console.error("[SignalEngine] HackerNews fetch error:", err);
+  }
+  
+  return signals;
+}
+
 // ─── AGGREGATION & DEDUPLICATION ─────────────────────────────────
 
 async function fetchAllSignals(): Promise<Signal[]> {
   console.log("[SignalEngine] Polling all data sources...");
 
-  const [cryptoSigs, newsSigs, redditSigs, trendsSigs] = await Promise.allSettled([
+  const [cryptoSigs, newsSigs, redditSigs, trendsSigs, hnSigs] = await Promise.allSettled([
     fetchCoinGeckoSignals(),
     fetchNewsSignals(),
     fetchRedditSignals(),
     fetchTrendsSignals(),
+    fetchHackerNewsSignals()
   ]);
 
   const all: Signal[] = [
@@ -407,6 +450,7 @@ async function fetchAllSignals(): Promise<Signal[]> {
     ...(newsSigs.status    === "fulfilled" ? newsSigs.value    : []),
     ...(redditSigs.status  === "fulfilled" ? redditSigs.value  : []),
     ...(trendsSigs.status  === "fulfilled" ? trendsSigs.value  : []),
+    ...(hnSigs.status      === "fulfilled" ? hnSigs.value      : []),
   ];
 
   // Deduplicate: only add signals whose fingerprint hasn't been seen
@@ -444,7 +488,8 @@ async function fetchAllSignals(): Promise<Signal[]> {
     `(crypto: ${cryptoSigs.status === "fulfilled" ? cryptoSigs.value.length : 0}, ` +
     `news: ${newsSigs.status === "fulfilled" ? newsSigs.value.length : 0}, ` +
     `reddit: ${redditSigs.status === "fulfilled" ? redditSigs.value.length : 0}, ` +
-    `trends: ${trendsSigs.status === "fulfilled" ? trendsSigs.value.length : 0})`
+    `trends: ${trendsSigs.status === "fulfilled" ? trendsSigs.value.length : 0}, ` +
+    `hn: ${hnSigs.status === "fulfilled" ? hnSigs.value.length : 0})`
   );
 
   return fresh;

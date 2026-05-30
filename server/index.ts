@@ -148,6 +148,40 @@ function broadcastSSE(event: string, data: unknown) {
   eventBus.broadcastRaw(event, data);
 }
 
+// ─── CHAIN TRANSPARENCY LOOP ──────────────────────────────────────
+setInterval(async () => {
+  const markets = getApprovedMarkets();
+  const resolved = markets.filter((m: any) => m.status === "RESOLVED");
+  const active   = markets.filter((m: any) => m.status === "ACTIVE");
+  
+  const totalVolume = tradesHistory.reduce((sum, t) => sum + Math.abs(t.amountSpent), 0);
+  const settlementRate = markets.length > 0 ? Math.round((resolved.length / markets.length) * 100) : 100;
+
+  let blockNumber: number | null = null;
+  let gasPrice: string | null = null;
+  let rpcLatencyMs: number | null = null;
+  let rpcStatus = "degraded";
+
+  try {
+    const t0 = Date.now();
+    if (somniaProvider) {
+      blockNumber = await Promise.race([
+        somniaProvider.getBlockNumber(),
+        new Promise<never>((_, reject) => setTimeout(() => reject(new Error("timeout")), 4000))
+      ]) as number;
+      const feeData = await somniaProvider.getFeeData();
+      gasPrice = feeData.gasPrice ? (Number(feeData.gasPrice) / 1e9).toFixed(4) : "N/A";
+      rpcLatencyMs = Date.now() - t0;
+      rpcStatus = "healthy";
+    }
+  } catch {}
+
+  broadcastSSE("CHAIN_TRANSPARENCY", {
+    chain: { blockNumber, gasPrice, rpcLatencyMs, rpcStatus },
+    protocol: { activeMarkets: active.length, resolvedMarkets: resolved.length, totalVolumeSOM: totalVolume, settlementSuccessRate: settlementRate, activeAgents: getAgentStatuses().length }
+  });
+}, 5000);
+
 
 // ─── PORTFOLIO & TRADING BACKEND SYSTEM ───────────────────────────
 export interface Trade {
@@ -298,129 +332,53 @@ app.get("/api/chain", async (_req: Request, res: Response) => {
   });
 });
 
-/** POST /api/markets/:id/trade — Buy YES or NO shares in a market */
-app.post("/api/markets/:id/trade", (req: Request, res: Response) => {
-  const marketId = req.params["id"] || "";
-  const { position, amount } = req.body; // position: boolean (true = YES, false = NO), amount: number (SOM)
-
-  if (typeof position !== "boolean" || typeof amount !== "number" || amount <= 0) {
-    res.status(400).json({ ok: false, error: "Invalid position state or buy amount." });
-    return;
-  }
-
-  const markets = getApprovedMarkets();
-  const market = markets.find((m: any) => m.ref === marketId || m.title === marketId);
-
-  if (!market) {
-    res.status(404).json({ ok: false, error: "Prediction market not found." });
-    return;
-  }
-
-  if (market.status && market.status !== "ACTIVE") {
-    res.status(400).json({ ok: false, error: "Market is no longer active." });
-    return;
-  }
-
-  if (userWalletBalance < amount) {
-    res.status(400).json({ ok: false, error: "Insufficient SOM wallet balance." });
-    return;
-  }
-
-  // Deduct wallet balance
-  userWalletBalance -= amount;
-
-  // Initialize pool values if they do not exist
-  if (!market.yesOdds) market.yesOdds = 0.50;
-  if (!market.noOdds) market.noOdds = 0.50;
+/** POST /api/markets/traded — Broadcast a trade executed on-chain */
+app.post("/api/markets/traded", (req: Request, res: Response) => {
+  const { marketId, ref, title, position, amount, sharesMinted, txHash, trader } = req.body;
   
-  const initialOdds = position ? market.yesOdds : market.noOdds;
-  const sharesMinted = amount / initialOdds;
-
-  // Track position
-  const key = market.ref;
-  let pos = portfolioPositions.get(key);
-  if (!pos) {
-    pos = {
-      marketId: key,
-      marketTitle: market.title,
-      ref: market.ref,
-      yesShares: 0,
-      noShares: 0,
-      averagePrice: initialOdds,
-      amountInvested: 0,
-      timestamp: Date.now(),
-    };
-  }
-
-  if (position) {
-    pos.yesShares += sharesMinted;
-  } else {
-    pos.noShares += sharesMinted;
-  }
-  
-  pos.amountInvested += amount;
-  pos.averagePrice = pos.amountInvested / (pos.yesShares + pos.noShares);
-  portfolioPositions.set(key, pos);
-
-  // Update market AMM state
-  market.totalLiquidity = (market.totalLiquidity || 0) + amount;
-  if (position) {
-    market.yesSharesPool = (market.yesSharesPool || 0) + sharesMinted;
-  } else {
-    market.noSharesPool = (market.noSharesPool || 0) + sharesMinted;
-  }
-
-  // Recalculate dynamic odds ratio
-  const totalShares = (market.yesSharesPool || 1) + (market.noSharesPool || 1);
-  market.yesOdds = (market.yesSharesPool || 0) / totalShares;
-  // Bound odds between 5% and 95%
-  if (market.yesOdds < 0.05) market.yesOdds = 0.05;
-  if (market.yesOdds > 0.95) market.yesOdds = 0.95;
-  market.noOdds = 1 - market.yesOdds;
-
-  // Save to history
-  const txHash = "0x" + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join("");
-  const trade: Trade = {
-    marketId: key,
-    marketTitle: market.title,
-    ref: market.ref,
-    trader: "User (Me)",
+  const trade = {
+    marketId,
+    marketTitle: title,
+    ref,
+    trader,
     position,
     amountSpent: amount,
     sharesMinted,
     timestamp: Date.now(),
-    txHash,
+    txHash
   };
-  tradesHistory.unshift(trade);
+
+  const markets = getApprovedMarkets();
+  const market = markets.find((m: any) => m.onChainMarketId === marketId || m.ref === ref);
+  if (market) {
+      market.volume = (market.volume || 0) + Math.abs(amount);
+      if (sharesMinted > 0) market.totalLiquidity = (market.totalLiquidity || 0) + Math.abs(amount);
+  }
 
   // Broadcast realtime SSE updates to all frontend connections
-  broadcastSSE("TRADE_EXECUTED", { trade, market });
+  broadcastSSE("TRADE_EXECUTED", { trade, market: market || { ref } });
   
   // Emit TRADE_EXECUTED on the central EventBus
-  eventBus.emit("TRADE_EXECUTED", {
-    marketId: trade.marketId,
-    marketTitle: trade.marketTitle,
-    ref: trade.ref,
-    trader: trade.trader,
-    position: trade.position,
-    amountSpent: trade.amountSpent,
-    sharesMinted: trade.sharesMinted,
-    txHash: trade.txHash,
-    timestamp: trade.timestamp
-  });
-  broadcastSSE("POSITION_UPDATED", {
-    walletBalance: userWalletBalance,
-    positions: Array.from(portfolioPositions.values()),
-    trades: tradesHistory,
+  eventBus.emit("TRADE_EXECUTED", trade);
+  
+  res.json({ ok: true });
+});
+
+/** POST /api/markets/executed — Record an executed market from the UI and broadcast to all */
+app.post("/api/markets/executed", (req: Request, res: Response) => {
+  const { title, category, expiry, yesOdds, noOdds, confidence, agentName, txHash, onChainMarketId } = req.body;
+
+  const market: any = {
+    title, category, expiry, yesOdds, noOdds, confidence, agent: agentName,
+    status: "ACTIVE", onChainMarketId, settlementTx: txHash,
+    statusText: "On-Chain Active", badge: "Smart Contract", ref: "#" + Date.now().toString().slice(-6)
+  };
+
+  eventBus.emit("MARKET_CREATED", {
+    market, onChainMarketId, txHash, timestamp: Date.now()
   });
 
-  res.json({
-    ok: true,
-    message: "Trade successfully executed.",
-    trade,
-    marketOdds: { yes: market.yesOdds, no: market.noOdds },
-    portfolio: { walletBalance: userWalletBalance, position: pos },
-  });
+  res.json({ ok: true, market });
 });
 
 /** POST /api/markets/:id/dispute — Dispute a settled prediction market with a bond-stake */
@@ -526,151 +484,13 @@ app.post("/api/bridge/deposit", (req: Request, res: Response) => {
   });
 });
 
-/** POST /api/markets/:id/sell — Sell shares prior to expiry */
-app.post("/api/markets/:id/sell", (req: Request, res: Response) => {
-  const marketId = req.params["id"] || "";
-  const key = marketId;
-  const pos = portfolioPositions.get(key);
-
-  if (!pos || (pos.yesShares === 0 && pos.noShares === 0)) {
-    res.status(404).json({ ok: false, error: "No open positions found in this market." });
-    return;
-  }
-
-  const markets = getApprovedMarkets();
-  const market = markets.find((m: any) => m.ref === marketId);
-
-  if (!market) {
-    res.status(404).json({ ok: false, error: "Market not found." });
-    return;
-  }
-
-  const yesOdds = market.yesOdds || 0.50;
-  const noOdds = 1 - yesOdds;
-
-  let payout = 0;
-  if (pos.yesShares > 0) {
-    payout += pos.yesShares * yesOdds;
-    market.yesSharesPool = Math.max(0, (market.yesSharesPool || 0) - pos.yesShares);
-  }
-  if (pos.noShares > 0) {
-    payout += pos.noShares * noOdds;
-    market.noSharesPool = Math.max(0, (market.noSharesPool || 0) - pos.noShares);
-  }
-
-  // 2% exit AMM fee
-  payout = payout * 0.98;
-
-  // Update pools
-  market.totalLiquidity = Math.max(0, (market.totalLiquidity || 0) - payout);
-  userWalletBalance += payout;
-
-  // Record trade history entry representing position closing
-  const txHash = "0x" + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join("");
-  const sellTrade: Trade = {
-    marketId: key,
-    marketTitle: market.title,
-    ref: market.ref,
-    trader: "User (Me)",
-    position: pos.yesShares > 0,
-    amountSpent: -payout, // Negative spent signifies selling/exit
-    sharesMinted: -(pos.yesShares + pos.noShares),
-    timestamp: Date.now(),
-    txHash,
-  };
-  tradesHistory.unshift(sellTrade);
-
-  // Clear positions
-  portfolioPositions.delete(key);
-
-  // Broadcast realtime events
-  broadcastSSE("TRADE_EXECUTED", { trade: sellTrade, market });
-
-  // Emit TRADE_EXECUTED on the central EventBus
-  eventBus.emit("TRADE_EXECUTED", {
-    marketId: sellTrade.marketId,
-    marketTitle: sellTrade.marketTitle,
-    ref: sellTrade.ref,
-    trader: sellTrade.trader,
-    position: sellTrade.position,
-    amountSpent: sellTrade.amountSpent,
-    sharesMinted: sellTrade.sharesMinted,
-    txHash: sellTrade.txHash,
-    timestamp: sellTrade.timestamp
-  });
-  broadcastSSE("POSITION_UPDATED", {
-    walletBalance: userWalletBalance,
-    positions: Array.from(portfolioPositions.values()),
-    trades: tradesHistory,
-  });
-
-  res.json({
-    ok: true,
-    message: "Position closed and shares successfully sold.",
-    refundPayout: payout,
-    walletBalance: userWalletBalance,
-  });
-});
-
-/** POST /api/markets/:id/claim — Claim rewards for winning positions */
-app.post("/api/markets/:id/claim", (req: Request, res: Response) => {
-  const marketId = req.params["id"] || "";
-  const key = marketId;
-  const pos = portfolioPositions.get(key);
-
-  if (!pos) {
-    res.status(400).json({ ok: false, error: "No shares owned in this market." });
-    return;
-  }
-
-  const markets = getApprovedMarkets();
-  const market = markets.find((m: any) => m.ref === marketId);
-
-  if (!market || market.status !== "RESOLVED") {
-    res.status(400).json({ ok: false, error: "Market is not resolved yet." });
-    return;
-  }
-
-  const winOutcome = market.resolvedOutcome;
-  const winningShares = winOutcome ? pos.yesShares : pos.noShares;
-
-  if (winningShares === 0) {
-    res.status(400).json({ ok: false, error: "You do not own winning shares." });
-    return;
-  }
-
-  const totalWinShares = winOutcome ? market.yesSharesPool : market.noSharesPool;
-  const rewardPayout = (winningShares * (market.totalLiquidity || market.volume || 1000)) / (totalWinShares || 1);
-
-  userWalletBalance += rewardPayout;
-
-  const txHash = "0x" + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join("");
-  const claim: RewardClaim = {
-    marketId: key,
-    marketTitle: market.title,
-    ref: market.ref,
-    payoutAmount: rewardPayout,
-    timestamp: Date.now(),
-    txHash,
-  };
-  rewardClaims.unshift(claim);
-
-  // Clear position
-  portfolioPositions.delete(key);
-
-  broadcastSSE("POSITION_UPDATED", {
-    walletBalance: userWalletBalance,
-    positions: Array.from(portfolioPositions.values()),
-    trades: tradesHistory,
-    claims: rewardClaims,
-  });
-
-  res.json({
-    ok: true,
-    message: "Rewards successfully claimed.",
-    payoutAmount: rewardPayout,
-    walletBalance: userWalletBalance,
-  });
+/** POST /api/markets/claimed — Broadcast a reward claim executed on-chain */
+app.post("/api/markets/claimed", (req: Request, res: Response) => {
+  const { marketId, claimant, txHash } = req.body;
+  
+  broadcastSSE("REWARD_CLAIMED", { marketId, claimant, txHash });
+  
+  res.json({ ok: true });
 });
 
 /** POST /api/markets/:id/dispute — Dispute a resolved market outcome */

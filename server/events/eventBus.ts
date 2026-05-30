@@ -7,11 +7,15 @@ export type AstraEvent =
   | "SIGNAL_DETECTED"
   | "MARKET_CREATED"
   | "AGENT_DECISION_MADE"
-  | "TRADE_EXECUTED";
+  | "TRADE_EXECUTED"
+  | "PROPOSAL_CREATED"
+  | "MARKET_EXECUTED"
+  | "AGENT_ANALYZED"
+  | "MARKET_SETTLED";
 
 export interface Signal {
   topic: string;
-  source: "crypto" | "news" | "reddit" | "trends";
+  source: "crypto" | "news" | "reddit" | "trends" | "hackernews";
   sentiment: "bullish" | "bearish" | "neutral";
   importance: number; // 0-100
   velocity: number;   // 0-100
@@ -83,6 +87,10 @@ interface AstraEventTypes {
   MARKET_CREATED: [MarketCreatedPayload];
   AGENT_DECISION_MADE: [AgentDecisionMadePayload];
   TRADE_EXECUTED: [TradeExecutedPayload];
+  PROPOSAL_CREATED: [MarketProposal];
+  MARKET_EXECUTED: [any];
+  AGENT_ANALYZED: [AgentDecisionMadePayload];
+  MARKET_SETTLED: [any];
 }
 
 // ─── EVENT BUS CLASS ────────────────────────────────────────────────
