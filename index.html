@@ -1,1536 +1,1536 @@
 <!DOCTYPE html>
 <html class="light" lang="en">
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>AstraMarkets | Terminal v1.0</title>
-    
-    <!-- External Styles & Frameworks -->
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,700&family=Nunito+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-    
-    <!-- Custom Design Token Stylesheet -->
-    <link rel="stylesheet" href="/styles.css">
-    
-    <script id="tailwind-config">
-        tailwind.config = {
-          darkMode: "class",
-          theme: {
-            extend: {
-              "colors": {
-                "tertiary-fixed": "#f8e0a8",
-                "tertiary": "var(--tertiary)",
-                "on-secondary-container": "#5e5548",
-                "on-tertiary-container": "#554020",
-                "primary-container": "var(--primary-glow)",
-                "on-tertiary-fixed-variant": "#554020",
-                "on-secondary-fixed-variant": "#4a4538",
-                "on-surface-variant": "var(--text-secondary)",
-                "secondary-container": "var(--surface-container)",
-                "on-primary-fixed": "#002110",
-                "surface-dim": "var(--surface-container-low)",
-                "inverse-primary": "var(--primary)",
-                "surface-container-lowest": "var(--surface-solid)",
-                "on-tertiary-fixed": "#221a05",
-                "surface-container-highest": "var(--surface-container-high)",
-                "secondary-fixed-dim": "#d4ccbf",
-                "outline-variant": "var(--border-color)",
-                "inverse-surface": "var(--text-primary)",
-                "on-error-container": "#690005",
-                "on-secondary-fixed": "#1e1a13",
-                "on-primary-container": "var(--text-primary)",
-                "inverse-on-surface": "var(--bg-primary)",
-                "background": "var(--bg-primary)",
-                "primary": "var(--primary)",
-                "on-primary-fixed-variant": "var(--primary)",
-                "on-error": "#ffffff",
-                "surface-container-high": "var(--surface-container-high)",
-                "secondary": "var(--secondary)",
-                "error-container": "#ffdad8",
-                "on-secondary": "#ffffff",
-                "error": "#b83230",
-                "tertiary-container": "var(--tertiary)",
-                "on-tertiary": "#ffffff",
-                "primary-fixed-dim": "var(--primary)",
-                "surface-container-low": "var(--surface-container-low)",
-                "surface-container": "var(--surface-container)",
-                "surface-bright": "var(--bg-primary)",
-                "primary-fixed": "var(--primary-glow)",
-                "tertiary-fixed-dim": "#dcc48e",
-                "on-background": "var(--text-primary)",
-                "on-surface": "var(--text-primary)",
-                "secondary-fixed": "var(--surface-container)",
-                "surface-tint": "var(--primary)",
-                "on-primary": "var(--surface-solid)",
-                "surface-variant": "var(--surface-container)",
-                "surface": "var(--surface)",
-                "outline": "var(--text-muted)"
-              },
-              "borderRadius": {
-                "DEFAULT": "0.5rem",
-                "lg": "1rem",
-                "xl": "1.5rem",
-                "full": "9999px"
-              },
-              "fontFamily": {
-                "display": ["Literata"],
-                "headline": ["Literata"],
-                "body": ["Nunito Sans"],
-                "label": ["Nunito Sans"]
-              }
-            }
-          }
-        }
-    </script>
+ <meta charset="utf-8"/>
+ <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+ <title>AstraMarkets | Terminal v1.0</title>
+ 
+ <!-- External Styles & Frameworks -->
+ <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+ <link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,700&family=Nunito+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+ <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+ 
+ <!-- Custom Design Token Stylesheet -->
+ <link rel="stylesheet" href="/styles.css">
+ 
+ <script id="tailwind-config">
+ tailwind.config = {
+ darkMode: "class",
+ theme: {
+ extend: {
+ "colors": {
+ "tertiary-fixed": "#f8e0a8",
+ "tertiary": "var(--tertiary)",
+ "on-secondary-container": "#5e5548",
+ "on-tertiary-container": "#554020",
+ "primary-container": "var(--primary-glow)",
+ "on-tertiary-fixed-variant": "#554020",
+ "on-secondary-fixed-variant": "#4a4538",
+ "on-surface-variant": "var(--text-secondary)",
+ "secondary-container": "var(--surface-container)",
+ "on-primary-fixed": "#002110",
+ "surface-dim": "var(--surface-container-low)",
+ "inverse-primary": "var(--primary)",
+ "surface-container-lowest": "var(--surface-solid)",
+ "on-tertiary-fixed": "#221a05",
+ "surface-container-highest": "var(--surface-container-high)",
+ "secondary-fixed-dim": "#d4ccbf",
+ "outline-variant": "var(--border-color)",
+ "inverse-surface": "var(--text-primary)",
+ "on-error-container": "#690005",
+ "on-secondary-fixed": "#1e1a13",
+ "on-primary-container": "var(--text-primary)",
+ "inverse-on-surface": "var(--bg-primary)",
+ "background": "var(--bg-primary)",
+ "primary": "var(--primary)",
+ "on-primary-fixed-variant": "var(--primary)",
+ "on-error": "#ffffff",
+ "surface-container-high": "var(--surface-container-high)",
+ "secondary": "var(--secondary)",
+ "error-container": "#ffdad8",
+ "on-secondary": "#ffffff",
+ "error": "#b83230",
+ "tertiary-container": "var(--tertiary)",
+ "on-tertiary": "#ffffff",
+ "primary-fixed-dim": "var(--primary)",
+ "surface-container-low": "var(--surface-container-low)",
+ "surface-container": "var(--surface-container)",
+ "surface-bright": "var(--bg-primary)",
+ "primary-fixed": "var(--primary-glow)",
+ "tertiary-fixed-dim": "#dcc48e",
+ "on-background": "var(--text-primary)",
+ "on-surface": "var(--text-primary)",
+ "secondary-fixed": "var(--surface-container)",
+ "surface-tint": "var(--primary)",
+ "on-primary": "var(--surface-solid)",
+ "surface-variant": "var(--surface-container)",
+ "surface": "var(--surface)",
+ "outline": "var(--text-muted)"
+ },
+ "borderRadius": {
+ "DEFAULT": "0.5rem",
+ "lg": "1rem",
+ "xl": "1.5rem",
+ "full": "9999px"
+ },
+ "fontFamily": {
+ "display":["Literata"],
+ "headline":["Literata"],
+ "body":["Nunito Sans"],
+ "label":["Nunito Sans"]
+ }
+ }
+ }
+ }
+ </script>
 </head>
 <body class="font-body text-on-surface">
 
-    <!-- Fixed SideNavBar (Organic Root) -->
-    <aside class="fixed left-0 top-0 h-full w-20 flex flex-col items-center py-8 bg-surface-container/60 border-r border-outline-variant/30 backdrop-blur-xl z-40">
-        <div class="mb-12 group cursor-pointer" id="logo-button">
-            <span class="material-symbols-outlined text-primary text-4xl transition-all">eco</span>
-        </div>
-        <nav class="flex flex-col gap-8 flex-1">
-            <!-- Portal / Home (Active) -->
-            <button id="nav-landing" data-tab="landing" class="nav-btn relative flex items-center justify-center w-12 h-12 rounded-full text-outline border border-transparent active">
-                <span class="material-symbols-outlined">home</span>
-            </button>
-            <!-- Markets / Terminal -->
-            <button id="nav-markets" data-tab="markets" class="nav-btn flex items-center justify-center w-12 h-12 rounded-full text-outline border border-transparent">
-                <span class="material-symbols-outlined">monitoring</span>
-            </button>
-            <!-- AI Command Console -->
-            <button id="nav-agents" data-tab="agents" class="nav-btn flex items-center justify-center w-12 h-12 rounded-full text-outline border border-transparent">
-                <span class="material-symbols-outlined">psychology</span>
-            </button>
-            <!-- Signal Stream Feed -->
-            <button id="nav-feed" data-tab="feed" class="nav-btn relative flex items-center justify-center w-12 h-12 rounded-full text-outline border border-transparent">
-                <span class="material-symbols-outlined">dynamic_feed</span>
-                <span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-error animate-pulse hidden" id="feed-notif"></span>
-            </button>
-        </nav>
-        
-        <!-- Theme Toggle at Bottom -->
-        <div class="flex flex-col gap-5 mt-auto items-center">
-            <button id="theme-toggle" class="flex items-center justify-center w-12 h-12 rounded-full text-outline border border-transparent hover:text-primary transition-colors cursor-pointer">
-                <span class="material-symbols-outlined" id="theme-icon">dark_mode</span>
-            </button>
-        </div>
-    </aside>
+ <!-- Fixed SideNavBar (Organic Root) -->
+ <aside class="fixed left-0 top-0 h-full w-20 flex flex-col items-center py-8 bg-surface-container/60 border-r border-outline-variant/30 backdrop-blur-xl z-40">
+ <div class="mb-12 group cursor-pointer" id="logo-button">
+ <span class="material-symbols-outlined text-primary text-4xl transition-all">eco</span>
+ </div>
+ <nav class="flex flex-col gap-8 flex-1">
+ <!-- Portal / Home (Active) -->
+ <button id="nav-landing" data-tab="landing" class="nav-btn relative flex items-center justify-center w-12 h-12 rounded-full text-outline border border-transparent active">
+ <span class="material-symbols-outlined">home</span>
+ </button>
+ <!-- Markets / Terminal -->
+ <button id="nav-markets" data-tab="markets" class="nav-btn flex items-center justify-center w-12 h-12 rounded-full text-outline border border-transparent">
+ <span class="material-symbols-outlined">monitoring</span>
+ </button>
+ <!-- AI Command Console -->
+ <button id="nav-agents" data-tab="agents" class="nav-btn flex items-center justify-center w-12 h-12 rounded-full text-outline border border-transparent">
+ <span class="material-symbols-outlined">psychology</span>
+ </button>
+ <!-- Signal Stream Feed -->
+ <button id="nav-feed" data-tab="feed" class="nav-btn relative flex items-center justify-center w-12 h-12 rounded-full text-outline border border-transparent">
+ <span class="material-symbols-outlined">dynamic_feed</span>
+ <span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-error animate-pulse hidden" id="feed-notif"></span>
+ </button>
+ </nav>
+ 
+ <!-- Theme Toggle at Bottom -->
+ <div class="flex flex-col gap-5 mt-auto items-center">
+ <button id="theme-toggle" class="flex items-center justify-center w-12 h-12 rounded-full text-outline border border-transparent hover:text-primary transition-colors cursor-pointer">
+ <span class="material-symbols-outlined" id="theme-icon">dark_mode</span>
+ </button>
+ </div>
+ </aside>
 
-    <!-- TopNavBar -->
-    <header class="fixed top-0 right-0 w-[calc(100%-80px)] h-16 flex justify-between items-center px-12 bg-surface/40 border-b border-outline-variant/20 backdrop-blur-md z-50">
-        <div class="flex items-center gap-8">
-            <div class="flex flex-col cursor-pointer" id="brand-header">
-                <h1 class="font-display text-2xl text-primary font-bold tracking-tight">AstraMarkets</h1>
-                <p class="font-label text-[10px] text-outline uppercase tracking-[0.2em]">Rooted Intelligence Engine</p>
-            </div>
-        </div>
-        <div class="flex items-center gap-4">
-            <!-- Wallet Button -->
-            <button id="wallet-connect-btn" class="bg-primary text-on-primary hover:bg-on-primary-fixed-variant px-6 py-1.5 font-label text-xs font-bold rounded-full transition-all uppercase shadow-sm flex items-center gap-2 border border-primary/25">
-                <span class="material-symbols-outlined text-xs">account_balance_wallet</span>
-                <span id="wallet-btn-text">CONNECT</span>
-            </button>
-            
-            <!-- Notification Bell -->
-            <button id="notif-btn" class="text-outline hover:text-primary transition-colors relative">
-                <span class="material-symbols-outlined">notifications</span>
-                <span id="notif-badge" class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-error border border-white dark:border-black hidden"></span>
-            </button>
-            
-            <!-- User Profile Avatar (Acts as Portfolio Tab) -->
-            <button id="nav-portfolio-profile" data-tab="portfolio" class="nav-btn w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant/50 overflow-hidden ring-1 ring-primary/20 cursor-pointer hover:ring-primary/45 transition-all p-0 focus:outline-none flex items-center justify-center">
-                <img alt="Profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQl71M2Q_6ZwoWpoPRtVN2_yjcx4Qxt2woOGT0RP3gTyxJR2pck74_cXP_I_VPnCQi6CxAE_ScJDERj1JmgcgBPUvScJx3avPSxvvZZVxg8xPk2oQhFWUVBDqs_fFupqJ93JU8ssR4miWsbXQTrxZHWg60sxx4HFaDIaBCob9z4BmIiMZEsD2ybwoEfINirABibuXisUlqH61_qiqvyV6uQoYVB0cXHdCt-lEqnJJ7vvHIqxi9b2Cm54XXsk2gv7E3JHi8lIpGJbE" class="w-full h-full object-cover"/>
-            </button>
-        </div>
-    </header>
+ <!-- TopNavBar -->
+ <header class="fixed top-0 right-0 w-[calc(100%-80px)] h-16 flex justify-between items-center px-12 bg-surface/40 border-b border-outline-variant/20 backdrop-blur-md z-50">
+ <div class="flex items-center gap-8">
+ <div class="flex flex-col cursor-pointer" id="brand-header">
+ <h1 class="font-display text-2xl text-primary font-bold tracking-tight">AstraMarkets</h1>
+ <p class="font-label text-[10px] text-outline uppercase tracking-[0.2em]">Rooted Intelligence Engine</p>
+ </div>
+ </div>
+ <div class="flex items-center gap-4">
+ <!-- Wallet Button -->
+ <button id="wallet-connect-btn" class="bg-primary text-on-primary hover:bg-on-primary-fixed-variant px-6 py-1.5 font-label text-xs font-bold rounded-full transition-all uppercase shadow-sm flex items-center gap-2 border border-primary/25">
+ <span class="material-symbols-outlined text-xs">account_balance_wallet</span>
+ <span id="wallet-btn-text">CONNECT</span>
+ </button>
+ 
+ <!-- Notification Bell -->
+ <button id="notif-btn" class="text-outline hover:text-primary transition-colors relative">
+ <span class="material-symbols-outlined">notifications</span>
+ <span id="notif-badge" class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-error border border-white dark:border-black hidden"></span>
+ </button>
+ 
+ <!-- User Profile Avatar (Acts as Portfolio Tab) -->
+ <button id="nav-portfolio-profile" data-tab="portfolio" class="nav-btn w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant/50 overflow-hidden ring-1 ring-primary/20 cursor-pointer hover:ring-primary/45 transition-all p-0 focus:outline-none flex items-center justify-center">
+ <img alt="Profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQl71M2Q_6ZwoWpoPRtVN2_yjcx4Qxt2woOGT0RP3gTyxJR2pck74_cXP_I_VPnCQi6CxAE_ScJDERj1JmgcgBPUvScJx3avPSxvvZZVxg8xPk2oQhFWUVBDqs_fFupqJ93JU8ssR4miWsbXQTrxZHWg60sxx4HFaDIaBCob9z4BmIiMZEsD2ybwoEfINirABibuXisUlqH61_qiqvyV6uQoYVB0cXHdCt-lEqnJJ7vvHIqxi9b2Cm54XXsk2gv7E3JHi8lIpGJbE" class="w-full h-full object-cover"/>
+ </button>
+ </div>
+ </header>
 
-    <!-- Main Content Grid -->
-    <main class="ml-20 pt-16 min-h-screen flex flex-col xl:flex-row">
-        
-        <!-- Central Column: Astra Content Tabs -->
-        <section class="flex-1 max-w-4xl mx-auto px-6 md:px-12 py-12">
-            
-            <!-- PAGE 0: Landing Portal (Home) -->
-            <div id="tab-landing" class="page-tab active flex flex-col gap-12 w-full">
-                <!-- HERO SECTION -->
-                <div class="relative overflow-hidden rounded-3xl border border-outline-variant/40 bg-surface-container/30 dark:bg-black/20 p-8 md:p-12 flex flex-col gap-6 backdrop-blur-xl">
-                    <!-- Elegant Synaptic Grid background decoration -->
-                    <div class="absolute top-0 right-0 w-80 h-80 bg-primary/10 rounded-full blur-3xl -z-10 pointer-events-none"></div>
-                    <div class="absolute bottom-0 left-0 w-60 h-60 bg-tertiary/10 rounded-full blur-2xl -z-10 pointer-events-none"></div>
-                    
-                    <div class="flex items-center gap-2">
-                        <span class="material-symbols-outlined text-primary text-xl">eco</span>
-                        <span class="font-label text-[10px] font-bold tracking-widest text-primary uppercase bg-primary/10 px-2.5 py-1 rounded-full border border-primary/20">Somnia L1 Ecosystem Portal</span>
-                    </div>
-                    
-                    <h2 class="font-display text-4xl md:text-5xl font-extrabold text-on-surface leading-tight tracking-tight">
-                        AstraMarkets <br>
-                        <span class="text-primary bg-clip-text">Autonomous Financial Intelligence</span>
-                    </h2>
-                    
-                    <!-- Elite Definitive Tagline Banner -->
-                    <div class="border-l-2 border-primary/40 pl-4 py-1.5 bg-primary/[0.02] rounded-r-lg max-w-2xl">
-                        <p class="text-[10px] sm:text-xs uppercase tracking-widest text-primary font-mono font-black leading-relaxed">
-                            A fully autonomous, self-learning, on-chain prediction intelligence protocol with verifiable AI agents and real economic feedback loops.
-                        </p>
-                    </div>
-                    <div class="flex flex-col gap-3 max-w-2xl">
-                        <p class="text-sm md:text-base text-outline leading-relaxed font-bold">
-                            AstraMarkets is an autonomous market intelligence protocol where specialized AI agents continuously transform real-world information into verifiable on-chain economic coordination.
-                        </p>
-                        <p class="text-xs md:text-sm text-outline/80 leading-relaxed font-semibold">
-                            Rather than waiting for humans to create markets, AstraMarkets discovers emerging opportunities, deploys prediction economies, measures performance, learns from outcomes, and settles results transparently on-chain.
-                        </p>
-                    </div>
-                    
-                    <div class="flex flex-wrap gap-4 mt-2">
+ <!-- Main Content Grid -->
+ <main class="ml-20 pt-16 min-h-screen flex flex-col xl:flex-row">
+ 
+ <!-- Central Column: Astra Content Tabs -->
+ <section class="flex-1 max-w-4xl mx-auto px-6 md:px-12 py-12">
+ 
+ <!-- PAGE 0: Landing Portal (Home) -->
+ <div id="tab-landing" class="page-tab active flex flex-col gap-12 w-full">
+ <!-- HERO SECTION -->
+ <div class="relative overflow-hidden rounded-3xl border border-outline-variant/40 bg-surface-container/30 dark:bg-black/20 p-8 md:p-12 flex flex-col gap-6 backdrop-blur-xl">
+ <!-- Elegant Synaptic Grid background decoration -->
+ <div class="absolute top-0 right-0 w-80 h-80 bg-primary/10 rounded-full blur-3xl -z-10 pointer-events-none"></div>
+ <div class="absolute bottom-0 left-0 w-60 h-60 bg-tertiary/10 rounded-full blur-2xl -z-10 pointer-events-none"></div>
+ 
+ <div class="flex items-center gap-2">
+ <span class="material-symbols-outlined text-primary text-xl">eco</span>
+ <span class="font-label text-[10px] font-bold tracking-widest text-primary uppercase bg-primary/10 px-2.5 py-1 rounded-full border border-primary/20">Somnia L1 Ecosystem Portal</span>
+ </div>
+ 
+ <h2 class="font-display text-4xl md:text-5xl font-extrabold text-on-surface leading-tight tracking-tight">
+ AstraMarkets <br>
+ <span class="text-primary bg-clip-text">Autonomous Financial Intelligence</span>
+ </h2>
+ 
+ <!-- Elite Definitive Tagline Banner -->
+ <div class="border-l-2 border-primary/40 pl-4 py-1.5 bg-primary/[0.02] rounded-r-lg max-w-2xl">
+ <p class="text-[10px] sm:text-xs uppercase tracking-widest text-primary font-mono font-black leading-relaxed">
+ A fully autonomous, self-learning, on-chain prediction intelligence protocol with verifiable AI agents and real economic feedback loops.
+ </p>
+ </div>
+ <div class="flex flex-col gap-3 max-w-2xl">
+ <p class="text-sm md:text-base text-outline leading-relaxed font-bold">
+ AstraMarkets is an autonomous market intelligence protocol where specialized AI agents continuously transform real-world information into verifiable on-chain economic coordination.
+ </p>
+ <p class="text-xs md:text-sm text-outline/80 leading-relaxed font-semibold">
+ Rather than waiting for humans to create markets, AstraMarkets discovers emerging opportunities, deploys prediction economies, measures performance, learns from outcomes, and settles results transparently on-chain.
+ </p>
+ </div>
+ 
+ <div class="flex flex-wrap gap-4 mt-2">
 
-                        <button id="hero-launch-terminal" class="bg-surface-solid border border-outline-variant/40 hover:border-primary/50 text-on-surface font-label text-xs font-bold px-8 py-3.5 rounded-xl uppercase tracking-wider transition-all flex items-center gap-2">
-                            <span class="material-symbols-outlined text-sm">monitoring</span>
-                            Launch Terminal
-                        </button>
-                        <button id="hero-explore-ai" class="bg-surface-solid border border-outline-variant/40 hover:border-primary/50 text-on-surface font-label text-xs font-bold px-8 py-3.5 rounded-xl uppercase tracking-wider transition-all flex items-center gap-2">
-                            <span class="material-symbols-outlined text-sm">psychology</span>
-                            Explore AI Swarm
-                        </button>
-                    </div>
-                </div>
+ <button id="hero-launch-terminal" class="bg-surface-solid border border-outline-variant/40 hover:border-primary/50 text-on-surface font-label text-xs font-bold px-8 py-3.5 rounded-xl uppercase tracking-wider transition-all flex items-center gap-2">
+ <span class="material-symbols-outlined text-sm">monitoring</span>
+ Launch Terminal
+ </button>
+ <button id="hero-explore-ai" class="bg-surface-solid border border-outline-variant/40 hover:border-primary/50 text-on-surface font-label text-xs font-bold px-8 py-3.5 rounded-xl uppercase tracking-wider transition-all flex items-center gap-2">
+ <span class="material-symbols-outlined text-sm">psychology</span>
+ Explore AI Swarm
+ </button>
+ </div>
+ </div>
 
-                <!-- LIVE STATS TICKER BANNER -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-                    <div class="cosmic-card p-5 rounded-2xl border border-outline-variant/40 flex flex-col gap-1.5">
-                        <div class="flex items-center gap-1.5 text-outline">
-                            <span class="material-symbols-outlined text-sm text-primary">speed</span>
-                            <span class="text-[9px] font-bold uppercase tracking-wider">Block Settlement</span>
-                        </div>
-                        <span class="text-2xl font-bold font-display text-primary tracking-tight">&lt; 1 Second</span>
-                        <span class="text-[9px] text-outline font-semibold block">Ultra-Fast Somnia L1 EVM</span>
-                    </div>
-                    <div class="cosmic-card p-5 rounded-2xl border border-outline-variant/40 flex flex-col gap-1.5">
-                        <div class="flex items-center gap-1.5 text-outline">
-                            <span class="material-symbols-outlined text-sm text-tertiary">database</span>
-                            <span class="text-[9px] font-bold uppercase tracking-wider">Signal Velocity</span>
-                        </div>
-                        <span class="text-2xl font-bold font-display text-on-surface tracking-tight" id="landing-signal-count">12 / Min</span>
-                        <span class="text-[9px] text-outline font-semibold block">Real API Live Ingestion</span>
-                    </div>
-                    <div class="cosmic-card p-5 rounded-2xl border border-outline-variant/40 flex flex-col gap-1.5">
-                        <div class="flex items-center gap-1.5 text-outline">
-                            <span class="material-symbols-outlined text-sm text-primary">smart_toy</span>
-                            <span class="text-[9px] font-bold uppercase tracking-wider">Active Swarms</span>
-                        </div>
-                        <span class="text-2xl font-bold font-display text-primary tracking-tight">4 Autonomous</span>
-                        <span class="text-[9px] text-outline font-semibold block">Continuous 15s Reasoning</span>
-                    </div>
-                    <div class="cosmic-card p-5 rounded-2xl border border-outline-variant/40 flex flex-col gap-1.5">
-                        <div class="flex items-center gap-1.5 text-outline">
-                            <span class="material-symbols-outlined text-sm text-tertiary">payments</span>
-                            <span class="text-[9px] font-bold uppercase tracking-wider">Gas Execution Fee</span>
-                        </div>
-                        <span class="text-2xl font-bold font-display text-tertiary tracking-tight">0.001 SOM</span>
-                        <span class="text-[9px] text-outline font-semibold block">Hyper-Scalable Sub-Cent Cost</span>
-                    </div>
-                </div>
+ <!-- LIVE STATS TICKER BANNER -->
+ <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+ <div class="cosmic-card p-5 rounded-2xl border border-outline-variant/40 flex flex-col gap-1.5">
+ <div class="flex items-center gap-1.5 text-outline">
+ <span class="material-symbols-outlined text-sm text-primary">speed</span>
+ <span class="text-[9px] font-bold uppercase tracking-wider">Block Settlement</span>
+ </div>
+ <span class="text-2xl font-bold font-display text-primary tracking-tight">&lt; 1 Second</span>
+ <span class="text-[9px] text-outline font-semibold block">Ultra-Fast Somnia L1 EVM</span>
+ </div>
+ <div class="cosmic-card p-5 rounded-2xl border border-outline-variant/40 flex flex-col gap-1.5">
+ <div class="flex items-center gap-1.5 text-outline">
+ <span class="material-symbols-outlined text-sm text-tertiary">database</span>
+ <span class="text-[9px] font-bold uppercase tracking-wider">Signal Velocity</span>
+ </div>
+ <span class="text-2xl font-bold font-display text-on-surface tracking-tight" id="landing-signal-count">12 / Min</span>
+ <span class="text-[9px] text-outline font-semibold block">Real API Live Ingestion</span>
+ </div>
+ <div class="cosmic-card p-5 rounded-2xl border border-outline-variant/40 flex flex-col gap-1.5">
+ <div class="flex items-center gap-1.5 text-outline">
+ <span class="material-symbols-outlined text-sm text-primary">smart_toy</span>
+ <span class="text-[9px] font-bold uppercase tracking-wider">Active Swarms</span>
+ </div>
+ <span class="text-2xl font-bold font-display text-primary tracking-tight">4 Autonomous</span>
+ <span class="text-[9px] text-outline font-semibold block">Continuous 15s Reasoning</span>
+ </div>
+ <div class="cosmic-card p-5 rounded-2xl border border-outline-variant/40 flex flex-col gap-1.5">
+ <div class="flex items-center gap-1.5 text-outline">
+ <span class="material-symbols-outlined text-sm text-tertiary">payments</span>
+ <span class="text-[9px] font-bold uppercase tracking-wider">Gas Execution Fee</span>
+ </div>
+ <span class="text-2xl font-bold font-display text-tertiary tracking-tight">0.001 SOM</span>
+ <span class="text-[9px] text-outline font-semibold block">Hyper-Scalable Sub-Cent Cost</span>
+ </div>
+ </div>
 
-                <!-- VALUE PROPOSITIONS / FEATURES GRID -->
-                <div class="flex flex-col gap-6">
-                    <div class="text-center md:text-left flex flex-col gap-1">
-                        <h3 class="font-display text-2xl text-on-surface font-bold">Protocol Architecture</h3>
-                        <p class="text-xs text-outline font-semibold">Four pillars powering the Somnia prediction core.</p>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Pillar 1 -->
-                        <div class="cosmic-card p-6 rounded-2xl border border-outline-variant/40 flex gap-4">
-                            <div class="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
-                                <span class="material-symbols-outlined text-primary text-xl">psychology</span>
-                            </div>
-                            <div class="flex flex-col gap-2">
-                                <h4 class="font-display text-lg text-primary font-bold">Multi-Agent Cognitive Routing</h4>
-                                <p class="text-xs text-outline leading-relaxed">
-                                    Autonomous agents (Macro, Social, Sports, Risk) constantly digest news, reddit sentiment, and trending metrics. Through our EventEmitter EventBus, they validate and propose consensus-approved prediction markets.
-                                </p>
-                            </div>
-                        </div>
-                        <!-- Pillar 2 -->
-                        <div class="cosmic-card p-6 rounded-2xl border border-outline-variant/40 flex gap-4">
-                            <div class="w-12 h-12 rounded-xl bg-tertiary/10 border border-tertiary/20 flex items-center justify-center shrink-0">
-                                <span class="material-symbols-outlined text-tertiary text-xl">dataset_linked</span>
-                            </div>
-                            <div class="flex flex-col gap-2">
-                                <h4 class="font-display text-lg text-tertiary font-bold">Dynamic Signal Ingestion Engine</h4>
-                                <p class="text-xs text-outline leading-relaxed">
-                                    Our backend continuously parses live data streams from Google Trends, CoinGecko, NewsAPI, and sports outcomes. If the engine detects a sudden velocity surge, agents react to seed prediction pools instantly.
-                                </p>
-                            </div>
-                        </div>
-                        <!-- Pillar 3 -->
-                        <div class="cosmic-card p-6 rounded-2xl border border-outline-variant/40 flex gap-4">
-                            <div class="w-12 h-12 rounded-xl bg-tertiary/10 border border-tertiary/20 flex items-center justify-center shrink-0">
-                                <span class="material-symbols-outlined text-tertiary text-xl">bolt</span>
-                            </div>
-                            <div class="flex flex-col gap-2">
-                                <h4 class="font-display text-lg text-tertiary font-bold">Somnia L1 High-Fidelity Infrastructure</h4>
-                                <p class="text-xs text-outline leading-relaxed">
-                                    Deployed on Somnia L1 Testnet, AstraMarkets leverages extreme execution rates. Confirmations take less than one second, enabling continuous real-time market updates, low slippage, and tiny fractional transaction fees.
-                                </p>
-                            </div>
-                        </div>
-                        <!-- Pillar 4 -->
-                        <div class="cosmic-card p-6 rounded-2xl border border-outline-variant/40 flex gap-4">
-                            <div class="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
-                                <span class="material-symbols-outlined text-primary text-xl">token</span>
-                            </div>
-                            <div class="flex flex-col gap-2">
-                                <h4 class="font-display text-lg text-primary font-bold">Self-Balancing Market Arbitrage</h4>
-                                <p class="text-xs text-outline leading-relaxed">
-                                    When signals indicate shifts, agents automatically trade YES/NO contracts on their targets, maintaining healthy liquidity bands and balancing the odds against raw mathematical volatility.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+ <!-- VALUE PROPOSITIONS / FEATURES GRID -->
+ <div class="flex flex-col gap-6">
+ <div class="text-center md:text-left flex flex-col gap-1">
+ <h3 class="font-display text-2xl text-on-surface font-bold">Protocol Architecture</h3>
+ <p class="text-xs text-outline font-semibold">Four pillars powering the Somnia prediction core.</p>
+ </div>
+ 
+ <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+ <!-- Pillar 1 -->
+ <div class="cosmic-card p-6 rounded-2xl border border-outline-variant/40 flex gap-4">
+ <div class="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+ <span class="material-symbols-outlined text-primary text-xl">psychology</span>
+ </div>
+ <div class="flex flex-col gap-2">
+ <h4 class="font-display text-lg text-primary font-bold">Multi-Agent Cognitive Routing</h4>
+ <p class="text-xs text-outline leading-relaxed">
+ Autonomous agents (Macro, Social, Sports, Risk) constantly digest news, reddit sentiment, and trending metrics. Through our EventEmitter EventBus, they validate and propose consensus-approved prediction markets.
+ </p>
+ </div>
+ </div>
+ <!-- Pillar 2 -->
+ <div class="cosmic-card p-6 rounded-2xl border border-outline-variant/40 flex gap-4">
+ <div class="w-12 h-12 rounded-xl bg-tertiary/10 border border-tertiary/20 flex items-center justify-center shrink-0">
+ <span class="material-symbols-outlined text-tertiary text-xl">dataset_linked</span>
+ </div>
+ <div class="flex flex-col gap-2">
+ <h4 class="font-display text-lg text-tertiary font-bold">Dynamic Signal Ingestion Engine</h4>
+ <p class="text-xs text-outline leading-relaxed">
+ Our backend continuously parses live data streams from Google Trends, CoinGecko, NewsAPI, and sports outcomes. If the engine detects a sudden velocity surge, agents react to seed prediction pools instantly.
+ </p>
+ </div>
+ </div>
+ <!-- Pillar 3 -->
+ <div class="cosmic-card p-6 rounded-2xl border border-outline-variant/40 flex gap-4">
+ <div class="w-12 h-12 rounded-xl bg-tertiary/10 border border-tertiary/20 flex items-center justify-center shrink-0">
+ <span class="material-symbols-outlined text-tertiary text-xl">bolt</span>
+ </div>
+ <div class="flex flex-col gap-2">
+ <h4 class="font-display text-lg text-tertiary font-bold">Somnia L1 High-Fidelity Infrastructure</h4>
+ <p class="text-xs text-outline leading-relaxed">
+ Deployed on Somnia L1 Testnet, AstraMarkets leverages extreme execution rates. Confirmations take less than one second, enabling continuous real-time market updates, low slippage, and tiny fractional transaction fees.
+ </p>
+ </div>
+ </div>
+ <!-- Pillar 4 -->
+ <div class="cosmic-card p-6 rounded-2xl border border-outline-variant/40 flex gap-4">
+ <div class="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+ <span class="material-symbols-outlined text-primary text-xl">token</span>
+ </div>
+ <div class="flex flex-col gap-2">
+ <h4 class="font-display text-lg text-primary font-bold">Self-Balancing Market Arbitrage</h4>
+ <p class="text-xs text-outline leading-relaxed">
+ When signals indicate shifts, agents automatically trade YES/NO contracts on their targets, maintaining healthy liquidity bands and balancing the odds against raw mathematical volatility.
+ </p>
+ </div>
+ </div>
+ </div>
+ </div>
 
-                <!-- HOT PREDICTION PREVIEW BOARD -->
-                <div class="flex flex-col gap-6">
-                    <div class="flex justify-between items-end">
-                        <div class="flex flex-col gap-1">
-                            <h3 class="font-display text-2xl text-on-surface font-bold">Featured Prediction Markets</h3>
-                            <p class="text-xs text-outline font-semibold">Active prediction boards driven by real-time signal velocity.</p>
-                        </div>
-                        <button id="landing-view-all-markets" class="text-xs font-bold text-primary hover:text-on-primary-fixed-variant border-b border-primary hover:border-on-primary-fixed-variant pb-0.5 transition-all uppercase tracking-wider flex items-center gap-1">
-                            Go to Terminal
-                            <span class="material-symbols-outlined text-xs">arrow_forward</span>
-                        </button>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="landing-featured-markets">
-                        <!-- Populated dynamically with top 3 hot markets -->
-                    </div>
-                </div>
+ <!-- HOT PREDICTION PREVIEW BOARD -->
+ <div class="flex flex-col gap-6">
+ <div class="flex justify-between items-end">
+ <div class="flex flex-col gap-1">
+ <h3 class="font-display text-2xl text-on-surface font-bold">Featured Prediction Markets</h3>
+ <p class="text-xs text-outline font-semibold">Active prediction boards driven by real-time signal velocity.</p>
+ </div>
+ <button id="landing-view-all-markets" class="text-xs font-bold text-primary hover:text-on-primary-fixed-variant border-b border-primary hover:border-on-primary-fixed-variant pb-0.5 transition-all uppercase tracking-wider flex items-center gap-1">
+ Go to Terminal
+ <span class="material-symbols-outlined text-xs">arrow_forward</span>
+ </button>
+ </div>
+ 
+ <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="landing-featured-markets">
+ <!-- Populated dynamically with top 3 hot markets -->
+ </div>
+ </div>
 
-                <!-- ACTIVE AGENTS COMMAND OVERVIEW -->
-                <div class="flex flex-col gap-6">
-                    <div class="flex justify-between items-end">
-                        <div class="flex flex-col gap-1">
-                            <h3 class="font-display text-2xl text-on-surface font-bold">Ecosystem Intelligence Swarm</h3>
-                            <p class="text-xs text-outline font-semibold">Live registry of operational specialist intelligence swarms.</p>
-                        </div>
-                        <button id="landing-view-all-agents" class="text-xs font-bold text-primary hover:text-on-primary-fixed-variant border-b border-primary hover:border-on-primary-fixed-variant pb-0.5 transition-all uppercase tracking-wider flex items-center gap-1">
-                            Open Swarm Console
-                            <span class="material-symbols-outlined text-xs">arrow_forward</span>
-                        </button>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6" id="landing-agents-roster">
-                        <!-- Populated dynamically with beautiful agent cards -->
-                    </div>
-                </div>
+ <!-- ACTIVE AGENTS COMMAND OVERVIEW -->
+ <div class="flex flex-col gap-6">
+ <div class="flex justify-between items-end">
+ <div class="flex flex-col gap-1">
+ <h3 class="font-display text-2xl text-on-surface font-bold">Ecosystem Intelligence Swarm</h3>
+ <p class="text-xs text-outline font-semibold">Live registry of operational specialist intelligence swarms.</p>
+ </div>
+ <button id="landing-view-all-agents" class="text-xs font-bold text-primary hover:text-on-primary-fixed-variant border-b border-primary hover:border-on-primary-fixed-variant pb-0.5 transition-all uppercase tracking-wider flex items-center gap-1">
+ Open Swarm Console
+ <span class="material-symbols-outlined text-xs">arrow_forward</span>
+ </button>
+ </div>
+ 
+ <div class="grid grid-cols-1 md:grid-cols-4 gap-6" id="landing-agents-roster">
+ <!-- Populated dynamically with beautiful agent cards -->
+ </div>
+ </div>
 
-                <!-- VALUE COMPARISON TABLE -->
-                <div class="flex flex-col gap-6">
-                    <h3 class="font-display text-2xl text-on-surface font-bold text-center md:text-left">Standard vs AstraMarkets</h3>
-                    <div class="cosmic-card rounded-2xl overflow-hidden border border-outline-variant/40">
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full text-left border-collapse">
-                                <thead>
-                                    <tr class="bg-surface-container/60 border-b border-outline-variant/30 text-[9px] font-bold text-outline uppercase tracking-widest">
-                                        <th class="py-4 px-6">Capability / Metric</th>
-                                        <th class="py-4 px-6">Traditional Platforms</th>
-                                        <th class="py-4 px-6 text-primary font-extrabold">AstraMarkets (Somnia L1)</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="text-xs text-on-surface/90">
-                                    <tr class="border-b border-outline-variant/20">
-                                        <td class="py-3.5 px-6 font-semibold">Transaction Speed</td>
-                                        <td class="py-3.5 px-6 text-outline">Minutes to Hours (High slippage)</td>
-                                        <td class="py-3.5 px-6 text-primary font-bold flex items-center gap-1">
-                                            <span class="material-symbols-outlined text-xs">bolt</span>
-                                            Sub-Second (&lt;1s confirmation)
-                                        </td>
-                                    </tr>
-                                    <tr class="border-b border-outline-variant/20">
-                                        <td class="py-3.5 px-6 font-semibold">Gas / Trading Fees</td>
-                                        <td class="py-3.5 px-6 text-outline">5% - 10% standard exchange fee</td>
-                                        <td class="py-3.5 px-6 text-primary font-bold">0.001 SOM (Sub-cent)</td>
-                                    </tr>
-                                    <tr class="border-b border-outline-variant/20">
-                                        <td class="py-3.5 px-6 font-semibold">Market Seeding</td>
-                                        <td class="py-3.5 px-6 text-outline">Manual submission (requires approval)</td>
-                                        <td class="py-3.5 px-6 text-primary font-bold">Autonomous (Live Multi-Agent Consensus)</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="py-3.5 px-6 font-semibold">Market Intelligence</td>
-                                        <td class="py-3.5 px-6 text-outline">Static crowds (highly reactive)</td>
-                                        <td class="py-3.5 px-6 text-primary font-bold">Autonomous Calibration (Continuous Signal Attribution)</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+ <!-- VALUE COMPARISON TABLE -->
+ <div class="flex flex-col gap-6">
+ <h3 class="font-display text-2xl text-on-surface font-bold text-center md:text-left">Standard vs AstraMarkets</h3>
+ <div class="cosmic-card rounded-2xl overflow-hidden border border-outline-variant/40">
+ <div class="overflow-x-auto">
+ <table class="min-w-full text-left border-collapse">
+ <thead>
+ <tr class="bg-surface-container/60 border-b border-outline-variant/30 text-[9px] font-bold text-outline uppercase tracking-widest">
+ <th class="py-4 px-6">Capability / Metric</th>
+ <th class="py-4 px-6">Traditional Platforms</th>
+ <th class="py-4 px-6 text-primary font-extrabold">AstraMarkets (Somnia L1)</th>
+ </tr>
+ </thead>
+ <tbody class="text-xs text-on-surface/90">
+ <tr class="border-b border-outline-variant/20">
+ <td class="py-3.5 px-6 font-semibold">Transaction Speed</td>
+ <td class="py-3.5 px-6 text-outline">Minutes to Hours (High slippage)</td>
+ <td class="py-3.5 px-6 text-primary font-bold flex items-center gap-1">
+ <span class="material-symbols-outlined text-xs">bolt</span>
+ Sub-Second (&lt;1s confirmation)
+ </td>
+ </tr>
+ <tr class="border-b border-outline-variant/20">
+ <td class="py-3.5 px-6 font-semibold">Gas / Trading Fees</td>
+ <td class="py-3.5 px-6 text-outline">5% - 10% standard exchange fee</td>
+ <td class="py-3.5 px-6 text-primary font-bold">0.001 SOM (Sub-cent)</td>
+ </tr>
+ <tr class="border-b border-outline-variant/20">
+ <td class="py-3.5 px-6 font-semibold">Market Seeding</td>
+ <td class="py-3.5 px-6 text-outline">Manual submission (requires approval)</td>
+ <td class="py-3.5 px-6 text-primary font-bold">Autonomous (Live Multi-Agent Consensus)</td>
+ </tr>
+ <tr>
+ <td class="py-3.5 px-6 font-semibold">Market Intelligence</td>
+ <td class="py-3.5 px-6 text-outline">Static crowds (highly reactive)</td>
+ <td class="py-3.5 px-6 text-primary font-bold">Autonomous Calibration (Continuous Signal Attribution)</td>
+ </tr>
+ </tbody>
+ </table>
+ </div>
+ </div>
+ </div>
 
-                <!-- FOOTER -->
-                <footer class="border-t border-outline-variant/20 pt-8 pb-4 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] text-outline uppercase font-bold tracking-widest text-center">
-                    <span>© 2026 AstraMarkets Protocol. All rights reserved.</span>
-                    <div class="flex gap-6">
-                        <a href="https://somnia.network" target="_blank" class="hover:text-primary transition-colors">Somnia L1</a>
-                        <a href="#" class="hover:text-primary transition-colors">Documentation</a>
-                        <a href="#" class="hover:text-primary transition-colors">GitHub</a>
-                    </div>
-                </footer>
-            </div>
-            
-            <!-- PAGE 1: Feed (Astra Stream) -->
-            <div id="tab-feed" class="page-tab flex flex-col gap-8 w-full">
-                <div class="flex items-center justify-between mb-2">
-                    <h2 class="font-display text-3xl text-on-surface font-bold">Astra Stream</h2>
-                    <div class="flex gap-2 items-center">
-                        <span class="font-label text-[10px] text-outline uppercase tracking-wider">Sort by:</span>
-                        <div class="flex gap-3">
-                            <span data-feed-filter="all" class="feed-filter-btn font-label text-primary text-xs font-bold border-b-2 border-primary cursor-pointer pb-0.5 uppercase tracking-wider">All Signals</span>
-                            <span data-feed-filter="sports" class="feed-filter-btn font-label text-outline text-xs font-bold border-b-2 border-transparent cursor-pointer hover:text-primary hover:border-primary/50 pb-0.5 transition-colors uppercase tracking-wider">Sports</span>
-                            <span data-feed-filter="crypto" class="feed-filter-btn font-label text-outline text-xs font-bold border-b-2 border-transparent cursor-pointer hover:text-primary hover:border-primary/50 pb-0.5 transition-colors uppercase tracking-wider">Crypto</span>
-                            <span data-feed-filter="tech" class="feed-filter-btn font-label text-outline text-xs font-bold border-b-2 border-transparent cursor-pointer hover:text-primary hover:border-primary/50 pb-0.5 transition-colors uppercase tracking-wider">Tech</span>
-                            <span data-feed-filter="politics" class="feed-filter-btn font-label text-outline text-xs font-bold border-b-2 border-transparent cursor-pointer hover:text-primary hover:border-primary/50 pb-0.5 transition-colors uppercase tracking-wider">Politics</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Stream Feed Container -->
-                <div class="flex flex-col gap-6" id="feed-container">
-                    <!-- Cards will be populated dynamically -->
-                </div>
-            </div>
-            
-            <!-- PAGE 2: Markets (Prediction Board) -->
-            <div id="tab-markets" class="page-tab flex-col gap-8 w-full">
-                <!-- Header with scanning effect -->
-                <div class="scanning-container px-4 py-2 border-l-4 border-primary/40 mb-2">
-                    <div class="scanning-line"></div>
-                    <div class="flex items-center justify-between">
-                        <h2 class="font-display text-3xl text-primary font-bold">Prediction Markets</h2>
-                        <span class="text-xs px-3 py-1 bg-primary/10 text-primary border border-primary/20 rounded-full font-bold uppercase tracking-wider">Live Liquidity Core</span>
-                    </div>
-                </div>
-                
-                <!-- Main Redesigned Content Layout: Sidebar + Grid -->
-                <div class="flex flex-col lg:flex-row gap-8 items-start w-full">
-                    
-                    <!-- Left Side: Interactive Category Sidebar -->
-                    <aside class="w-full lg:w-60 shrink-0 flex flex-col gap-5 bg-surface-container/30 border border-outline-variant/30 rounded-2xl p-5 backdrop-blur-md">
-                        <div class="flex flex-col gap-1">
-                            <span class="font-label text-[9px] font-bold text-outline uppercase tracking-[0.2em]">Filter Markets</span>
-                            <h3 class="font-display text-base font-bold text-on-surface">Categories</h3>
-                        </div>
-                        
-                        <!-- Hidden Select Input for Compatibility -->
-                        <input type="hidden" id="market-category" value="all">
-                        
-                        <!-- Category Button List -->
-                        <div class="flex flex-col gap-2" id="side-category-list">
-                            <!-- All Categories -->
-                            <button data-cat="all" class="market-cat-btn active w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 font-label text-xs font-bold border border-transparent text-left">
-                                <div class="flex items-center gap-3">
-                                    <span class="material-symbols-outlined text-sm">grid_view</span>
-                                    <span>All Categories</span>
-                                </div>
-                                <span class="cat-count text-[9px] px-2 py-0.5 rounded-full bg-outline-variant/30 text-outline-variant" id="count-all">0</span>
-                            </button>
-                            
-                            <!-- Sport -->
-                            <button data-cat="sports" class="market-cat-btn w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 font-label text-xs font-bold border border-transparent text-left">
-                                <div class="flex items-center gap-3">
-                                    <span class="material-symbols-outlined text-sm">emoji_events</span>
-                                    <span>Sport</span>
-                                </div>
-                                <span class="cat-count text-[9px] px-2 py-0.5 rounded-full bg-outline-variant/30 text-outline-variant" id="count-sports">0</span>
-                            </button>
-                            
-                            <!-- Crypto -->
-                            <button data-cat="crypto" class="market-cat-btn w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 font-label text-xs font-bold border border-transparent text-left">
-                                <div class="flex items-center gap-3">
-                                    <span class="material-symbols-outlined text-sm">currency_bitcoin</span>
-                                    <span>Crypto</span>
-                                </div>
-                                <span class="cat-count text-[9px] px-2 py-0.5 rounded-full bg-outline-variant/30 text-outline-variant" id="count-crypto">0</span>
-                            </button>
-                            
-                            <!-- Politics -->
-                            <button data-cat="politics" class="market-cat-btn w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 font-label text-xs font-bold border border-transparent text-left">
-                                <div class="flex items-center gap-3">
-                                    <span class="material-symbols-outlined text-sm">gavel</span>
-                                    <span>Politics</span>
-                                </div>
-                                <span class="cat-count text-[9px] px-2 py-0.5 rounded-full bg-outline-variant/30 text-outline-variant" id="count-politics">0</span>
-                            </button>
-                            
-                            <!-- Tech -->
-                            <button data-cat="tech" class="market-cat-btn w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 font-label text-xs font-bold border border-transparent text-left">
-                                <div class="flex items-center gap-3">
-                                    <span class="material-symbols-outlined text-sm">memory</span>
-                                    <span>Tech</span>
-                                </div>
-                                <span class="cat-count text-[9px] px-2 py-0.5 rounded-full bg-outline-variant/30 text-outline-variant" id="count-tech">0</span>
-                            </button>
+ <!-- FOOTER -->
+ <footer class="border-t border-outline-variant/20 pt-8 pb-4 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] text-outline uppercase font-bold tracking-widest text-center">
+ <span>© 2026 AstraMarkets Protocol. All rights reserved.</span>
+ <div class="flex gap-6">
+ <a href="https://somnia.network" target="_blank" class="hover:text-primary transition-colors">Somnia L1</a>
+ <a href="#" class="hover:text-primary transition-colors">Documentation</a>
+ <a href="#" class="hover:text-primary transition-colors">GitHub</a>
+ </div>
+ </footer>
+ </div>
+ 
+ <!-- PAGE 1: Feed (Astra Stream) -->
+ <div id="tab-feed" class="page-tab flex flex-col gap-8 w-full">
+ <div class="flex items-center justify-between mb-2">
+ <h2 class="font-display text-3xl text-on-surface font-bold">Astra Stream</h2>
+ <div class="flex gap-2 items-center">
+ <span class="font-label text-[10px] text-outline uppercase tracking-wider">Sort by:</span>
+ <div class="flex gap-3">
+ <span data-feed-filter="all" class="feed-filter-btn font-label text-primary text-xs font-bold border-b-2 border-primary cursor-pointer pb-0.5 uppercase tracking-wider">All Signals</span>
+ <span data-feed-filter="sports" class="feed-filter-btn font-label text-outline text-xs font-bold border-b-2 border-transparent cursor-pointer hover:text-primary hover:border-primary/50 pb-0.5 transition-colors uppercase tracking-wider">Sports</span>
+ <span data-feed-filter="crypto" class="feed-filter-btn font-label text-outline text-xs font-bold border-b-2 border-transparent cursor-pointer hover:text-primary hover:border-primary/50 pb-0.5 transition-colors uppercase tracking-wider">Crypto</span>
+ <span data-feed-filter="tech" class="feed-filter-btn font-label text-outline text-xs font-bold border-b-2 border-transparent cursor-pointer hover:text-primary hover:border-primary/50 pb-0.5 transition-colors uppercase tracking-wider">Tech</span>
+ <span data-feed-filter="politics" class="feed-filter-btn font-label text-outline text-xs font-bold border-b-2 border-transparent cursor-pointer hover:text-primary hover:border-primary/50 pb-0.5 transition-colors uppercase tracking-wider">Politics</span>
+ </div>
+ </div>
+ </div>
+ 
+ <!-- Stream Feed Container -->
+ <div class="flex flex-col gap-6" id="feed-container">
+ <!-- Cards will be populated dynamically -->
+ </div>
+ </div>
+ 
+ <!-- PAGE 2: Markets (Prediction Board) -->
+ <div id="tab-markets" class="page-tab flex-col gap-8 w-full">
+ <!-- Header with scanning effect -->
+ <div class="scanning-container px-4 py-2 border-l-4 border-primary/40 mb-2">
+ <div class="scanning-line"></div>
+ <div class="flex items-center justify-between">
+ <h2 class="font-display text-3xl text-primary font-bold">Prediction Markets</h2>
+ <span class="text-xs px-3 py-1 bg-primary/10 text-primary border border-primary/20 rounded-full font-bold uppercase tracking-wider">Live Liquidity Core</span>
+ </div>
+ </div>
+ 
+ <!-- Main Redesigned Content Layout: Sidebar + Grid -->
+ <div class="flex flex-col lg:flex-row gap-8 items-start w-full">
+ 
+ <!-- Left Side: Interactive Category Sidebar -->
+ <aside class="w-full lg:w-60 shrink-0 flex flex-col gap-5 bg-surface-container/30 border border-outline-variant/30 rounded-2xl p-5 backdrop-blur-md">
+ <div class="flex flex-col gap-1">
+ <span class="font-label text-[9px] font-bold text-outline uppercase tracking-[0.2em]">Filter Markets</span>
+ <h3 class="font-display text-base font-bold text-on-surface">Categories</h3>
+ </div>
+ 
+ <!-- Hidden Select Input for Compatibility -->
+ <input type="hidden" id="market-category" value="all">
+ 
+ <!-- Category Button List -->
+ <div class="flex flex-col gap-2" id="side-category-list">
+ <!-- All Categories -->
+ <button data-cat="all" class="market-cat-btn active w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 font-label text-xs font-bold border border-transparent text-left">
+ <div class="flex items-center gap-3">
+ <span class="material-symbols-outlined text-sm">grid_view</span>
+ <span>All Categories</span>
+ </div>
+ <span class="cat-count text-[9px] px-2 py-0.5 rounded-full bg-outline-variant/30 text-outline-variant" id="count-all">0</span>
+ </button>
+ 
+ <!-- Sport -->
+ <button data-cat="sports" class="market-cat-btn w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 font-label text-xs font-bold border border-transparent text-left">
+ <div class="flex items-center gap-3">
+ <span class="material-symbols-outlined text-sm">emoji_events</span>
+ <span>Sport</span>
+ </div>
+ <span class="cat-count text-[9px] px-2 py-0.5 rounded-full bg-outline-variant/30 text-outline-variant" id="count-sports">0</span>
+ </button>
+ 
+ <!-- Crypto -->
+ <button data-cat="crypto" class="market-cat-btn w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 font-label text-xs font-bold border border-transparent text-left">
+ <div class="flex items-center gap-3">
+ <span class="material-symbols-outlined text-sm">currency_bitcoin</span>
+ <span>Crypto</span>
+ </div>
+ <span class="cat-count text-[9px] px-2 py-0.5 rounded-full bg-outline-variant/30 text-outline-variant" id="count-crypto">0</span>
+ </button>
+ 
+ <!-- Politics -->
+ <button data-cat="politics" class="market-cat-btn w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 font-label text-xs font-bold border border-transparent text-left">
+ <div class="flex items-center gap-3">
+ <span class="material-symbols-outlined text-sm">gavel</span>
+ <span>Politics</span>
+ </div>
+ <span class="cat-count text-[9px] px-2 py-0.5 rounded-full bg-outline-variant/30 text-outline-variant" id="count-politics">0</span>
+ </button>
+ 
+ <!-- Tech -->
+ <button data-cat="tech" class="market-cat-btn w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 font-label text-xs font-bold border border-transparent text-left">
+ <div class="flex items-center gap-3">
+ <span class="material-symbols-outlined text-sm">memory</span>
+ <span>Tech</span>
+ </div>
+ <span class="cat-count text-[9px] px-2 py-0.5 rounded-full bg-outline-variant/30 text-outline-variant" id="count-tech">0</span>
+ </button>
 
-                            <!-- Politics -->
-                            <button data-cat="politics" class="market-cat-btn w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 font-label text-xs font-bold border border-transparent text-left">
-                                <div class="flex items-center gap-3">
-                                    <span class="material-symbols-outlined text-sm">public</span>
-                                    <span>Politics</span>
-                                </div>
-                                <span class="cat-count text-[9px] px-2 py-0.5 rounded-full bg-outline-variant/30 text-outline-variant" id="count-politics">0</span>
-                            </button>
-                        </div>
-                        
-                        <!-- Beautiful summary card inside sidebar -->
-                        <div class="mt-4 p-4 rounded-xl bg-primary/5 border border-primary/10 flex flex-col gap-2">
-                            <div class="flex items-center gap-1.5 text-[9px] font-bold text-primary uppercase tracking-wider">
-                                <span class="material-symbols-outlined text-xs">monitoring</span>
-                                <span>Active Pools</span>
-                            </div>
-                            <p class="text-[10px] text-outline leading-relaxed font-semibold">
-                                Markets are dynamically seeded by our AI Cognitive Swarms on the Somnia L1 Network.
-                            </p>
-                        </div>
-                    </aside>
-                    
-                    <!-- Right Side: Search and Markets list -->
-                    <div class="flex-1 w-full flex flex-col gap-6">
-                        
-                        <!-- Search and Metadata Control -->
-                        <div class="flex flex-col sm:flex-row gap-4 items-center justify-between bg-surface-container/20 border border-outline-variant/20 rounded-2xl p-4 w-full">
-                            <div class="relative w-full sm:w-72">
-                                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm">search</span>
-                                <input type="text" id="market-search" placeholder="Search active contracts..." class="glass-input text-xs pl-9 pr-4 py-2.5 rounded-xl border border-outline-variant/40 bg-surface/30 w-full focus:ring-1 focus:ring-primary focus:outline-none">
-                            </div>
-                            <div class="flex items-center gap-3 text-xs font-semibold text-outline">
-                                <span class="flex items-center gap-1">
-                                    <span id="market-result-count" class="font-bold text-primary">0</span> contracts found
-                                </span>
-                            </div>
-                        </div>
-                        
-                        <!-- Markets Grid -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full" id="markets-container">
-                            <!-- Populated Dynamically -->
-                        </div>
-                    </div>
-                    
-                </div>
-            </div>
-            
-            <!-- PAGE 3: AI Agent Creator Lab -->
-            <div id="tab-agents" class="page-tab flex-col gap-8 w-full">
-                <!-- Header -->
-                <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-outline-variant/20 pb-6">
-                    <div class="flex flex-col gap-2">
-                        <h2 class="font-display text-4xl text-on-surface font-bold tracking-tight">Swarm Core</h2>
-                        <p class="text-xs text-outline font-semibold">Deploy and monitor autonomous AI market makers</p>
-                    </div>
-                    <div class="flex items-center gap-3 bg-tertiary/10 px-4 py-2 rounded-xl border border-tertiary/20">
-                        <span class="w-2.5 h-2.5 rounded-full bg-tertiary animate-pulse"></span>
-                        <span class="text-[10px] font-bold text-tertiary uppercase tracking-widest">Protocol Active</span>
-                    </div>
-                </div>
-                
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-2">
-                    <!-- Autonomous Core Engine Status -->
-                    <div class="cosmic-card p-8 rounded-3xl lg:col-span-1 border border-outline-variant/30 flex flex-col justify-between gap-8 bg-surface-container/20 relative overflow-hidden group">
-                        <div class="absolute -right-20 -top-20 w-48 h-48 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/20 transition-all duration-700"></div>
-                        <div class="absolute -left-10 -bottom-10 w-32 h-32 bg-secondary/10 rounded-full blur-2xl group-hover:bg-secondary/20 transition-all duration-700"></div>
-                        
-                        <div class="flex flex-col gap-1 relative z-10">
-                            <span class="text-xs font-bold text-primary uppercase tracking-widest flex items-center gap-2">
-                                <span class="material-symbols-outlined text-sm animate-spin-slow">cyclone</span>
-                                Autonomous Engine
-                            </span>
-                            <span class="text-[10px] text-outline font-semibold">Self-learning prediction protocol</span>
-                        </div>
-                        
-                        <div class="flex flex-col gap-6 relative z-10 my-4">
-                            <!-- Unique visual metric 1 -->
-                            <div class="flex flex-col gap-2">
-                                <div class="flex justify-between items-end">
-                                    <span class="text-[9px] font-bold text-outline uppercase tracking-widest">Network Synchronization</span>
-                                    <span class="text-primary font-mono text-sm font-bold">100%</span>
-                                </div>
-                                <div class="w-full h-1 bg-surface-container rounded-full overflow-hidden">
-                                    <div class="h-full bg-primary w-full animate-pulse"></div>
-                                </div>
-                            </div>
-                            
-                            <!-- Unique visual metric 2 -->
-                            <div class="flex flex-col gap-2">
-                                <div class="flex justify-between items-end">
-                                    <span class="text-[9px] font-bold text-outline uppercase tracking-widest">Cognitive Load</span>
-                                    <span class="text-secondary font-mono text-sm font-bold">42.8%</span>
-                                </div>
-                                <div class="w-full h-1 bg-surface-container rounded-full overflow-hidden">
-                                    <div class="h-full bg-secondary w-[42.8%]"></div>
-                                </div>
-                            </div>
-                            
-                            <!-- Status Badges -->
-                            <div class="grid grid-cols-2 gap-3 mt-2">
-                                <div class="bg-surface-container/40 border border-outline-variant/20 p-3 rounded-2xl flex flex-col gap-1 items-center text-center backdrop-blur-sm">
-                                    <span class="material-symbols-outlined text-tertiary text-lg">admin_panel_settings</span>
-                                    <span class="text-[8px] font-bold text-outline uppercase tracking-wider">Protocol</span>
-                                    <span class="text-[10px] font-bold text-on-surface">SECURED</span>
-                                </div>
-                                <div class="bg-surface-container/40 border border-outline-variant/20 p-3 rounded-2xl flex flex-col gap-1 items-center text-center backdrop-blur-sm">
-                                    <span class="material-symbols-outlined text-primary text-lg">bolt</span>
-                                    <span class="text-[8px] font-bold text-outline uppercase tracking-wider">Latency</span>
-                                    <span class="text-[10px] font-bold text-on-surface font-mono">12ms</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="w-full bg-surface-container/30 border border-outline-variant/20 text-outline font-label text-[9px] font-bold uppercase tracking-widest py-4 rounded-2xl flex items-center justify-center gap-2 relative z-10 cursor-not-allowed">
-                            <span class="material-symbols-outlined text-xs">lock</span>
-                            Manual Deployment Locked
-                        </div>
-                    </div>
-                    
-                    <!-- Active Agents Monitor -->
-                    <div class="lg:col-span-2 flex flex-col gap-6">
-                        <div class="flex justify-between items-center bg-surface-container/20 p-4 rounded-2xl border border-outline-variant/20">
-                            <h3 class="font-display text-lg font-bold text-on-surface">Active Swarm Registry</h3>
-                            <span class="text-[10px] bg-surface-container px-3 py-1 rounded-full text-outline font-mono uppercase tracking-widest" id="total-agents-deployed-text">0 cores active</span>
-                        </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="agents-monitor-container">
-                            <!-- Populated Dynamically -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- PAGE 4: Portfolio Dashboard -->
-            <div id="tab-portfolio" class="page-tab flex-col gap-8 w-full">
-                <!-- Header -->
-                <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-outline-variant/20 pb-6">
-                    <div class="flex flex-col gap-2">
-                        <h2 class="font-display text-4xl text-on-surface font-bold tracking-tight">Ledger Profile</h2>
-                        <p class="text-xs text-outline font-semibold">Real-time Web3 synchronization on Somnia L1</p>
-                    </div>
-                    <div class="flex items-center gap-3 bg-surface-container/30 px-4 py-2 rounded-xl border border-outline-variant/20">
-                        <span class="w-2.5 h-2.5 rounded-full bg-primary glow-green animate-pulse"></span>
-                        <span class="text-[10px] font-bold text-outline uppercase tracking-widest">Network Verified</span>
-                    </div>
-                </div>
-                
-                <!-- Financial Overview -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <!-- Net Worth -->
-                    <div class="cosmic-card p-6 rounded-3xl border border-outline-variant/30 flex flex-col justify-between relative overflow-hidden bg-surface-container/20 group hover:border-primary/40 transition-colors">
-                        <div class="absolute -right-10 -top-10 w-32 h-32 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors"></div>
-                        <span class="text-[10px] font-bold text-outline uppercase tracking-widest mb-4">Total Net Worth</span>
-                        <span class="text-4xl font-black font-display text-primary tracking-tighter" id="port-net-worth">0.00 SOM</span>
-                    </div>
-                    
-                    <!-- Liquid Balance -->
-                    <div class="cosmic-card p-6 rounded-3xl border border-outline-variant/30 flex flex-col justify-between bg-surface-container/20 hover:border-outline-variant/50 transition-colors">
-                        <span class="text-[10px] font-bold text-outline uppercase tracking-widest mb-4">Available Liquidity</span>
-                        <span class="text-3xl font-bold font-display text-on-surface tracking-tight" id="port-available">0.00 SOM</span>
-                    </div>
-                    
-                    <!-- Locked / Active -->
-                    <div class="cosmic-card p-6 rounded-3xl border border-outline-variant/30 flex flex-col justify-between bg-surface-container/20 hover:border-tertiary/30 transition-colors">
-                        <span class="text-[10px] font-bold text-outline uppercase tracking-widest mb-4">Active Capital</span>
-                        <span class="text-3xl font-bold font-display text-tertiary tracking-tight" id="port-locked">0.00 SOM</span>
-                    </div>
-                </div>
+ <!-- Politics -->
+ <button data-cat="politics" class="market-cat-btn w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 font-label text-xs font-bold border border-transparent text-left">
+ <div class="flex items-center gap-3">
+ <span class="material-symbols-outlined text-sm">public</span>
+ <span>Politics</span>
+ </div>
+ <span class="cat-count text-[9px] px-2 py-0.5 rounded-full bg-outline-variant/30 text-outline-variant" id="count-politics">0</span>
+ </button>
+ </div>
+ 
+ <!-- Beautiful summary card inside sidebar -->
+ <div class="mt-4 p-4 rounded-xl bg-primary/5 border border-primary/10 flex flex-col gap-2">
+ <div class="flex items-center gap-1.5 text-[9px] font-bold text-primary uppercase tracking-wider">
+ <span class="material-symbols-outlined text-xs">monitoring</span>
+ <span>Active Pools</span>
+ </div>
+ <p class="text-[10px] text-outline leading-relaxed font-semibold">
+ Markets are dynamically seeded by our AI Cognitive Swarms on the Somnia L1 Network.
+ </p>
+ </div>
+ </aside>
+ 
+ <!-- Right Side: Search and Markets list -->
+ <div class="flex-1 w-full flex flex-col gap-6">
+ 
+ <!-- Search and Metadata Control -->
+ <div class="flex flex-col sm:flex-row gap-4 items-center justify-between bg-surface-container/20 border border-outline-variant/20 rounded-2xl p-4 w-full">
+ <div class="relative w-full sm:w-72">
+ <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm">search</span>
+ <input type="text" id="market-search" placeholder="Search active contracts..." class="glass-input text-xs pl-9 pr-4 py-2.5 rounded-xl border border-outline-variant/40 bg-surface/30 w-full focus:ring-1 focus:ring-primary focus:outline-none">
+ </div>
+ <div class="flex items-center gap-3 text-xs font-semibold text-outline">
+ <span class="flex items-center gap-1">
+ <span id="market-result-count" class="font-bold text-primary">0</span> contracts found
+ </span>
+ </div>
+ </div>
+ 
+ <!-- Markets Grid -->
+ <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full" id="markets-container">
+ <!-- Populated Dynamically -->
+ </div>
+ </div>
+ 
+ </div>
+ </div>
+ 
+ <!-- PAGE 3: AI Agent Creator Lab -->
+ <div id="tab-agents" class="page-tab flex-col gap-8 w-full">
+ <!-- Header -->
+ <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-outline-variant/20 pb-6">
+ <div class="flex flex-col gap-2">
+ <h2 class="font-display text-4xl text-on-surface font-bold tracking-tight">Swarm Core</h2>
+ <p class="text-xs text-outline font-semibold">Deploy and monitor autonomous AI market makers</p>
+ </div>
+ <div class="flex items-center gap-3 bg-tertiary/10 px-4 py-2 rounded-xl border border-tertiary/20">
+ <span class="w-2.5 h-2.5 rounded-full bg-tertiary animate-pulse"></span>
+ <span class="text-[10px] font-bold text-tertiary uppercase tracking-widest">Protocol Active</span>
+ </div>
+ </div>
+ 
+ <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-2">
+ <!-- Autonomous Core Engine Status -->
+ <div class="cosmic-card p-8 rounded-3xl lg:col-span-1 border border-outline-variant/30 flex flex-col justify-between gap-8 bg-surface-container/20 relative overflow-hidden group">
+ <div class="absolute -right-20 -top-20 w-48 h-48 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/20 transition-all duration-700"></div>
+ <div class="absolute -left-10 -bottom-10 w-32 h-32 bg-secondary/10 rounded-full blur-2xl group-hover:bg-secondary/20 transition-all duration-700"></div>
+ 
+ <div class="flex flex-col gap-1 relative z-10">
+ <span class="text-xs font-bold text-primary uppercase tracking-widest flex items-center gap-2">
+ <span class="material-symbols-outlined text-sm animate-spin-slow">cyclone</span>
+ Autonomous Engine
+ </span>
+ <span class="text-[10px] text-outline font-semibold">Self-learning prediction protocol</span>
+ </div>
+ 
+ <div class="flex flex-col gap-6 relative z-10 my-4">
+ <!-- Unique visual metric 1 -->
+ <div class="flex flex-col gap-2">
+ <div class="flex justify-between items-end">
+ <span class="text-[9px] font-bold text-outline uppercase tracking-widest">Network Synchronization</span>
+ <span class="text-primary font-mono text-sm font-bold">100%</span>
+ </div>
+ <div class="w-full h-1 bg-surface-container rounded-full overflow-hidden">
+ <div class="h-full bg-primary w-full animate-pulse"></div>
+ </div>
+ </div>
+ 
+ <!-- Unique visual metric 2 -->
+ <div class="flex flex-col gap-2">
+ <div class="flex justify-between items-end">
+ <span class="text-[9px] font-bold text-outline uppercase tracking-widest">Cognitive Load</span>
+ <span class="text-secondary font-mono text-sm font-bold">42.8%</span>
+ </div>
+ <div class="w-full h-1 bg-surface-container rounded-full overflow-hidden">
+ <div class="h-full bg-secondary w-[42.8%]"></div>
+ </div>
+ </div>
+ 
+ <!-- Status Badges -->
+ <div class="grid grid-cols-2 gap-3 mt-2">
+ <div class="bg-surface-container/40 border border-outline-variant/20 p-3 rounded-2xl flex flex-col gap-1 items-center text-center backdrop-blur-sm">
+ <span class="material-symbols-outlined text-tertiary text-lg">admin_panel_settings</span>
+ <span class="text-[8px] font-bold text-outline uppercase tracking-wider">Protocol</span>
+ <span class="text-[10px] font-bold text-on-surface">SECURED</span>
+ </div>
+ <div class="bg-surface-container/40 border border-outline-variant/20 p-3 rounded-2xl flex flex-col gap-1 items-center text-center backdrop-blur-sm">
+ <span class="material-symbols-outlined text-primary text-lg">bolt</span>
+ <span class="text-[8px] font-bold text-outline uppercase tracking-wider">Latency</span>
+ <span class="text-[10px] font-bold text-on-surface font-mono">12ms</span>
+ </div>
+ </div>
+ </div>
+ 
+ <div class="w-full bg-surface-container/30 border border-outline-variant/20 text-outline font-label text-[9px] font-bold uppercase tracking-widest py-4 rounded-2xl flex items-center justify-center gap-2 relative z-10 cursor-not-allowed">
+ <span class="material-symbols-outlined text-xs">lock</span>
+ Manual Deployment Locked
+ </div>
+ </div>
+ 
+ <!-- Active Agents Monitor -->
+ <div class="lg:col-span-2 flex flex-col gap-6">
+ <div class="flex justify-between items-center bg-surface-container/20 p-4 rounded-2xl border border-outline-variant/20">
+ <h3 class="font-display text-lg font-bold text-on-surface">Active Swarm Registry</h3>
+ <span class="text-[10px] bg-surface-container px-3 py-1 rounded-full text-outline font-mono uppercase tracking-widest" id="total-agents-deployed-text">0 cores active</span>
+ </div>
+ 
+ <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="agents-monitor-container">
+ <!-- Populated Dynamically -->
+ </div>
+ </div>
+ </div>
+ </div>
+ 
+ <!-- PAGE 4: Portfolio Dashboard -->
+ <div id="tab-portfolio" class="page-tab flex-col gap-8 w-full">
+ <!-- Header -->
+ <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-outline-variant/20 pb-6">
+ <div class="flex flex-col gap-2">
+ <h2 class="font-display text-4xl text-on-surface font-bold tracking-tight">Ledger Profile</h2>
+ <p class="text-xs text-outline font-semibold">Real-time Web3 synchronization on Somnia L1</p>
+ </div>
+ <div class="flex items-center gap-3 bg-surface-container/30 px-4 py-2 rounded-xl border border-outline-variant/20">
+ <span class="w-2.5 h-2.5 rounded-full bg-primary glow-green animate-pulse"></span>
+ <span class="text-[10px] font-bold text-outline uppercase tracking-widest">Network Verified</span>
+ </div>
+ </div>
+ 
+ <!-- Financial Overview -->
+ <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+ <!-- Net Worth -->
+ <div class="cosmic-card p-6 rounded-3xl border border-outline-variant/30 flex flex-col justify-between relative overflow-hidden bg-surface-container/20 group hover:border-primary/40 transition-colors">
+ <div class="absolute -right-10 -top-10 w-32 h-32 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors"></div>
+ <span class="text-[10px] font-bold text-outline uppercase tracking-widest mb-4">Total Net Worth</span>
+ <span class="text-4xl font-black font-display text-primary tracking-tighter" id="port-net-worth">0.00 SOM</span>
+ </div>
+ 
+ <!-- Liquid Balance -->
+ <div class="cosmic-card p-6 rounded-3xl border border-outline-variant/30 flex flex-col justify-between bg-surface-container/20 hover:border-outline-variant/50 transition-colors">
+ <span class="text-[10px] font-bold text-outline uppercase tracking-widest mb-4">Available Liquidity</span>
+ <span class="text-3xl font-bold font-display text-on-surface tracking-tight" id="port-available">0.00 SOM</span>
+ </div>
+ 
+ <!-- Locked / Active -->
+ <div class="cosmic-card p-6 rounded-3xl border border-outline-variant/30 flex flex-col justify-between bg-surface-container/20 hover:border-tertiary/30 transition-colors">
+ <span class="text-[10px] font-bold text-outline uppercase tracking-widest mb-4">Active Capital</span>
+ <span class="text-3xl font-bold font-display text-tertiary tracking-tight" id="port-locked">0.00 SOM</span>
+ </div>
+ </div>
 
-                <!-- Active Positions & Performance Split -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-4">
-                    <!-- Positions List -->
-                    <div class="lg:col-span-2 flex flex-col gap-5">
-                        <div class="flex items-center justify-between">
-                            <h3 class="font-display text-xl font-bold text-on-surface">Active Positions</h3>
-                            <span class="text-[10px] bg-surface-container/50 px-3 py-1 rounded-full text-outline font-mono uppercase border border-outline-variant/20">Live Data</span>
-                        </div>
-                        
-                        <div class="flex flex-col gap-3 min-h-[300px] bg-surface-container/10 p-2 rounded-3xl border border-outline-variant/20 relative" id="portfolio-positions-list">
-                            <!-- Injected dynamically by renderPortfolio() -->
-                        </div>
-                    </div>
-                    
-                    <!-- Real Performance Metrics -->
-                    <div class="lg:col-span-1 flex flex-col gap-5">
-                        <h3 class="font-display text-xl font-bold text-on-surface">Settlement Yield</h3>
-                        
-                        <div class="cosmic-card p-6 rounded-3xl border border-outline-variant/30 flex flex-col gap-6 bg-surface-container/20">
-                            <div class="flex flex-col gap-1.5">
-                                <span class="text-[10px] font-bold text-outline uppercase tracking-widest">Net Realized PnL</span>
-                                <span id="port-pnl" class="text-3xl font-bold font-display tracking-tight text-on-surface">0.00 SOM</span>
-                            </div>
-                            
-                            <div class="w-full h-[1px] bg-outline-variant/20"></div>
-                            
-                            <div class="flex flex-col gap-4">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-[10px] font-bold text-outline uppercase tracking-wider">Win Rate Validation</span>
-                                    <span id="reputation-winrate" class="text-xs font-bold text-primary font-mono">0%</span>
-                                </div>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-[10px] font-bold text-outline uppercase tracking-wider">Trading Frequency</span>
-                                    <span id="reputation-freq" class="text-xs font-bold text-on-surface font-mono">0 trades</span>
-                                </div>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-[10px] font-bold text-outline uppercase tracking-wider">Capital Velocity</span>
-                                    <span id="metric-staking-flow" class="text-xs font-bold text-on-surface font-mono">0.00 SOM</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- PAGE 5: Activity Ledger (Transaction Ledger) -->
-            <div id="tab-activity" class="page-tab flex-col gap-8 w-full">
-                <div class="scanning-container px-4 py-2 border-l-4 border-primary/40">
-                    <div class="scanning-line"></div>
-                    <div class="flex items-center justify-between">
-                        <h2 class="font-display text-3xl text-primary font-bold">Activity Explorer</h2>
-                        <div class="flex gap-2">
-                            <button id="clear-activity-btn" class="text-xs px-3 py-1 border border-outline-variant/40 hover:border-primary/50 text-outline hover:text-primary rounded-lg transition-all font-semibold uppercase">Clear Logs</button>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Protocol Status & Chain Transparency Panel Grid -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 -mt-2">
-                    
-                    <!-- Panel 1: Chain Transparency Panel -->
-                    <div class="cosmic-card p-6 rounded-2xl border border-outline-variant/40 flex flex-col gap-4">
-                        <div class="flex items-center justify-between border-b border-outline-variant/20 pb-2">
-                            <span class="text-xs font-bold text-primary uppercase tracking-wider flex items-center gap-1.5">
-                                <span class="material-symbols-outlined text-sm animate-spin">sync</span>
-                                Somnia L1 Chain Transparency Panel
-                            </span>
-                            <span class="text-[9px] px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/25 rounded text-emerald-500 font-mono font-bold" id="rpc-transparency-status">HEALTHY | 12ms</span>
-                        </div>
-                        
-                        <div class="grid grid-cols-2 gap-4 text-[11px] font-mono text-outline leading-normal">
-                            <div class="flex flex-col bg-surface-container/30 p-3 rounded-xl border border-outline-variant/10">
-                                <span class="text-[8px] uppercase tracking-wider text-outline font-bold">Active Somnia Block</span>
-                                <span class="font-bold text-on-surface text-sm mt-1 flex items-center gap-1.5" id="transparency-block-num">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                    14,892,903
-                                </span>
-                            </div>
-                            
-                            <div class="flex flex-col bg-surface-container/30 p-3 rounded-xl border border-outline-variant/10">
-                                <span class="text-[8px] uppercase tracking-wider text-outline font-bold">Current Gas Metrics</span>
-                                <span class="font-bold text-on-surface text-[10px] mt-1" id="transparency-gas-metrics">
-                                    0.15 Gwei | Limit: 30M
-                                </span>
-                            </div>
-                            
-                            <div class="flex flex-col bg-surface-container/30 p-3 rounded-xl border border-outline-variant/10 col-span-2">
-                                <span class="text-[8px] uppercase tracking-wider text-outline font-bold mb-1">Authoritative Settlement Confirmations</span>
-                                <div class="flex flex-col gap-1.5 text-[10px] max-h-24 overflow-y-auto" id="transparency-settlements-list">
-                                    <!-- Populated dynamically with live on-chain confirmations -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                                      <!-- Panel 2: Protocol Health Dashboard -->
-                    <div class="cosmic-card p-6 rounded-2xl border border-outline-variant/40 flex flex-col gap-4">
-                        <div class="flex items-center justify-between border-b border-outline-variant/20 pb-2">
-                            <span class="text-xs font-bold text-secondary uppercase tracking-wider flex items-center gap-1.5">
-                                <span class="material-symbols-outlined text-sm">health_and_safety</span>
-                                Protocol Health Dashboard
-                            </span>
-                            <span class="text-[9px] px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/25 rounded text-emerald-500 font-mono font-bold" id="protocol-uptime-badge">UPTIME 99.98%</span>
-                        </div>
-                        
-                        <div class="grid grid-cols-2 gap-3 text-[11px] font-mono leading-normal">
-                            <div class="flex flex-col bg-surface-container/30 p-2.5 rounded-xl border border-outline-variant/10">
-                                <span class="text-[7.5px] uppercase tracking-wider text-outline font-bold">Markets Created</span>
-                                <span class="font-bold text-on-surface text-xs mt-0.5" id="health-markets-created">824</span>
-                            </div>
-                            
-                            <div class="flex flex-col bg-surface-container/30 p-2.5 rounded-xl border border-outline-variant/10">
-                                <span class="text-[7.5px] uppercase tracking-wider text-outline font-bold">Markets Settled</span>
-                                <span class="font-bold text-on-surface text-xs mt-0.5" id="health-markets-settled">791</span>
-                            </div>
-                            
-                            <div class="flex flex-col bg-surface-container/30 p-2.5 rounded-xl border border-outline-variant/10">
-                                <span class="text-[7.5px] uppercase tracking-wider text-outline font-bold">Settlement Accuracy</span>
-                                <span class="font-bold text-primary text-xs mt-0.5" id="health-settlement-accuracy">78%</span>
-                            </div>
-                            
-                            <div class="flex flex-col bg-surface-container/30 p-2.5 rounded-xl border border-outline-variant/10">
-                                <span class="text-[7.5px] uppercase tracking-wider text-outline font-bold">Active Liquidity</span>
-                                <span class="font-bold text-on-surface text-xs mt-0.5" id="health-active-liquidity">1.4M STT</span>
-                            </div>
-                            
-                            <div class="flex flex-col bg-surface-container/30 p-2.5 rounded-xl border border-outline-variant/10">
-                                <span class="text-[7.5px] uppercase tracking-wider text-outline font-bold">Total Volume</span>
-                                <span class="font-bold text-on-surface text-xs mt-0.5" id="health-total-volume">9.7M STT</span>
-                            </div>
-                            
-                            <div class="flex flex-col bg-surface-container/30 p-2.5 rounded-xl border border-outline-variant/10">
-                                <span class="text-[7.5px] uppercase tracking-wider text-outline font-bold">Avg Agent Confidence</span>
-                                <span class="font-bold text-tertiary text-xs mt-0.5" id="health-avg-confidence">74%</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Ledger Table Card -->
-                <div class="cosmic-card rounded-2xl overflow-hidden border border-outline-variant/40">
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full text-left border-collapse">
-                            <thead>
-                                <tr class="bg-surface-container/60 border-b border-outline-variant/30 text-[10px] font-bold text-outline uppercase tracking-widest">
-                                    <th class="py-4 px-6">Tx Hash</th>
-                                    <th class="py-4 px-6">Action / Event</th>
-                                    <th class="py-4 px-6">Sender</th>
-                                    <th class="py-4 px-6">Details</th>
-                                    <th class="py-4 px-6">Trust Audit</th>
-                                    <th class="py-4 px-6">Timestamp</th>
-                                </tr>
-                            </thead>
-                            <tbody id="activity-table-body" class="text-xs text-on-surface/90">
-                                <!-- Populated Dynamically -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+ <!-- Active Positions & Performance Split -->
+ <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-4">
+ <!-- Positions List -->
+ <div class="lg:col-span-2 flex flex-col gap-5">
+ <div class="flex items-center justify-between">
+ <h3 class="font-display text-xl font-bold text-on-surface">Active Positions</h3>
+ <span class="text-[10px] bg-surface-container/50 px-3 py-1 rounded-full text-outline font-mono uppercase border border-outline-variant/20">Live Data</span>
+ </div>
+ 
+ <div class="flex flex-col gap-3 min-h-[300px] bg-surface-container/10 p-2 rounded-3xl border border-outline-variant/20 relative" id="portfolio-positions-list">
+ <!-- Injected dynamically by renderPortfolio() -->
+ </div>
+ </div>
+ 
+ <!-- Real Performance Metrics -->
+ <div class="lg:col-span-1 flex flex-col gap-5">
+ <h3 class="font-display text-xl font-bold text-on-surface">Settlement Yield</h3>
+ 
+ <div class="cosmic-card p-6 rounded-3xl border border-outline-variant/30 flex flex-col gap-6 bg-surface-container/20">
+ <div class="flex flex-col gap-1.5">
+ <span class="text-[10px] font-bold text-outline uppercase tracking-widest">Net Realized PnL</span>
+ <span id="port-pnl" class="text-3xl font-bold font-display tracking-tight text-on-surface">0.00 SOM</span>
+ </div>
+ 
+ <div class="w-full h-[1px] bg-outline-variant/20"></div>
+ 
+ <div class="flex flex-col gap-4">
+ <div class="flex items-center justify-between">
+ <span class="text-[10px] font-bold text-outline uppercase tracking-wider">Win Rate Validation</span>
+ <span id="reputation-winrate" class="text-xs font-bold text-primary font-mono">0%</span>
+ </div>
+ <div class="flex items-center justify-between">
+ <span class="text-[10px] font-bold text-outline uppercase tracking-wider">Trading Frequency</span>
+ <span id="reputation-freq" class="text-xs font-bold text-on-surface font-mono">0 trades</span>
+ </div>
+ <div class="flex items-center justify-between">
+ <span class="text-[10px] font-bold text-outline uppercase tracking-wider">Capital Velocity</span>
+ <span id="metric-staking-flow" class="text-xs font-bold text-on-surface font-mono">0.00 SOM</span>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+ 
+ <!-- PAGE 5: Activity Ledger (Transaction Ledger) -->
+ <div id="tab-activity" class="page-tab flex-col gap-8 w-full">
+ <div class="scanning-container px-4 py-2 border-l-4 border-primary/40">
+ <div class="scanning-line"></div>
+ <div class="flex items-center justify-between">
+ <h2 class="font-display text-3xl text-primary font-bold">Activity Explorer</h2>
+ <div class="flex gap-2">
+ <button id="clear-activity-btn" class="text-xs px-3 py-1 border border-outline-variant/40 hover:border-primary/50 text-outline hover:text-primary rounded-lg transition-all font-semibold uppercase">Clear Logs</button>
+ </div>
+ </div>
+ </div>
+ 
+ <!-- Protocol Status & Chain Transparency Panel Grid -->
+ <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 -mt-2">
+ 
+ <!-- Panel 1: Chain Transparency Panel -->
+ <div class="cosmic-card p-6 rounded-2xl border border-outline-variant/40 flex flex-col gap-4">
+ <div class="flex items-center justify-between border-b border-outline-variant/20 pb-2">
+ <span class="text-xs font-bold text-primary uppercase tracking-wider flex items-center gap-1.5">
+ <span class="material-symbols-outlined text-sm animate-spin">sync</span>
+ Somnia L1 Chain Transparency Panel
+ </span>
+ <span class="text-[9px] px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/25 rounded text-emerald-500 font-mono font-bold" id="rpc-transparency-status">HEALTHY | 12ms</span>
+ </div>
+ 
+ <div class="grid grid-cols-2 gap-4 text-[11px] font-mono text-outline leading-normal">
+ <div class="flex flex-col bg-surface-container/30 p-3 rounded-xl border border-outline-variant/10">
+ <span class="text-[8px] uppercase tracking-wider text-outline font-bold">Active Somnia Block</span>
+ <span class="font-bold text-on-surface text-sm mt-1 flex items-center gap-1.5" id="transparency-block-num">
+ <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+ 14,892,903
+ </span>
+ </div>
+ 
+ <div class="flex flex-col bg-surface-container/30 p-3 rounded-xl border border-outline-variant/10">
+ <span class="text-[8px] uppercase tracking-wider text-outline font-bold">Current Gas Metrics</span>
+ <span class="font-bold text-on-surface text-[10px] mt-1" id="transparency-gas-metrics">
+ 0.15 Gwei | Limit: 30M
+ </span>
+ </div>
+ 
+ <div class="flex flex-col bg-surface-container/30 p-3 rounded-xl border border-outline-variant/10 col-span-2">
+ <span class="text-[8px] uppercase tracking-wider text-outline font-bold mb-1">Authoritative Settlement Confirmations</span>
+ <div class="flex flex-col gap-1.5 text-[10px] max-h-24 overflow-y-auto" id="transparency-settlements-list">
+ <!-- Populated dynamically with live on-chain confirmations -->
+ </div>
+ </div>
+ </div>
+ </div>
+ <!-- Panel 2: Protocol Health Dashboard -->
+ <div class="cosmic-card p-6 rounded-2xl border border-outline-variant/40 flex flex-col gap-4">
+ <div class="flex items-center justify-between border-b border-outline-variant/20 pb-2">
+ <span class="text-xs font-bold text-secondary uppercase tracking-wider flex items-center gap-1.5">
+ <span class="material-symbols-outlined text-sm">health_and_safety</span>
+ Protocol Health Dashboard
+ </span>
+ <span class="text-[9px] px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/25 rounded text-emerald-500 font-mono font-bold" id="protocol-uptime-badge">UPTIME 99.98%</span>
+ </div>
+ 
+ <div class="grid grid-cols-2 gap-3 text-[11px] font-mono leading-normal">
+ <div class="flex flex-col bg-surface-container/30 p-2.5 rounded-xl border border-outline-variant/10">
+ <span class="text-[7.5px] uppercase tracking-wider text-outline font-bold">Markets Created</span>
+ <span class="font-bold text-on-surface text-xs mt-0.5" id="health-markets-created">824</span>
+ </div>
+ 
+ <div class="flex flex-col bg-surface-container/30 p-2.5 rounded-xl border border-outline-variant/10">
+ <span class="text-[7.5px] uppercase tracking-wider text-outline font-bold">Markets Settled</span>
+ <span class="font-bold text-on-surface text-xs mt-0.5" id="health-markets-settled">791</span>
+ </div>
+ 
+ <div class="flex flex-col bg-surface-container/30 p-2.5 rounded-xl border border-outline-variant/10">
+ <span class="text-[7.5px] uppercase tracking-wider text-outline font-bold">Settlement Accuracy</span>
+ <span class="font-bold text-primary text-xs mt-0.5" id="health-settlement-accuracy">78%</span>
+ </div>
+ 
+ <div class="flex flex-col bg-surface-container/30 p-2.5 rounded-xl border border-outline-variant/10">
+ <span class="text-[7.5px] uppercase tracking-wider text-outline font-bold">Active Liquidity</span>
+ <span class="font-bold text-on-surface text-xs mt-0.5" id="health-active-liquidity">1.4M STT</span>
+ </div>
+ 
+ <div class="flex flex-col bg-surface-container/30 p-2.5 rounded-xl border border-outline-variant/10">
+ <span class="text-[7.5px] uppercase tracking-wider text-outline font-bold">Total Volume</span>
+ <span class="font-bold text-on-surface text-xs mt-0.5" id="health-total-volume">9.7M STT</span>
+ </div>
+ 
+ <div class="flex flex-col bg-surface-container/30 p-2.5 rounded-xl border border-outline-variant/10">
+ <span class="text-[7.5px] uppercase tracking-wider text-outline font-bold">Avg Agent Confidence</span>
+ <span class="font-bold text-tertiary text-xs mt-0.5" id="health-avg-confidence">74%</span>
+ </div>
+ </div>
+ </div>
+ </div>
+ 
+ <!-- Ledger Table Card -->
+ <div class="cosmic-card rounded-2xl overflow-hidden border border-outline-variant/40">
+ <div class="overflow-x-auto">
+ <table class="min-w-full text-left border-collapse">
+ <thead>
+ <tr class="bg-surface-container/60 border-b border-outline-variant/30 text-[10px] font-bold text-outline uppercase tracking-widest">
+ <th class="py-4 px-6">Tx Hash</th>
+ <th class="py-4 px-6">Action / Event</th>
+ <th class="py-4 px-6">Sender</th>
+ <th class="py-4 px-6">Details</th>
+ <th class="py-4 px-6">Trust Audit</th>
+ <th class="py-4 px-6">Timestamp</th>
+ </tr>
+ </thead>
+ <tbody id="activity-table-body" class="text-xs text-on-surface/90">
+ <!-- Populated Dynamically -->
+ </tbody>
+ </table>
+ </div>
+ </div>
+ </div>
 
-            <!-- PAGE 6: Capital Bridge Portal -->
-            <div id="tab-bridge" class="page-tab flex-col gap-8 w-full">
-                <div class="scanning-container px-4 py-2 border-l-4 border-primary/40 mb-2">
-                    <div class="scanning-line"></div>
-                    <div class="flex items-center justify-between">
-                        <h2 class="font-display text-3xl text-primary font-bold">Institutional Capital Bridge</h2>
-                        <span class="text-xs px-3 py-1 bg-primary/10 text-primary border border-primary/20 rounded-full font-bold uppercase tracking-wider">Cross-Chain Relayer Layer</span>
-                    </div>
-                </div>
+ <!-- PAGE 6: Capital Bridge Portal -->
+ <div id="tab-bridge" class="page-tab flex-col gap-8 w-full">
+ <div class="scanning-container px-4 py-2 border-l-4 border-primary/40 mb-2">
+ <div class="scanning-line"></div>
+ <div class="flex items-center justify-between">
+ <h2 class="font-display text-3xl text-primary font-bold">Institutional Capital Bridge</h2>
+ <span class="text-xs px-3 py-1 bg-primary/10 text-primary border border-primary/20 rounded-full font-bold uppercase tracking-wider">Cross-Chain Relayer Layer</span>
+ </div>
+ </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start w-full">
-                    <!-- Column 1: Bridge Controller Form -->
-                    <div class="cosmic-card p-6 rounded-2xl border border-outline-variant/30 flex flex-col gap-6 backdrop-blur-md">
-                        <div class="flex flex-col gap-1 border-b border-outline-variant/20 pb-3">
-                            <h3 class="font-display text-lg text-on-surface font-bold">Cross-Chain Asset Relayer</h3>
-                            <p class="text-xs text-outline font-semibold">Deposit stablecoin collateral or native protocol assets directly from EVM networks to Somnia L1.</p>
-                        </div>
+ <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start w-full">
+ <!-- Column 1: Bridge Controller Form -->
+ <div class="cosmic-card p-6 rounded-2xl border border-outline-variant/30 flex flex-col gap-6 backdrop-blur-md">
+ <div class="flex flex-col gap-1 border-b border-outline-variant/20 pb-3">
+ <h3 class="font-display text-lg text-on-surface font-bold">Cross-Chain Asset Relayer</h3>
+ <p class="text-xs text-outline font-semibold">Deposit stablecoin collateral or native protocol assets directly from EVM networks to Somnia L1.</p>
+ </div>
 
-                        <div class="flex flex-col gap-4">
-                            <!-- Source Network Selector -->
-                            <div class="flex flex-col gap-1.5">
-                                <label class="text-[10px] font-bold text-outline uppercase tracking-wider">Source L1/L2 Network</label>
-                                <select id="bridge-source-chain" class="glass-input p-3 rounded-xl border border-outline-variant/40 text-xs bg-surface-container font-semibold w-full focus:outline-none focus:border-primary">
-                                    <option value="arbitrum">Arbitrum One (L2)</option>
-                                    <option value="optimism">Optimism Mainnet (L2)</option>
-                                    <option value="ethereum">Ethereum Mainnet (L1)</option>
-                                    <option value="base">Base L2 (EVM)</option>
-                                </select>
-                            </div>
+ <div class="flex flex-col gap-4">
+ <!-- Source Network Selector -->
+ <div class="flex flex-col gap-1.5">
+ <label class="text-[10px] font-bold text-outline uppercase tracking-wider">Source L1/L2 Network</label>
+ <select id="bridge-source-chain" class="glass-input p-3 rounded-xl border border-outline-variant/40 text-xs bg-surface-container font-semibold w-full focus:outline-none focus:border-primary">
+ <option value="arbitrum">Arbitrum One (L2)</option>
+ <option value="optimism">Optimism Mainnet (L2)</option>
+ <option value="ethereum">Ethereum Mainnet (L1)</option>
+ <option value="base">Base L2 (EVM)</option>
+ </select>
+ </div>
 
-                            <!-- Destination Network (Locked) -->
-                            <div class="flex flex-col gap-1.5">
-                                <label class="text-[10px] font-bold text-outline uppercase tracking-wider">Destination Network (Autonomous Target)</label>
-                                <div class="p-3 bg-primary/5 border border-primary/20 rounded-xl text-xs font-semibold text-primary flex items-center justify-between">
-                                    <span>Somnia L1 Network</span>
-                                    <span class="text-[8px] px-1.5 py-0.5 bg-primary/20 rounded uppercase font-black">L1 Core</span>
-                                </div>
-                            </div>
+ <!-- Destination Network (Locked) -->
+ <div class="flex flex-col gap-1.5">
+ <label class="text-[10px] font-bold text-outline uppercase tracking-wider">Destination Network (Autonomous Target)</label>
+ <div class="p-3 bg-primary/5 border border-primary/20 rounded-xl text-xs font-semibold text-primary flex items-center justify-between">
+ <span>Somnia L1 Network</span>
+ <span class="text-[8px] px-1.5 py-0.5 bg-primary/20 rounded uppercase font-black">L1 Core</span>
+ </div>
+ </div>
 
-                            <!-- Asset Selector & Amount -->
-                            <div class="grid grid-cols-2 gap-4">
-                                <div class="flex flex-col gap-1.5">
-                                    <label class="text-[10px] font-bold text-outline uppercase tracking-wider">Collateral Asset</label>
-                                    <select id="bridge-asset" class="glass-input p-3 rounded-xl border border-outline-variant/40 text-xs bg-surface-container font-semibold focus:outline-none focus:border-primary">
-                                        <option value="USDC">USDC (Stablecoin)</option>
-                                        <option value="STT">STT (Astra Token)</option>
-                                        <option value="ETH">ETH (Wrapped)</option>
-                                    </select>
-                                </div>
-                                <div class="flex flex-col gap-1.5">
-                                    <label class="text-[10px] font-bold text-outline uppercase tracking-wider">Transfer Amount</label>
-                                    <input type="number" id="bridge-amount" value="500" min="1" class="glass-input p-3 rounded-xl border border-outline-variant/40 text-xs focus:outline-none focus:border-primary" placeholder="0.00">
-                                </div>
-                            </div>
+ <!-- Asset Selector & Amount -->
+ <div class="grid grid-cols-2 gap-4">
+ <div class="flex flex-col gap-1.5">
+ <label class="text-[10px] font-bold text-outline uppercase tracking-wider">Collateral Asset</label>
+ <select id="bridge-asset" class="glass-input p-3 rounded-xl border border-outline-variant/40 text-xs bg-surface-container font-semibold focus:outline-none focus:border-primary">
+ <option value="USDC">USDC (Stablecoin)</option>
+ <option value="STT">STT (Astra Token)</option>
+ <option value="ETH">ETH (Wrapped)</option>
+ </select>
+ </div>
+ <div class="flex flex-col gap-1.5">
+ <label class="text-[10px] font-bold text-outline uppercase tracking-wider">Transfer Amount</label>
+ <input type="number" id="bridge-amount" value="500" min="1" class="glass-input p-3 rounded-xl border border-outline-variant/40 text-xs focus:outline-none focus:border-primary" placeholder="0.00">
+ </div>
+ </div>
 
-                            <!-- Action button -->
-                            <button id="bridge-execute-btn" class="w-full mt-2 py-3.5 bg-primary hover:bg-on-primary-fixed-variant text-surface-solid font-label text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer">
-                                <span class="material-symbols-outlined text-sm">swap_calls</span>
-                                Authorize Bridge Transfer
-                            </button>
-                        </div>
+ <!-- Action button -->
+ <button id="bridge-execute-btn" class="w-full mt-2 py-3.5 bg-primary hover:bg-on-primary-fixed-variant text-surface-solid font-label text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer">
+ <span class="material-symbols-outlined text-sm">swap_calls</span>
+ Authorize Bridge Transfer
+ </button>
+ </div>
 
-                        <!-- Real-time Bridge Progress Stepper (Hidden by default) -->
-                        <div id="bridge-stepper-container" class="mt-4 p-5 bg-surface-container/50 border border-outline-variant/20 rounded-xl flex flex-col gap-4 hidden">
-                            <span class="text-[9px] font-bold text-outline uppercase tracking-wider block mb-1">Bridge Relaying Stepper</span>
-                            
-                            <div class="flex flex-col gap-3 font-mono text-[10px]">
-                                <div class="flex items-center gap-3" id="step-allowance">
-                                    <span class="w-4 h-4 rounded-full bg-surface-container-high border border-outline-variant flex items-center justify-center font-bold text-[9px] shrink-0 text-outline">1</span>
-                                    <span class="text-outline text-allowance-txt">Authorize allowance on source chain</span>
-                                </div>
-                                <div class="flex items-center gap-3" id="step-signature">
-                                    <span class="w-4 h-4 rounded-full bg-surface-container-high border border-outline-variant flex items-center justify-center font-bold text-[9px] shrink-0 text-outline">2</span>
-                                    <span class="text-outline text-signature-txt">Sign L1 transaction payload</span>
-                                </div>
-                                <div class="flex items-center gap-3" id="step-confirming">
-                                    <span class="w-4 h-4 rounded-full bg-surface-container-high border border-outline-variant flex items-center justify-center font-bold text-[9px] shrink-0 text-outline">3</span>
-                                    <span class="text-outline text-confirming-txt">Mining block confirmations on Source Chain</span>
-                                </div>
-                                <div class="flex items-center gap-3" id="step-minting">
-                                    <span class="w-4 h-4 rounded-full bg-surface-container-high border border-outline-variant flex items-center justify-center font-bold text-[9px] shrink-0 text-outline">4</span>
-                                    <span class="text-outline text-minting-txt">Minting parimutuel collateral on Somnia</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+ <!-- Real-time Bridge Progress Stepper (Hidden by default) -->
+ <div id="bridge-stepper-container" class="mt-4 p-5 bg-surface-container/50 border border-outline-variant/20 rounded-xl flex flex-col gap-4 hidden">
+ <span class="text-[9px] font-bold text-outline uppercase tracking-wider block mb-1">Bridge Relaying Stepper</span>
+ 
+ <div class="flex flex-col gap-3 font-mono text-[10px]">
+ <div class="flex items-center gap-3" id="step-allowance">
+ <span class="w-4 h-4 rounded-full bg-surface-container-high border border-outline-variant flex items-center justify-center font-bold text-[9px] shrink-0 text-outline">1</span>
+ <span class="text-outline text-allowance-txt">Authorize allowance on source chain</span>
+ </div>
+ <div class="flex items-center gap-3" id="step-signature">
+ <span class="w-4 h-4 rounded-full bg-surface-container-high border border-outline-variant flex items-center justify-center font-bold text-[9px] shrink-0 text-outline">2</span>
+ <span class="text-outline text-signature-txt">Sign L1 transaction payload</span>
+ </div>
+ <div class="flex items-center gap-3" id="step-confirming">
+ <span class="w-4 h-4 rounded-full bg-surface-container-high border border-outline-variant flex items-center justify-center font-bold text-[9px] shrink-0 text-outline">3</span>
+ <span class="text-outline text-confirming-txt">Mining block confirmations on Source Chain</span>
+ </div>
+ <div class="flex items-center gap-3" id="step-minting">
+ <span class="w-4 h-4 rounded-full bg-surface-container-high border border-outline-variant flex items-center justify-center font-bold text-[9px] shrink-0 text-outline">4</span>
+ <span class="text-outline text-minting-txt">Minting parimutuel collateral on Somnia</span>
+ </div>
+ </div>
+ </div>
+ </div>
 
-                    <!-- Column 2: Status & Explorer Logs -->
-                    <div class="flex flex-col gap-6 w-full">
-                        <!-- Relayer stats card -->
-                        <div class="cosmic-card p-6 rounded-2xl border border-outline-variant/30 flex flex-col gap-4 backdrop-blur-md">
-                            <div class="flex items-center justify-between border-b border-outline-variant/20 pb-2">
-                                <span class="text-xs font-bold text-primary uppercase tracking-wider flex items-center gap-1.5">
-                                    <span class="material-symbols-outlined text-sm">settings_ethernet</span>
-                                    Bridge Status Monitor
-                                </span>
-                                <span class="text-[9px] px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/25 rounded text-emerald-500 font-mono font-bold">RELAYER HEALTH: ONLINE</span>
-                            </div>
+ <!-- Column 2: Status & Explorer Logs -->
+ <div class="flex flex-col gap-6 w-full">
+ <!-- Relayer stats card -->
+ <div class="cosmic-card p-6 rounded-2xl border border-outline-variant/30 flex flex-col gap-4 backdrop-blur-md">
+ <div class="flex items-center justify-between border-b border-outline-variant/20 pb-2">
+ <span class="text-xs font-bold text-primary uppercase tracking-wider flex items-center gap-1.5">
+ <span class="material-symbols-outlined text-sm">settings_ethernet</span>
+ Bridge Status Monitor
+ </span>
+ <span class="text-[9px] px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/25 rounded text-emerald-500 font-mono font-bold">RELAYER HEALTH: ONLINE</span>
+ </div>
 
-                            <div class="grid grid-cols-2 gap-4 font-mono text-[11px] text-outline">
-                                <div class="flex flex-col bg-surface-container/30 p-3 rounded-xl border border-outline-variant/10">
-                                    <span class="text-[8px] uppercase tracking-wider font-bold">Relayed Transactions</span>
-                                    <span class="font-bold text-on-surface text-sm mt-1">14,204</span>
-                                </div>
-                                <div class="flex flex-col bg-surface-container/30 p-3 rounded-xl border border-outline-variant/10">
-                                    <span class="text-[8px] uppercase tracking-wider font-bold">Total Bridged Volume</span>
-                                    <span class="font-bold text-primary text-sm mt-1">4.2M STT</span>
-                                </div>
-                                <div class="flex flex-col bg-surface-container/30 p-3 rounded-xl border border-outline-variant/10">
-                                    <span class="text-[8px] uppercase tracking-wider font-bold">Active Relayers</span>
-                                    <span class="font-bold text-secondary text-sm mt-1">3/3 Online</span>
-                                </div>
-                                <div class="flex flex-col bg-surface-container/30 p-3 rounded-xl border border-outline-variant/10">
-                                    <span class="text-[8px] uppercase tracking-wider font-bold">Avg Confirmation Latency</span>
-                                    <span class="font-bold text-tertiary text-sm mt-1">1.8s</span>
-                                </div>
-                            </div>
-                        </div>
+ <div class="grid grid-cols-2 gap-4 font-mono text-[11px] text-outline">
+ <div class="flex flex-col bg-surface-container/30 p-3 rounded-xl border border-outline-variant/10">
+ <span class="text-[8px] uppercase tracking-wider font-bold">Relayed Transactions</span>
+ <span class="font-bold text-on-surface text-sm mt-1">14,204</span>
+ </div>
+ <div class="flex flex-col bg-surface-container/30 p-3 rounded-xl border border-outline-variant/10">
+ <span class="text-[8px] uppercase tracking-wider font-bold">Total Bridged Volume</span>
+ <span class="font-bold text-primary text-sm mt-1">4.2M STT</span>
+ </div>
+ <div class="flex flex-col bg-surface-container/30 p-3 rounded-xl border border-outline-variant/10">
+ <span class="text-[8px] uppercase tracking-wider font-bold">Active Relayers</span>
+ <span class="font-bold text-secondary text-sm mt-1">3/3 Online</span>
+ </div>
+ <div class="flex flex-col bg-surface-container/30 p-3 rounded-xl border border-outline-variant/10">
+ <span class="text-[8px] uppercase tracking-wider font-bold">Avg Confirmation Latency</span>
+ <span class="font-bold text-tertiary text-sm mt-1">1.8s</span>
+ </div>
+ </div>
+ </div>
 
-                        <!-- Bridge Transaction Log -->
-                        <div class="cosmic-card p-6 rounded-2xl border border-outline-variant/30 flex flex-col gap-4 backdrop-blur-md flex-1">
-                            <span class="text-xs font-bold text-on-surface uppercase tracking-wider flex items-center gap-1.5">
-                                <span class="material-symbols-outlined text-sm text-primary">receipt_long</span>
-                                Institutional Bridge Transaction Log
-                            </span>
+ <!-- Bridge Transaction Log -->
+ <div class="cosmic-card p-6 rounded-2xl border border-outline-variant/30 flex flex-col gap-4 backdrop-blur-md flex-1">
+ <span class="text-xs font-bold text-on-surface uppercase tracking-wider flex items-center gap-1.5">
+ <span class="material-symbols-outlined text-sm text-primary">receipt_long</span>
+ Institutional Bridge Transaction Log
+ </span>
 
-                            <div class="flex flex-col gap-3 mt-1 overflow-y-auto max-h-[220px]" id="bridge-logs-container">
-                                <!-- Pre-populated with historical mock bridging -->
-                                <div class="flex items-center justify-between p-3 rounded-xl bg-surface-container/40 border border-outline-variant/10 text-[10px] font-mono text-outline">
-                                    <div class="flex flex-col">
-                                        <span class="font-bold text-on-surface">Deposit +5,000 USDC</span>
-                                        <span class="text-[9px]">From: Arbitrum One | Hash: 0x8a92...d83a</span>
-                                    </div>
-                                    <span class="text-emerald-500 font-bold">SUCCESS</span>
-                                </div>
-                                <div class="flex items-center justify-between p-3 rounded-xl bg-surface-container/40 border border-outline-variant/10 text-[10px] font-mono text-outline">
-                                    <div class="flex flex-col">
-                                        <span class="font-bold text-on-surface">Deposit +1,200 STT</span>
-                                        <span class="text-[9px]">From: Base L2 | Hash: 0xf92c...e901</span>
-                                    </div>
-                                    <span class="text-emerald-500 font-bold">SUCCESS</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+ <div class="flex flex-col gap-3 mt-1 overflow-y-auto max-h-[220px]" id="bridge-logs-container">
+ <!-- Pre-populated with historical mock bridging -->
+ <div class="flex items-center justify-between p-3 rounded-xl bg-surface-container/40 border border-outline-variant/10 text-[10px] font-mono text-outline">
+ <div class="flex flex-col">
+ <span class="font-bold text-on-surface">Deposit +5,000 USDC</span>
+ <span class="text-[9px]">From: Arbitrum One | Hash: 0x8a92...d83a</span>
+ </div>
+ <span class="text-emerald-500 font-bold">SUCCESS</span>
+ </div>
+ <div class="flex items-center justify-between p-3 rounded-xl bg-surface-container/40 border border-outline-variant/10 text-[10px] font-mono text-outline">
+ <div class="flex flex-col">
+ <span class="font-bold text-on-surface">Deposit +1,200 STT</span>
+ <span class="text-[9px]">From: Base L2 | Hash: 0xf92c...e901</span>
+ </div>
+ <span class="text-emerald-500 font-bold">SUCCESS</span>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
 
-            
-        </section>
+ 
+ </section>
 
-        <!-- Right Column: Swarm Decisional Stream -->
-        <aside id="cognitive-aside" class="w-full xl:w-96 border-t xl:border-t-0 xl:border-l border-outline-variant/30 bg-surface-container-low/40 dark:bg-black/30 backdrop-blur-md p-8 flex flex-col shrink-0">
-            
-            <!-- Header Decisional Registry -->
-            <div class="flex items-center justify-between mb-6">
-                <div class="flex flex-col">
-                    <h2 class="font-display text-xl text-primary font-bold">Market Decisional Stream</h2>
-                    <p class="font-label text-[10px] text-outline uppercase tracking-wider">Real-Time Swarm Telemetry</p>
-                </div>
-                <div class="flex items-center gap-3">
-                    <!-- Tab Toggle -->
-                    <div class="flex gap-1.5 bg-surface-container p-0.5 rounded-lg border border-outline-variant/20 text-[9px] font-bold uppercase tracking-wider">
-                        <button id="cog-tab-logs" class="px-2.5 py-1 rounded bg-surface-solid shadow text-primary font-extrabold cursor-pointer transition-all">Logs</button>
-                    </div>
-                    <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                </div>
-            </div>
+ <!-- Right Column: Swarm Decisional Stream -->
+ <aside id="cognitive-aside" class="w-full xl:w-96 border-t xl:border-t-0 xl:border-l border-outline-variant/30 bg-surface-container-low/40 dark:bg-black/30 backdrop-blur-md p-8 flex flex-col shrink-0">
+ 
+ <!-- Header Decisional Registry -->
+ <div class="flex items-center justify-between mb-6">
+ <div class="flex flex-col">
+ <h2 class="font-display text-xl text-primary font-bold">Market Decisional Stream</h2>
+ <p class="font-label text-[10px] text-outline uppercase tracking-wider">Real-Time Swarm Telemetry</p>
+ </div>
+ <div class="flex items-center gap-3">
+ <!-- Tab Toggle -->
+ <div class="flex gap-1.5 bg-surface-container p-0.5 rounded-lg border border-outline-variant/20 text-[9px] font-bold uppercase tracking-wider">
+ <button id="cog-tab-logs" class="px-2.5 py-1 rounded bg-surface-solid shadow text-primary font-extrabold cursor-pointer transition-all">Logs</button>
+ </div>
+ <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+ </div>
+ </div>
 
-            <!-- LOGS PANEL VIEW -->
-            <div id="consciousness-logs-panel" class="flex-1 flex flex-col gap-6 overflow-hidden">
-                <div class="flex-1 flex flex-col gap-6 overflow-y-auto pr-1" id="log-container">
-                    <!-- Populated Dynamically with scrolling log items -->
-                </div>
-                
-                <!-- Decision Panel (Ecosystem Event) -->
-                <div class="mt-4 p-5 rounded-xl bg-primary/10 border border-primary/20 shadow-sm typewriter-fade" id="rooted-decision-container">
-                    <div class="flex items-center justify-between mb-3">
-                        <div class="flex items-center gap-2">
-                            <span class="material-symbols-outlined text-lg text-primary">robot</span>
-                            <span class="font-label text-xs text-primary uppercase font-bold tracking-wider">Market Proposal</span>
-                        </div>
-                        <span class="text-[9px] font-bold uppercase tracking-widest text-primary px-1.5 py-0.5 rounded bg-primary/10 border border-primary/20" id="decision-status">AWAITING APPROVAL</span>
-                    </div>
-                    <p class="font-body text-sm text-on-surface-variant font-semibold" id="rooted-decision-text">New Market 'AI Compute War' seeded.</p>
-                    
-                    <div class="mt-4 flex flex-col gap-2">
-                        <div class="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider text-outline">
-                            <span id="vote-yes-label">Swarm Consensus: 92%</span>
-                            <span id="vote-no-label">Risk Threshold: 8%</span>
-                        </div>
-                        <div class="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden">
-                            <div id="rooted-decision-progress" class="bg-primary h-full w-[92%] transition-all duration-1000"></div>
-                        </div>
-                        <!-- Dynamic voting interactions -->
-                        <div class="flex gap-2 mt-2">
-                            <button id="vote-yes-btn" class="flex-1 py-1.5 border border-primary/30 hover:border-primary text-[10px] font-bold uppercase text-primary bg-primary/5 hover:bg-primary/10 rounded-lg transition-all">Execute Yes</button>
-                            <button id="vote-no-btn" class="flex-1 py-1.5 border border-error/30 hover:border-error text-[10px] font-bold uppercase text-error bg-error/5 hover:bg-error/10 rounded-lg transition-all">Reject</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+ <!-- LOGS PANEL VIEW -->
+ <div id="system-logs-panel" class="flex-1 flex flex-col gap-6 overflow-hidden">
+ <div class="flex-1 flex flex-col gap-6 overflow-y-auto pr-1" id="log-container">
+ <!-- Populated Dynamically with scrolling log items -->
+ </div>
+ 
+ <!-- Decision Panel (Ecosystem Event) -->
+ <div class="mt-4 p-5 rounded-xl bg-primary/10 border border-primary/20 shadow-sm typewriter-fade" id="rooted-decision-container">
+ <div class="flex items-center justify-between mb-3">
+ <div class="flex items-center gap-2">
+ <span class="material-symbols-outlined text-lg text-primary">robot</span>
+ <span class="font-label text-xs text-primary uppercase font-bold tracking-wider">Market Proposal</span>
+ </div>
+ <span class="text-[9px] font-bold uppercase tracking-widest text-primary px-1.5 py-0.5 rounded bg-primary/10 border border-primary/20" id="decision-status">AWAITING APPROVAL</span>
+ </div>
+ <p class="font-body text-sm text-on-surface-variant font-semibold" id="rooted-decision-text">New Market 'AI Compute War' seeded.</p>
+ 
+ <div class="mt-4 flex flex-col gap-2">
+ <div class="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider text-outline">
+ <span id="vote-yes-label">Swarm Consensus: 92%</span>
+ <span id="vote-no-label">Risk Threshold: 8%</span>
+ </div>
+ <div class="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden">
+ <div id="rooted-decision-progress" class="bg-primary h-full w-[92%] transition-all duration-1000"></div>
+ </div>
+ <!-- Dynamic voting interactions -->
+ <div class="flex gap-2 mt-2">
+ <button id="vote-yes-btn" class="flex-1 py-1.5 border border-primary/30 hover:border-primary text-[10px] font-bold uppercase text-primary bg-primary/5 hover:bg-primary/10 rounded-lg transition-all">Execute Yes</button>
+ <button id="vote-no-btn" class="flex-1 py-1.5 border border-error/30 hover:border-error text-[10px] font-bold uppercase text-error bg-error/5 hover:bg-error/10 rounded-lg transition-all">Reject</button>
+ </div>
+ </div>
+ </div>
+ </div>
 
-            
-        </aside>
-    </main>
+ 
+ </aside>
+ </main>
 
-    <!-- RIGHT SLIDE-OUT DRAWER: Market/Insight detail panel -->
-    <div id="insight-drawer" class="insight-drawer fixed top-0 right-0 h-full w-[450px] bg-surface-solid border-l border-outline-variant/40 shadow-2xl backdrop-blur-2xl z-50 flex flex-col p-8">
-        <!-- Close Button -->
-        <button id="insight-close" class="absolute top-6 right-6 text-outline hover:text-primary transition-colors">
-            <span class="material-symbols-outlined">close</span>
-        </button>
-        
-        <!-- Header Info -->
-        <div class="mb-6 flex flex-col gap-2 pr-8 mt-4">
-            <div class="flex items-center gap-2">
-                <span id="insight-category" class="px-2.5 py-0.5 bg-primary/10 rounded-full text-[9px] font-label font-bold text-primary uppercase border border-primary/20">Crypto</span>
-                <span id="insight-ref" class="font-body text-outline text-[10px]">Ref: #4829-X</span>
-            </div>
-            <h3 id="insight-title" class="font-display text-2xl font-bold text-on-surface tracking-tight mt-1 leading-snug">ETH ETF Momentum Spike</h3>
-        </div>
-        
-        <!-- Detailed Content Body scrollable -->
-        <div class="flex-1 flex flex-col gap-6 overflow-y-auto pr-1">
-            
-            <!-- Description -->
-            <p id="insight-desc" class="text-xs text-on-surface/80 leading-relaxed bg-surface-container/50 p-4 rounded-xl border border-outline-variant/20">
-                Heavy institutional flows detected in offshore derivatives. Cross-chain liquidity maps suggest early positioning for ETF final approval cycle.
-            </p>
-            
-            <!-- Specialist Agent Identity -->
-            <div id="insight-specialist-container" class="bg-surface-container/30 p-3.5 rounded-xl border border-outline-variant/15 flex flex-col gap-2 -mt-2">
-                <div class="flex items-center justify-between text-[10px]">
-                    <span class="font-bold text-outline uppercase tracking-wider">AI Specialization</span>
-                    <span id="insight-specialist-badge" class="font-black uppercase bg-primary/10 text-primary px-2 py-0.5 rounded border border-primary/20 text-[8px]">Macro Volatility</span>
-                </div>
-                <div class="flex justify-between items-center text-[10px]">
-                    <span class="font-bold text-outline uppercase tracking-wider">Domain Expertise</span>
-                    <span id="insight-specialist-domain" class="font-semibold text-primary/95 text-[9px] text-right font-mono truncate max-w-[240px]">ETF Inflows & Fed Rate Sentiment</span>
-                </div>
-            </div>
-            
-            <!-- Explainable Intelligence Summary -->
-            <div class="bg-surface-container/30 p-4 rounded-xl border border-outline-variant/15 flex flex-col gap-3 -mt-2">
-                <span class="text-[9px] font-bold text-primary uppercase tracking-wider block">Explainable Intelligence Summary</span>
-                <div class="flex flex-col gap-2 text-[10px] text-outline font-semibold leading-relaxed">
-                    <div class="flex flex-col gap-0.5">
-                        <span class="text-[8px] uppercase tracking-wider text-outline font-bold">Genesis Rationale</span>
-                        <p id="insight-genesis-intent" class="text-on-surface/90 font-sans">Automated ingestion anomaly...</p>
-                    </div>
-                    <div class="flex flex-col gap-0.5 mt-1">
-                        <span class="text-[8px] uppercase tracking-wider text-outline font-bold">Risk Calibrations & Hedges</span>
-                        <p id="insight-risk-adjustments" class="text-on-surface/90 font-sans">Volatility levels indexed under standard margins...</p>
-                    </div>
-                </div>
-            </div>
+ <!-- RIGHT SLIDE-OUT DRAWER: Market/Insight detail panel -->
+ <div id="insight-drawer" class="insight-drawer fixed top-0 right-0 h-full w-[450px] bg-surface-solid border-l border-outline-variant/40 shadow-2xl backdrop-blur-2xl z-50 flex flex-col p-8">
+ <!-- Close Button -->
+ <button id="insight-close" class="absolute top-6 right-6 text-outline hover:text-primary transition-colors">
+ <span class="material-symbols-outlined">close</span>
+ </button>
+ 
+ <!-- Header Info -->
+ <div class="mb-6 flex flex-col gap-2 pr-8 mt-4">
+ <div class="flex items-center gap-2">
+ <span id="insight-category" class="px-2.5 py-0.5 bg-primary/10 rounded-full text-[9px] font-label font-bold text-primary uppercase border border-primary/20">Crypto</span>
+ <span id="insight-ref" class="font-body text-outline text-[10px]">Ref: #4829-X</span>
+ </div>
+ <h3 id="insight-title" class="font-display text-2xl font-bold text-on-surface tracking-tight mt-1 leading-snug">ETH ETF Momentum Spike</h3>
+ </div>
+ 
+ <!-- Detailed Content Body scrollable -->
+ <div class="flex-1 flex flex-col gap-6 overflow-y-auto pr-1">
+ 
+ <!-- Description -->
+ <p id="insight-desc" class="text-xs text-on-surface/80 leading-relaxed bg-surface-container/50 p-4 rounded-xl border border-outline-variant/20">
+ Heavy institutional flows detected in offshore derivatives. Cross-chain liquidity maps suggest early positioning for ETF final approval cycle.
+ </p>
+ 
+ <!-- Specialist Agent Identity -->
+ <div id="insight-specialist-container" class="bg-surface-container/30 p-3.5 rounded-xl border border-outline-variant/15 flex flex-col gap-2 -mt-2">
+ <div class="flex items-center justify-between text-[10px]">
+ <span class="font-bold text-outline uppercase tracking-wider">AI Specialization</span>
+ <span id="insight-specialist-badge" class="font-black uppercase bg-primary/10 text-primary px-2 py-0.5 rounded border border-primary/20 text-[8px]">Macro Volatility</span>
+ </div>
+ <div class="flex justify-between items-center text-[10px]">
+ <span class="font-bold text-outline uppercase tracking-wider">Domain Expertise</span>
+ <span id="insight-specialist-domain" class="font-semibold text-primary/95 text-[9px] text-right font-mono truncate max-w-[240px]">ETF Inflows & Fed Rate Sentiment</span>
+ </div>
+ </div>
+ 
+ <!-- Explainable Intelligence Summary -->
+ <div class="bg-surface-container/30 p-4 rounded-xl border border-outline-variant/15 flex flex-col gap-3 -mt-2">
+ <span class="text-[9px] font-bold text-primary uppercase tracking-wider block">Explainable Intelligence Summary</span>
+ <div class="flex flex-col gap-2 text-[10px] text-outline font-semibold leading-relaxed">
+ <div class="flex flex-col gap-0.5">
+ <span class="text-[8px] uppercase tracking-wider text-outline font-bold">Genesis Rationale</span>
+ <p id="insight-genesis-intent" class="text-on-surface/90 font-sans">Automated ingestion anomaly...</p>
+ </div>
+ <div class="flex flex-col gap-0.5 mt-1">
+ <span class="text-[8px] uppercase tracking-wider text-outline font-bold">Risk Calibrations & Hedges</span>
+ <p id="insight-risk-adjustments" class="text-on-surface/90 font-sans">Volatility levels indexed under standard margins...</p>
+ </div>
+ </div>
+ </div>
 
-            <!-- Market Lifecycle Timeline -->
-            <div class="bg-surface-container/30 p-4 rounded-xl border border-outline-variant/15 flex flex-col gap-3 -mt-2">
-                <span class="text-[9px] font-bold text-outline uppercase tracking-wider block">Market Lifecycle Timeline</span>
-                <div class="flex items-center justify-between relative mt-2 px-1 select-none">
-                    <!-- Progress Line -->
-                    <div class="absolute left-4 right-4 top-[9px] h-[2px] bg-outline-variant/30 -z-10" id="timeline-progress-bar"></div>
-                    
-                    <!-- Steps -->
-                    <div class="flex flex-col items-center gap-1">
-                        <span class="w-4 h-4 rounded-full bg-primary/20 border border-primary text-[8px] font-black text-primary flex items-center justify-center font-mono">1</span>
-                        <span class="text-[6.5px] font-extrabold text-primary uppercase tracking-wider">Detected</span>
-                    </div>
-                    <div class="flex flex-col items-center gap-1">
-                        <span class="w-4 h-4 rounded-full bg-primary/20 border border-primary text-[8px] font-black text-primary flex items-center justify-center font-mono">2</span>
-                        <span class="text-[6.5px] font-extrabold text-primary uppercase tracking-wider">Deliberated</span>
-                    </div>
-                    <div class="flex flex-col items-center gap-1">
-                        <span class="w-4 h-4 rounded-full bg-primary/20 border border-primary text-[8px] font-black text-primary flex items-center justify-center font-mono">3</span>
-                        <span class="text-[6.5px] font-extrabold text-primary uppercase tracking-wider">Deployed</span>
-                    </div>
-                    <div class="flex flex-col items-center gap-1">
-                        <span class="w-4 h-4 rounded-full bg-primary/20 border border-primary text-[8px] font-black text-primary flex items-center justify-center font-mono" id="timeline-step-liquidity">4</span>
-                        <span class="text-[6.5px] font-extrabold text-primary uppercase tracking-wider" id="timeline-label-liquidity">Pooled</span>
-                    </div>
-                    <div class="flex flex-col items-center gap-1">
-                        <span class="w-4 h-4 rounded-full bg-surface-container-high border border-outline text-[8px] font-black text-outline flex items-center justify-center font-mono" id="timeline-step-settle">5</span>
-                        <span class="text-[6.5px] font-extrabold text-outline uppercase tracking-wider" id="timeline-label-settle">Resolved</span>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Stats Grid -->
-            <div class="grid grid-cols-2 gap-4">
-                <div class="bg-surface-container/40 p-3.5 rounded-xl border border-outline-variant/20 flex flex-col hidden">
-                    <span class="text-[9px] font-bold text-outline uppercase tracking-wider block mb-0.5">Market Intelligence Agent</span>
-                    <span id="insight-agent" class="text-sm font-bold text-primary font-display flex items-center gap-1.5">
-                        <span class="material-symbols-outlined text-xs">spa</span>
-                        MacroAgent
-                    </span>
-                </div>
-                <div class="bg-surface-container/40 p-3.5 rounded-xl border border-outline-variant/20 flex flex-col hidden">
-                    <span class="text-[9px] font-bold text-outline uppercase tracking-wider block mb-0.5">Market Confidence Index</span>
-                    <span id="insight-confidence" class="text-sm font-bold text-on-surface font-display">88%</span>
-                </div>
-                <div class="bg-surface-container/40 p-3.5 rounded-xl border border-outline-variant/20 flex flex-col">
-                    <span class="text-[9px] font-bold text-outline uppercase tracking-wider block mb-0.5">Yes Share Value</span>
-                    <span id="insight-yes-odds" class="text-sm font-bold text-on-surface font-display">0.54 SOM</span>
-                </div>
-                <div class="bg-surface-container/40 p-3.5 rounded-xl border border-outline-variant/20 flex flex-col">
-                    <span class="text-[9px] font-bold text-outline uppercase tracking-wider block mb-0.5">No Share Value</span>
-                    <span id="insight-no-odds" class="text-sm font-bold text-on-surface font-display">0.46 SOM</span>
-                </div>
-            </div>
-            
-            <!-- Decisional Signal Attribution Layer -->
-            <div class="bg-surface-container/40 p-5 rounded-2xl border border-outline-variant/20 flex flex-col gap-4">
-                <div class="flex items-center justify-between border-b border-outline-variant/20 pb-2">
-                    <span class="text-[9px] font-bold text-primary uppercase tracking-wider flex items-center gap-1.5">
-                        <span class="material-symbols-outlined text-[12px]">analytics</span>
-                        Signal Attribution Protocol
-                    </span>
-                    <span id="insight-volatility" class="text-[9px] px-2 py-0.5 bg-amber-500/10 border border-amber-500/25 rounded text-amber-500 uppercase font-bold tracking-wider">MODERATE VOLATILITY</span>
-                </div>
-                
-                <!-- Deliberated Confidence Rationale -->
-                <div class="flex flex-col gap-1.5 pb-2 border-b border-outline-variant/15">
-                    <span class="text-[9px] font-bold text-outline uppercase tracking-wider">deliberation rationale</span>
-                    <p id="insight-rationale" class="text-xs text-on-surface/90 font-mono italic leading-relaxed">
-                        "Deliberating node parameters on Somnia."
-                    </p>
-                </div>
-                
-                <!-- Confidence breakdown -->
-                <div class="flex flex-col gap-2.5">
-                    <span class="text-[9px] font-bold text-outline uppercase tracking-wider">Signal Influence Attribution</span>
-                    
-                    <div class="flex flex-col gap-1.5">
-                        <div class="flex justify-between items-center text-[10px] font-semibold text-outline">
-                            <span class="flex items-center gap-1">🪙 CoinGecko Price Flow</span>
-                            <span id="attr-coingecko" class="font-mono font-bold text-primary">35%</span>
-                        </div>
-                        <div class="w-full bg-surface-container-high h-1 rounded-full overflow-hidden">
-                            <div id="bar-coingecko" class="bg-primary h-full w-[35%] transition-all duration-700"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="flex flex-col gap-1.5">
-                        <div class="flex justify-between items-center text-[10px] font-semibold text-outline">
-                            <span class="flex items-center gap-1">💬 Reddit Community Sentiment</span>
-                            <span id="attr-reddit" class="font-mono font-bold text-secondary">25%</span>
-                        </div>
-                        <div class="w-full bg-surface-container-high h-1 rounded-full overflow-hidden">
-                            <div id="bar-reddit" class="bg-secondary h-full w-[25%] transition-all duration-700"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="flex flex-col gap-1.5">
-                        <div class="flex justify-between items-center text-[10px] font-semibold text-outline">
-                            <span class="flex items-center gap-1">📈 Trend Velocity Index</span>
-                            <span id="attr-trends" class="font-mono font-bold text-tertiary">20%</span>
-                        </div>
-                        <div class="w-full bg-surface-container-high h-1 rounded-full overflow-hidden">
-                            <div id="bar-trends" class="bg-tertiary h-full w-[20%] transition-all duration-700"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="flex flex-col gap-1.5">
-                        <div class="flex justify-between items-center text-[10px] font-semibold text-outline">
-                            <span class="flex items-center gap-1">📊 Politics Swarm Weight</span>
-                            <span id="attr-politics" class="font-mono font-bold text-outline">20%</span>
-                        </div>
-                        <div class="w-full bg-surface-container-high h-1 rounded-full overflow-hidden">
-                            <div id="bar-politics" class="bg-outline h-full w-[20%] transition-all duration-700"></div>
-                        </div>
-                    </div>
-                </div>
+ <!-- Market Lifecycle Timeline -->
+ <div class="bg-surface-container/30 p-4 rounded-xl border border-outline-variant/15 flex flex-col gap-3 -mt-2">
+ <span class="text-[9px] font-bold text-outline uppercase tracking-wider block">Market Lifecycle Timeline</span>
+ <div class="flex items-center justify-between relative mt-2 px-1 select-none">
+ <!-- Progress Line -->
+ <div class="absolute left-4 right-4 top-[9px] h-[2px] bg-outline-variant/30 -z-10" id="timeline-progress-bar"></div>
+ 
+ <!-- Steps -->
+ <div class="flex flex-col items-center gap-1">
+ <span class="w-4 h-4 rounded-full bg-primary/20 border border-primary text-[8px] font-black text-primary flex items-center justify-center font-mono">1</span>
+ <span class="text-[6.5px] font-extrabold text-primary uppercase tracking-wider">Detected</span>
+ </div>
+ <div class="flex flex-col items-center gap-1">
+ <span class="w-4 h-4 rounded-full bg-primary/20 border border-primary text-[8px] font-black text-primary flex items-center justify-center font-mono">2</span>
+ <span class="text-[6.5px] font-extrabold text-primary uppercase tracking-wider">Deliberated</span>
+ </div>
+ <div class="flex flex-col items-center gap-1">
+ <span class="w-4 h-4 rounded-full bg-primary/20 border border-primary text-[8px] font-black text-primary flex items-center justify-center font-mono">3</span>
+ <span class="text-[6.5px] font-extrabold text-primary uppercase tracking-wider">Deployed</span>
+ </div>
+ <div class="flex flex-col items-center gap-1">
+ <span class="w-4 h-4 rounded-full bg-primary/20 border border-primary text-[8px] font-black text-primary flex items-center justify-center font-mono" id="timeline-step-liquidity">4</span>
+ <span class="text-[6.5px] font-extrabold text-primary uppercase tracking-wider" id="timeline-label-liquidity">Pooled</span>
+ </div>
+ <div class="flex flex-col items-center gap-1">
+ <span class="w-4 h-4 rounded-full bg-surface-container-high border border-outline text-[8px] font-black text-outline flex items-center justify-center font-mono" id="timeline-step-settle">5</span>
+ <span class="text-[6.5px] font-extrabold text-outline uppercase tracking-wider" id="timeline-label-settle">Resolved</span>
+ </div>
+ </div>
+ </div>
+ 
+ <!-- Stats Grid -->
+ <div class="grid grid-cols-2 gap-4">
+ <div class="bg-surface-container/40 p-3.5 rounded-xl border border-outline-variant/20 flex flex-col hidden">
+ <span class="text-[9px] font-bold text-outline uppercase tracking-wider block mb-0.5">Market Intelligence Agent</span>
+ <span id="insight-agent" class="text-sm font-bold text-primary font-display flex items-center gap-1.5">
+ <span class="material-symbols-outlined text-xs">spa</span>
+ MacroAgent
+ </span>
+ </div>
+ <div class="bg-surface-container/40 p-3.5 rounded-xl border border-outline-variant/20 flex flex-col hidden">
+ <span class="text-[9px] font-bold text-outline uppercase tracking-wider block mb-0.5">Market Confidence Index</span>
+ <span id="insight-confidence" class="text-sm font-bold text-on-surface font-display">88%</span>
+ </div>
+ <div class="bg-surface-container/40 p-3.5 rounded-xl border border-outline-variant/20 flex flex-col">
+ <span class="text-[9px] font-bold text-outline uppercase tracking-wider block mb-0.5">Yes Share Value</span>
+ <span id="insight-yes-odds" class="text-sm font-bold text-on-surface font-display">0.54 SOM</span>
+ </div>
+ <div class="bg-surface-container/40 p-3.5 rounded-xl border border-outline-variant/20 flex flex-col">
+ <span class="text-[9px] font-bold text-outline uppercase tracking-wider block mb-0.5">No Share Value</span>
+ <span id="insight-no-odds" class="text-sm font-bold text-on-surface font-display">0.46 SOM</span>
+ </div>
+ </div>
+ 
+ <!-- Decisional Signal Attribution Layer -->
+ <div class="bg-surface-container/40 p-5 rounded-2xl border border-outline-variant/20 flex flex-col gap-4">
+ <div class="flex items-center justify-between border-b border-outline-variant/20 pb-2">
+ <span class="text-[9px] font-bold text-primary uppercase tracking-wider flex items-center gap-1.5">
+ <span class="material-symbols-outlined text-[12px]">analytics</span>
+ Signal Attribution Protocol
+ </span>
+ <span id="insight-volatility" class="text-[9px] px-2 py-0.5 bg-amber-500/10 border border-amber-500/25 rounded text-amber-500 uppercase font-bold tracking-wider">MODERATE VOLATILITY</span>
+ </div>
+ 
+ <!-- Deliberated Confidence Rationale -->
+ <div class="flex flex-col gap-1.5 pb-2 border-b border-outline-variant/15">
+ <span class="text-[9px] font-bold text-outline uppercase tracking-wider">deliberation rationale</span>
+ <p id="insight-rationale" class="text-xs text-on-surface/90 font-mono italic leading-relaxed">
+ "Deliberating node parameters on Somnia."
+ </p>
+ </div>
+ 
+ <!-- Confidence breakdown -->
+ <div class="flex flex-col gap-2.5">
+ <span class="text-[9px] font-bold text-outline uppercase tracking-wider">Signal Influence Attribution</span>
+ 
+ <div class="flex flex-col gap-1.5">
+ <div class="flex justify-between items-center text-[10px] font-semibold text-outline">
+ <span class="flex items-center gap-1"> CoinGecko Price Flow</span>
+ <span id="attr-coingecko" class="font-mono font-bold text-primary">35%</span>
+ </div>
+ <div class="w-full bg-surface-container-high h-1 rounded-full overflow-hidden">
+ <div id="bar-coingecko" class="bg-primary h-full w-[35%] transition-all duration-700"></div>
+ </div>
+ </div>
+ 
+ <div class="flex flex-col gap-1.5">
+ <div class="flex justify-between items-center text-[10px] font-semibold text-outline">
+ <span class="flex items-center gap-1"> Reddit Community Sentiment</span>
+ <span id="attr-reddit" class="font-mono font-bold text-secondary">25%</span>
+ </div>
+ <div class="w-full bg-surface-container-high h-1 rounded-full overflow-hidden">
+ <div id="bar-reddit" class="bg-secondary h-full w-[25%] transition-all duration-700"></div>
+ </div>
+ </div>
+ 
+ <div class="flex flex-col gap-1.5">
+ <div class="flex justify-between items-center text-[10px] font-semibold text-outline">
+ <span class="flex items-center gap-1"> Trend Velocity Index</span>
+ <span id="attr-trends" class="font-mono font-bold text-tertiary">20%</span>
+ </div>
+ <div class="w-full bg-surface-container-high h-1 rounded-full overflow-hidden">
+ <div id="bar-trends" class="bg-tertiary h-full w-[20%] transition-all duration-700"></div>
+ </div>
+ </div>
+ 
+ <div class="flex flex-col gap-1.5">
+ <div class="flex justify-between items-center text-[10px] font-semibold text-outline">
+ <span class="flex items-center gap-1"> Politics Swarm Weight</span>
+ <span id="attr-politics" class="font-mono font-bold text-outline">20%</span>
+ </div>
+ <div class="w-full bg-surface-container-high h-1 rounded-full overflow-hidden">
+ <div id="bar-politics" class="bg-outline h-full w-[20%] transition-all duration-700"></div>
+ </div>
+ </div>
+ </div>
 
-                <!-- Multi-Source Verification Layer -->
-                <div class="p-3 rounded-xl bg-surface-container/40 border border-outline-variant/15 flex flex-col gap-2">
-                    <div class="flex justify-between items-center pb-1 border-b border-outline-variant/10">
-                        <span class="text-[9px] font-bold text-outline uppercase tracking-wider flex items-center gap-1">
-                            <span class="material-symbols-outlined text-xs text-primary">fact_check</span>
-                            Multi-Source Verification Layer
-                        </span>
-                        <span class="text-[9px] font-black text-emerald-500 font-mono" id="verification-score-badge">SCORE: 3/3</span>
-                    </div>
-                    <div class="grid grid-cols-3 gap-2 text-[9px] font-bold font-mono" id="verification-sources-container">
-                        <!-- Populated dynamically based on signal confirmations -->
-                    </div>
-                </div>
+ <!-- Multi-Source Verification Layer -->
+ <div class="p-3 rounded-xl bg-surface-container/40 border border-outline-variant/15 flex flex-col gap-2">
+ <div class="flex justify-between items-center pb-1 border-b border-outline-variant/10">
+ <span class="text-[9px] font-bold text-outline uppercase tracking-wider flex items-center gap-1">
+ <span class="material-symbols-outlined text-xs text-primary">fact_check</span>
+ Multi-Source Verification Layer
+ </span>
+ <span class="text-[9px] font-black text-emerald-500 font-mono" id="verification-score-badge">SCORE: 3/3</span>
+ </div>
+ <div class="grid grid-cols-3 gap-2 text-[9px] font-bold font-mono" id="verification-sources-container">
+ <!-- Populated dynamically based on signal confirmations -->
+ </div>
+ </div>
 
-                <!-- Strongest Supporting Signals list -->
-                <div class="flex flex-col gap-2 mt-2 pt-2 border-t border-outline-variant/20">
-                    <span class="text-[9px] font-bold text-outline uppercase tracking-wider">Strongest Supporting Telemetry</span>
-                    <ul id="insight-telemetry-list" class="flex flex-col gap-2 text-[10px] text-on-surface/85 pl-4 list-disc font-semibold leading-relaxed">
-                        <!-- Loaded dynamically -->
-                    </ul>
-                </div>
-            </div>
-            
-            <!-- Market Health & Liquidity Dynamics -->
-            <div class="grid grid-cols-2 gap-4 mt-4">
-                <div class="bg-surface-container/40 p-4 rounded-2xl border border-outline-variant/20 flex flex-col gap-2">
-                    <span class="text-[9px] font-bold text-primary uppercase tracking-wider flex items-center gap-1">
-                        <span class="material-symbols-outlined text-[12px]">payments</span>
-                        Liquidity Layer
-                    </span>
-                    <div class="flex flex-col gap-1 text-[10px] font-mono text-outline">
-                        <div class="flex justify-between">
-                            <span>Total Pool:</span>
-                            <span id="insight-total-liq" class="font-bold text-on-surface">1,000 SOM</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>YES Depth:</span>
-                            <span id="insight-yes-depth" class="font-bold text-on-surface">500 SOM</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>NO Depth:</span>
-                            <span id="insight-no-depth" class="font-bold text-on-surface">500 SOM</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Ratio:</span>
-                            <span id="insight-part-ratio" class="font-bold text-primary">50%</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="bg-surface-container/40 p-4 rounded-2xl border border-outline-variant/20 flex flex-col gap-2">
-                    <span class="text-[9px] font-bold text-secondary uppercase tracking-wider flex items-center gap-1">
-                        <span class="material-symbols-outlined text-[12px]">health_and_safety</span>
-                        Health Indicators
-                    </span>
-                    <div class="flex flex-col gap-1 text-[10px] font-mono text-outline">
-                        <div class="flex justify-between">
-                            <span>Volatility:</span>
-                            <span id="insight-vol-score" class="font-bold text-on-surface">45</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Stability:</span>
-                            <span id="insight-stability" class="font-bold text-on-surface">94%</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Risk Level:</span>
-                            <span id="insight-risk-level" class="font-bold text-emerald-500">LOW</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Health Index:</span>
-                            <span id="insight-health-idx" class="font-bold text-secondary">92%</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Decentralized L1 Settlement Audit Trail -->
-            <div class="bg-surface-container/50 p-5 rounded-2xl border border-primary/20 flex flex-col gap-4 mt-4">
-                <div class="flex items-center justify-between border-b border-primary/20 pb-2">
-                    <span class="text-[9px] font-bold text-primary uppercase tracking-wider flex items-center gap-1.5">
-                        <span class="material-symbols-outlined text-[13px]">gavel</span>
-                        L1 Settlement Audit Trail
-                    </span>
-                    <span class="text-[8px] px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/25 rounded text-emerald-500 font-bold uppercase tracking-wider">Verified Audit</span>
-                </div>
-                
-                <div class="flex flex-col gap-3 text-[10px] font-mono text-outline">
-                    <!-- Genesis Signals -->
-                    <div class="flex flex-col gap-1 border-b border-outline-variant/10 pb-2.5">
-                        <span class="text-[8px] uppercase font-bold text-outline">1. Genesis Source Signals</span>
-                        <div id="audit-signals-list" class="flex flex-col gap-1 text-[9px] text-on-surface/90">
-                            <!-- Populated Dynamically -->
-                        </div>
-                    </div>
+ <!-- Strongest Supporting Signals list -->
+ <div class="flex flex-col gap-2 mt-2 pt-2 border-t border-outline-variant/20">
+ <span class="text-[9px] font-bold text-outline uppercase tracking-wider">Strongest Supporting Telemetry</span>
+ <ul id="insight-telemetry-list" class="flex flex-col gap-2 text-[10px] text-on-surface/85 pl-4 list-disc font-semibold leading-relaxed">
+ <!-- Loaded dynamically -->
+ </ul>
+ </div>
+ </div>
+ 
+ <!-- Market Health & Liquidity Dynamics -->
+ <div class="grid grid-cols-2 gap-4 mt-4">
+ <div class="bg-surface-container/40 p-4 rounded-2xl border border-outline-variant/20 flex flex-col gap-2">
+ <span class="text-[9px] font-bold text-primary uppercase tracking-wider flex items-center gap-1">
+ <span class="material-symbols-outlined text-[12px]">payments</span>
+ Liquidity Layer
+ </span>
+ <div class="flex flex-col gap-1 text-[10px] font-mono text-outline">
+ <div class="flex justify-between">
+ <span>Total Pool:</span>
+ <span id="insight-total-liq" class="font-bold text-on-surface">1,000 SOM</span>
+ </div>
+ <div class="flex justify-between">
+ <span>YES Depth:</span>
+ <span id="insight-yes-depth" class="font-bold text-on-surface">500 SOM</span>
+ </div>
+ <div class="flex justify-between">
+ <span>NO Depth:</span>
+ <span id="insight-no-depth" class="font-bold text-on-surface">500 SOM</span>
+ </div>
+ <div class="flex justify-between">
+ <span>Ratio:</span>
+ <span id="insight-part-ratio" class="font-bold text-primary">50%</span>
+ </div>
+ </div>
+ </div>
+ 
+ <div class="bg-surface-container/40 p-4 rounded-2xl border border-outline-variant/20 flex flex-col gap-2">
+ <span class="text-[9px] font-bold text-secondary uppercase tracking-wider flex items-center gap-1">
+ <span class="material-symbols-outlined text-[12px]">health_and_safety</span>
+ Health Indicators
+ </span>
+ <div class="flex flex-col gap-1 text-[10px] font-mono text-outline">
+ <div class="flex justify-between">
+ <span>Volatility:</span>
+ <span id="insight-vol-score" class="font-bold text-on-surface">45</span>
+ </div>
+ <div class="flex justify-between">
+ <span>Stability:</span>
+ <span id="insight-stability" class="font-bold text-on-surface">94%</span>
+ </div>
+ <div class="flex justify-between">
+ <span>Risk Level:</span>
+ <span id="insight-risk-level" class="font-bold text-emerald-500">LOW</span>
+ </div>
+ <div class="flex justify-between">
+ <span>Health Index:</span>
+ <span id="insight-health-idx" class="font-bold text-secondary">92%</span>
+ </div>
+ </div>
+ </div>
+ </div>
+ 
+ <!-- Decentralized L1 Settlement Audit Trail -->
+ <div class="bg-surface-container/50 p-5 rounded-2xl border border-primary/20 flex flex-col gap-4 mt-4">
+ <div class="flex items-center justify-between border-b border-primary/20 pb-2">
+ <span class="text-[9px] font-bold text-primary uppercase tracking-wider flex items-center gap-1.5">
+ <span class="material-symbols-outlined text-[13px]">gavel</span>
+ L1 Settlement Audit Trail
+ </span>
+ <span class="text-[8px] px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/25 rounded text-emerald-500 font-bold uppercase tracking-wider">Verified Audit</span>
+ </div>
+ 
+ <div class="flex flex-col gap-3 text-[10px] font-mono text-outline">
+ <!-- Genesis Signals -->
+ <div class="flex flex-col gap-1 border-b border-outline-variant/10 pb-2.5">
+ <span class="text-[8px] uppercase font-bold text-outline">1. Genesis Source Signals</span>
+ <div id="audit-signals-list" class="flex flex-col gap-1 text-[9px] text-on-surface/90">
+ <!-- Populated Dynamically -->
+ </div>
+ </div>
 
-                    <!-- Cognitive Logic -->
-                    <div class="flex flex-col gap-1 border-b border-outline-variant/10 pb-2.5">
-                        <span class="text-[8px] uppercase font-bold text-outline">2. Swarm Signal Attribution</span>
-                        <p id="audit-agent-reasoning" class="text-on-surface/90 font-sans italic leading-relaxed">
-                            <!-- Populated Dynamically -->
-                        </p>
-                    </div>
+ <!-- Cognitive Logic -->
+ <div class="flex flex-col gap-1 border-b border-outline-variant/10 pb-2.5">
+ <span class="text-[8px] uppercase font-bold text-outline">2. Swarm Signal Attribution</span>
+ <p id="audit-agent-reasoning" class="text-on-surface/90 font-sans italic leading-relaxed">
+ <!-- Populated Dynamically -->
+ </p>
+ </div>
 
-                    <!-- Deployment Tx -->
-                    <div class="flex justify-between items-center border-b border-outline-variant/10 pb-2.5">
-                        <span class="text-[8px] uppercase font-bold text-outline">3. Deployment Transaction</span>
-                        <span id="audit-deploy-tx" class="text-[9px] font-bold text-primary select-all cursor-copy truncate max-w-[200px]" title="Click to copy Somnia L1 Tx">-</span>
-                    </div>
+ <!-- Deployment Tx -->
+ <div class="flex justify-between items-center border-b border-outline-variant/10 pb-2.5">
+ <span class="text-[8px] uppercase font-bold text-outline">3. Deployment Transaction</span>
+ <span id="audit-deploy-tx" class="text-[9px] font-bold text-primary select-all cursor-copy truncate max-w-[200px]" title="Click to copy Somnia L1 Tx">-</span>
+ </div>
 
-                    <!-- Participation Log -->
-                    <div class="flex flex-col gap-1 border-b border-outline-variant/10 pb-2.5">
-                        <span class="text-[8px] uppercase font-bold text-outline">4. Pool Participation History</span>
-                        <div id="audit-participation-history" class="flex flex-col gap-1 text-[9px]">
-                            <!-- Populated Dynamically with dynamic transactions list -->
-                        </div>
-                    </div>
+ <!-- Participation Log -->
+ <div class="flex flex-col gap-1 border-b border-outline-variant/10 pb-2.5">
+ <span class="text-[8px] uppercase font-bold text-outline">4. Pool Participation History</span>
+ <div id="audit-participation-history" class="flex flex-col gap-1 text-[9px]">
+ <!-- Populated Dynamically with dynamic transactions list -->
+ </div>
+ </div>
 
-                    <!-- Settlement Block -->
-                    <div class="flex flex-col gap-1.5 pb-0.5">
-                        <div class="flex justify-between items-center">
-                            <span class="text-[8px] uppercase font-bold text-outline">5. Oracle Settlement Outcome</span>
-                            <span id="audit-final-outcome" class="text-[10px] font-black uppercase">-</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-[8px] uppercase font-bold text-outline">6. Settlement Tx Confirmation</span>
-                            <span id="audit-settle-tx" class="text-[9px] font-bold text-primary select-all cursor-copy truncate max-w-[200px]" title="Click to copy Somnia L1 Tx">-</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+ <!-- Settlement Block -->
+ <div class="flex flex-col gap-1.5 pb-0.5">
+ <div class="flex justify-between items-center">
+ <span class="text-[8px] uppercase font-bold text-outline">5. Oracle Settlement Outcome</span>
+ <span id="audit-final-outcome" class="text-[10px] font-black uppercase">-</span>
+ </div>
+ <div class="flex justify-between items-center">
+ <span class="text-[8px] uppercase font-bold text-outline">6. Settlement Tx Confirmation</span>
+ <span id="audit-settle-tx" class="text-[9px] font-bold text-primary select-all cursor-copy truncate max-w-[200px]" title="Click to copy Somnia L1 Tx">-</span>
+ </div>
+ </div>
+ </div>
+ </div>
 
-            <!-- Decentralized Dispute Governance Core -->
-            <div id="insight-dispute-panel" class="bg-error/5 p-5 rounded-2xl border border-error/20 flex flex-col gap-4 hidden">
-                <div class="flex items-center justify-between border-b border-error/20 pb-2">
-                    <span class="text-[9px] font-bold text-error uppercase tracking-wider flex items-center gap-1.5 animate-pulse">
-                        <span class="material-symbols-outlined text-[14px]">gavel</span>
-                        Decentralized Dispute Governance Layer
-                    </span>
-                    <span class="text-[9px] px-2 py-0.5 bg-error/15 border border-error/30 rounded text-error uppercase font-bold tracking-wider">ACTIVE CHALLENGE</span>
-                </div>
-                
-                <div class="flex flex-col gap-2">
-                    <span class="text-[9px] font-bold text-outline uppercase tracking-wider">Dispute Assessment & Rationale</span>
-                    <p id="insight-dispute-reason" class="text-[10px] text-on-surface-variant italic font-semibold leading-relaxed">
-                        Ambiguous news reports triggered multiple oracle deviations. Stakeholders initiated governance validation round.
-                    </p>
-                </div>
-                
-                <div class="grid grid-cols-2 gap-3.5 my-1">
-                    <div class="bg-surface-container/60 p-3 rounded-xl border border-outline-variant/20 flex flex-col text-center">
-                        <span class="text-[8px] font-bold text-outline uppercase">Yes consensus weight</span>
-                        <span id="insight-dispute-yes-weight" class="text-sm font-bold text-primary font-mono mt-0.5">0.00 YES</span>
-                    </div>
-                    <div class="bg-surface-container/60 p-3 rounded-xl border border-outline-variant/20 flex flex-col text-center">
-                        <span class="text-[8px] font-bold text-outline uppercase">No consensus weight</span>
-                        <span id="insight-dispute-no-weight" class="text-sm font-bold text-error font-mono mt-0.5">0.00 NO</span>
-                    </div>
-                </div>
-                
-                <div class="flex flex-col gap-2">
-                    <span class="text-[9px] font-bold text-outline uppercase tracking-wider">Oracle Conflict Sources</span>
-                    <ul id="insight-dispute-oracles" class="flex flex-col gap-1.5 text-[9px] text-outline font-mono list-disc pl-4">
-                        <!-- Loaded dynamically -->
-                    </ul>
-                </div>
-            </div>
-            
-            <!-- Prediction Action Drawer Forms -->
-            <div class="flex flex-col gap-4 border-t border-outline-variant/30 pt-5 mt-auto">
-                <div class="flex justify-between items-center text-xs font-bold text-outline uppercase tracking-wider">
-                    <span>Vote Consensus Option</span>
-                    <span>Fee: 0.1%</span>
-                </div>
-                
-                <!-- Toggle Selection -->
-                <div class="flex gap-2 p-1 bg-surface-container rounded-xl border border-outline-variant/20">
-                    <button id="trade-side-yes" class="flex-1 py-2.5 rounded-lg bg-surface-solid shadow text-primary font-bold uppercase text-xs flex items-center justify-center gap-1.5 transition-all">
-                        <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-                        Buy YES
-                    </button>
-                    <button id="trade-side-no" class="flex-1 py-2.5 rounded-lg text-outline hover:text-error font-bold uppercase text-xs flex items-center justify-center gap-1.5 transition-all">
-                        Buy NO
-                    </button>
-                </div>
-                
-                <div class="flex flex-col gap-1">
-                    <label class="text-[10px] font-bold text-outline uppercase tracking-wider">Trade Capital (SOM)</label>
-                    <div class="relative flex items-center">
-                        <input type="number" id="trade-amount" placeholder="0.00" class="glass-input w-full px-4 py-3 pr-16 rounded-xl border text-sm focus:outline-none">
-                        <span class="absolute right-4 font-bold text-xs text-outline uppercase font-label">SOM</span>
-                    </div>
-                </div>
-                
-                <div class="flex justify-between items-center text-xs py-1 border-b border-dashed border-outline-variant/30 text-outline">
-                    <span>Est. Shares Received:</span>
-                    <span class="font-bold text-on-surface" id="trade-shares-calc">0.00 YES</span>
-                </div>
-                
-                <button id="trade-submit-btn" class="w-full bg-primary text-white font-label font-bold text-xs py-3.5 rounded-xl hover:bg-on-primary-fixed-variant uppercase transition-all shadow-md mt-2 flex items-center justify-center gap-2">
-                    <span class="material-symbols-outlined text-sm">trending_up</span>
-                    Authorize Prediction Contract
-                </button>
-            </div>
-            
-        </div>
-    </div>
+ <!-- Decentralized Dispute Governance Core -->
+ <div id="insight-dispute-panel" class="bg-error/5 p-5 rounded-2xl border border-error/20 flex flex-col gap-4 hidden">
+ <div class="flex items-center justify-between border-b border-error/20 pb-2">
+ <span class="text-[9px] font-bold text-error uppercase tracking-wider flex items-center gap-1.5 animate-pulse">
+ <span class="material-symbols-outlined text-[14px]">gavel</span>
+ Decentralized Dispute Governance Layer
+ </span>
+ <span class="text-[9px] px-2 py-0.5 bg-error/15 border border-error/30 rounded text-error uppercase font-bold tracking-wider">ACTIVE CHALLENGE</span>
+ </div>
+ 
+ <div class="flex flex-col gap-2">
+ <span class="text-[9px] font-bold text-outline uppercase tracking-wider">Dispute Assessment & Rationale</span>
+ <p id="insight-dispute-reason" class="text-[10px] text-on-surface-variant italic font-semibold leading-relaxed">
+ Ambiguous news reports triggered multiple oracle deviations. Stakeholders initiated governance validation round.
+ </p>
+ </div>
+ 
+ <div class="grid grid-cols-2 gap-3.5 my-1">
+ <div class="bg-surface-container/60 p-3 rounded-xl border border-outline-variant/20 flex flex-col text-center">
+ <span class="text-[8px] font-bold text-outline uppercase">Yes consensus weight</span>
+ <span id="insight-dispute-yes-weight" class="text-sm font-bold text-primary font-mono mt-0.5">0.00 YES</span>
+ </div>
+ <div class="bg-surface-container/60 p-3 rounded-xl border border-outline-variant/20 flex flex-col text-center">
+ <span class="text-[8px] font-bold text-outline uppercase">No consensus weight</span>
+ <span id="insight-dispute-no-weight" class="text-sm font-bold text-error font-mono mt-0.5">0.00 NO</span>
+ </div>
+ </div>
+ 
+ <div class="flex flex-col gap-2">
+ <span class="text-[9px] font-bold text-outline uppercase tracking-wider">Oracle Conflict Sources</span>
+ <ul id="insight-dispute-oracles" class="flex flex-col gap-1.5 text-[9px] text-outline font-mono list-disc pl-4">
+ <!-- Loaded dynamically -->
+ </ul>
+ </div>
+ </div>
+ 
+ <!-- Prediction Action Drawer Forms -->
+ <div class="flex flex-col gap-4 border-t border-outline-variant/30 pt-5 mt-auto">
+ <div class="flex justify-between items-center text-xs font-bold text-outline uppercase tracking-wider">
+ <span>Vote Consensus Option</span>
+ <span>Fee: 0.1%</span>
+ </div>
+ 
+ <!-- Toggle Selection -->
+ <div class="flex gap-2 p-1 bg-surface-container rounded-xl border border-outline-variant/20">
+ <button id="trade-side-yes" class="flex-1 py-2.5 rounded-lg bg-surface-solid shadow text-primary font-bold uppercase text-xs flex items-center justify-center gap-1.5 transition-all">
+ <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+ Buy YES
+ </button>
+ <button id="trade-side-no" class="flex-1 py-2.5 rounded-lg text-outline hover:text-error font-bold uppercase text-xs flex items-center justify-center gap-1.5 transition-all">
+ Buy NO
+ </button>
+ </div>
+ 
+ <div class="flex flex-col gap-1">
+ <label class="text-[10px] font-bold text-outline uppercase tracking-wider">Trade Capital (SOM)</label>
+ <div class="relative flex items-center">
+ <input type="number" id="trade-amount" placeholder="0.00" class="glass-input w-full px-4 py-3 pr-16 rounded-xl border text-sm focus:outline-none">
+ <span class="absolute right-4 font-bold text-xs text-outline uppercase font-label">SOM</span>
+ </div>
+ </div>
+ 
+ <div class="flex justify-between items-center text-xs py-1 border-b border-dashed border-outline-variant/30 text-outline">
+ <span>Est. Shares Received:</span>
+ <span class="font-bold text-on-surface" id="trade-shares-calc">0.00 YES</span>
+ </div>
+ 
+ <button id="trade-submit-btn" class="w-full bg-primary text-white font-label font-bold text-xs py-3.5 rounded-xl hover:bg-on-primary-fixed-variant uppercase transition-all shadow-md mt-2 flex items-center justify-center gap-2">
+ <span class="material-symbols-outlined text-sm">trending_up</span>
+ Authorize Prediction Contract
+ </button>
+ </div>
+ 
+ </div>
+ </div>
 
-    <!-- MODAL OVERLAY: Wallet / Faucet Panel -->
-    <div id="wallet-modal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center">
-        <div class="modal-container w-[400px] cosmic-card p-8 rounded-3xl border border-outline-variant/40 flex flex-col gap-6 relative max-w-[90%]">
-            
-            <button id="wallet-modal-close" class="absolute top-6 right-6 text-outline hover:text-primary transition-colors">
-                <span class="material-symbols-outlined">close</span>
-            </button>
-            
-            <div class="flex flex-col gap-1 border-b border-outline-variant/20 pb-4">
-                <h3 class="font-display text-2xl font-bold text-primary flex items-center gap-2">
-                    <span class="material-symbols-outlined">account_balance_wallet</span>
-                    Somnia Wallet
-                </h3>
-                <p class="text-[10px] text-outline uppercase font-bold tracking-widest">Decentralized Web3 Ledger Profile</p>
-            </div>
-            
-            <div id="wallet-modal-content" class="flex flex-col gap-4">
-                <!-- Dynamically populated via renderWalletModal() in app.js -->
-            </div>
-            
-        </div>
-    </div>
+ <!-- MODAL OVERLAY: Wallet / Faucet Panel -->
+ <div id="wallet-modal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center">
+ <div class="modal-container w-[400px] cosmic-card p-8 rounded-3xl border border-outline-variant/40 flex flex-col gap-6 relative max-w-[90%]">
+ 
+ <button id="wallet-modal-close" class="absolute top-6 right-6 text-outline hover:text-primary transition-colors">
+ <span class="material-symbols-outlined">close</span>
+ </button>
+ 
+ <div class="flex flex-col gap-1 border-b border-outline-variant/20 pb-4">
+ <h3 class="font-display text-2xl font-bold text-primary flex items-center gap-2">
+ <span class="material-symbols-outlined">account_balance_wallet</span>
+ Somnia Wallet
+ </h3>
+ <p class="text-[10px] text-outline uppercase font-bold tracking-widest">Decentralized Web3 Ledger Profile</p>
+ </div>
+ 
+ <div id="wallet-modal-content" class="flex flex-col gap-4">
+ <!-- Dynamically populated via renderWalletModal() in app.js -->
+ </div>
+ 
+ </div>
+ </div>
 
-    <!-- MODAL OVERLAY: Settings / Node Config Panel -->
-    <div id="settings-modal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center">
-        <div class="modal-container w-[400px] cosmic-card p-8 rounded-3xl border border-outline-variant/40 flex flex-col gap-6 relative max-w-[90%]">
-            
-            <button id="settings-modal-close" class="absolute top-6 right-6 text-outline hover:text-primary transition-colors">
-                <span class="material-symbols-outlined">close</span>
-            </button>
-            
-            <div class="flex flex-col gap-1 border-b border-outline-variant/20 pb-4">
-                <h3 class="font-display text-2xl font-bold text-primary flex items-center gap-2">
-                    <span class="material-symbols-outlined">settings</span>
-                    Node Settings
-                </h3>
-                <p class="text-[10px] text-outline uppercase font-bold tracking-widest">Protocol Ingestion Controller</p>
-            </div>
-            
-            <div class="flex flex-col gap-4">
-                
-                <!-- Speed selection -->
-                <div class="flex flex-col gap-2.5">
-                    <span class="text-xs font-bold text-outline uppercase tracking-wider block">Node Sync Ingestion Frequency</span>
-                    <div class="grid grid-cols-3 gap-2 bg-surface-container p-1 rounded-xl border border-outline-variant/20">
-                        <button data-speed="1" class="speed-btn py-2 rounded-lg bg-surface-solid shadow text-primary font-bold text-xs uppercase flex items-center justify-center gap-1.5 transition-all active">10s standard</button>
-                        <button data-speed="2" class="speed-btn py-2 rounded-lg text-outline hover:text-primary font-bold text-xs uppercase flex items-center justify-center gap-1.5 transition-all">5s accelerated</button>
-                        <button data-speed="5" class="speed-btn py-2 rounded-lg text-outline hover:text-primary font-bold text-xs uppercase flex items-center justify-center gap-1.5 transition-all">2s real-time</button>
-                    </div>
-                </div>
-                
-                <!-- System Status toggles -->
-                <div class="flex flex-col gap-3 bg-surface-container/60 p-4 rounded-2xl border border-outline-variant/20 mt-2">
-                    <div class="flex justify-between items-center text-xs">
-                        <span class="font-bold text-outline uppercase tracking-wide">Automated Hedging Broker</span>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" id="settings-auto-trade" class="sr-only peer" checked>
-                            <div class="w-9 h-5 bg-surface-container-high peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:height-4 after:width-4 after:transition-all peer-checked:bg-primary"></div>
-                        </label>
-                    </div>
-                    <div class="flex justify-between items-center text-xs border-t border-outline-variant/20 pt-3">
-                        <span class="font-bold text-outline uppercase tracking-wide">Real-time Node Ingestion</span>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" id="settings-auto-market" class="sr-only peer" checked>
-                            <div class="w-9 h-5 bg-surface-container-high peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:height-4 after:width-4 after:transition-all peer-checked:bg-primary"></div>
-                        </label>
-                    </div>
-                </div>
-                
-                <div class="text-[10px] text-outline text-center px-4 leading-relaxed font-semibold italic border-t border-dashed border-outline-variant/30 pt-4 mt-2">
-                    AstraMarkets operates continuously as a decentralized protocol on Somnia L1. The settings above modify your local telemetry nodes and authoritative EVM synchronization boundaries.
-                </div>
-            </div>
-            
-        </div>
-    </div>
+ <!-- MODAL OVERLAY: Settings / Node Config Panel -->
+ <div id="settings-modal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center">
+ <div class="modal-container w-[400px] cosmic-card p-8 rounded-3xl border border-outline-variant/40 flex flex-col gap-6 relative max-w-[90%]">
+ 
+ <button id="settings-modal-close" class="absolute top-6 right-6 text-outline hover:text-primary transition-colors">
+ <span class="material-symbols-outlined">close</span>
+ </button>
+ 
+ <div class="flex flex-col gap-1 border-b border-outline-variant/20 pb-4">
+ <h3 class="font-display text-2xl font-bold text-primary flex items-center gap-2">
+ <span class="material-symbols-outlined">settings</span>
+ Node Settings
+ </h3>
+ <p class="text-[10px] text-outline uppercase font-bold tracking-widest">Protocol Ingestion Controller</p>
+ </div>
+ 
+ <div class="flex flex-col gap-4">
+ 
+ <!-- Speed selection -->
+ <div class="flex flex-col gap-2.5">
+ <span class="text-xs font-bold text-outline uppercase tracking-wider block">Node Sync Ingestion Frequency</span>
+ <div class="grid grid-cols-3 gap-2 bg-surface-container p-1 rounded-xl border border-outline-variant/20">
+ <button data-speed="1" class="speed-btn py-2 rounded-lg bg-surface-solid shadow text-primary font-bold text-xs uppercase flex items-center justify-center gap-1.5 transition-all active">10s standard</button>
+ <button data-speed="2" class="speed-btn py-2 rounded-lg text-outline hover:text-primary font-bold text-xs uppercase flex items-center justify-center gap-1.5 transition-all">5s accelerated</button>
+ <button data-speed="5" class="speed-btn py-2 rounded-lg text-outline hover:text-primary font-bold text-xs uppercase flex items-center justify-center gap-1.5 transition-all">2s real-time</button>
+ </div>
+ </div>
+ 
+ <!-- System Status toggles -->
+ <div class="flex flex-col gap-3 bg-surface-container/60 p-4 rounded-2xl border border-outline-variant/20 mt-2">
+ <div class="flex justify-between items-center text-xs">
+ <span class="font-bold text-outline uppercase tracking-wide">Automated Hedging Broker</span>
+ <label class="relative inline-flex items-center cursor-pointer">
+ <input type="checkbox" id="settings-auto-trade" class="sr-only peer" checked>
+ <div class="w-9 h-5 bg-surface-container-high peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:height-4 after:width-4 after:transition-all peer-checked:bg-primary"></div>
+ </label>
+ </div>
+ <div class="flex justify-between items-center text-xs border-t border-outline-variant/20 pt-3">
+ <span class="font-bold text-outline uppercase tracking-wide">Real-time Node Ingestion</span>
+ <label class="relative inline-flex items-center cursor-pointer">
+ <input type="checkbox" id="settings-auto-market" class="sr-only peer" checked>
+ <div class="w-9 h-5 bg-surface-container-high peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:height-4 after:width-4 after:transition-all peer-checked:bg-primary"></div>
+ </label>
+ </div>
+ </div>
+ 
+ <div class="text-[10px] text-outline text-center px-4 leading-relaxed font-semibold italic border-t border-dashed border-outline-variant/30 pt-4 mt-2">
+ AstraMarkets operates continuously as a decentralized protocol on Somnia L1. The settings above modify your local telemetry nodes and authoritative EVM synchronization boundaries.
+ </div>
+ </div>
+ 
+ </div>
+ </div>
 
-    <!-- MODAL OVERLAY: SomniaScan Block Explorer -->
-    <div id="explorer-modal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center">
-        <div class="modal-container w-[500px] cosmic-card p-8 rounded-3xl border border-outline-variant/40 flex flex-col gap-6 relative max-w-[95%]">
-            
-            <button id="explorer-modal-close" class="absolute top-6 right-6 text-outline hover:text-primary transition-colors">
-                <span class="material-symbols-outlined">close</span>
-            </button>
-            
-            <div class="flex flex-col gap-1 border-b border-outline-variant/20 pb-4">
-                <h3 class="font-display text-2xl font-bold text-primary flex items-center gap-2">
-                    <span class="material-symbols-outlined">network_node</span>
-                    SomniaScan L1 Explorer
-                </h3>
-                <p class="text-[10px] text-outline uppercase font-bold tracking-widest">Authoritative EVM Transaction Receipt</p>
-            </div>
-            
-            <div class="flex flex-col gap-4 text-xs font-mono">
-                <div class="flex flex-col bg-surface-container/60 p-4 rounded-2xl border border-outline-variant/20 gap-3">
-                    
-                    <div class="flex justify-between items-center pb-2 border-b border-outline-variant/10">
-                        <span class="text-outline uppercase text-[9px] font-bold">Transaction Hash</span>
-                        <span class="text-primary font-bold select-all truncate max-w-[240px]" id="explorer-tx-hash">0x...</span>
-                    </div>
-                    
-                    <div class="flex justify-between items-center pb-2 border-b border-outline-variant/10">
-                        <span class="text-outline uppercase text-[9px] font-bold">Smart Contract</span>
-                        <span class="text-on-surface font-semibold select-all" id="explorer-tx-contract">0xSomniaContractFactory</span>
-                    </div>
+ <!-- MODAL OVERLAY: SomniaScan Block Explorer -->
+ <div id="explorer-modal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center">
+ <div class="modal-container w-[500px] cosmic-card p-8 rounded-3xl border border-outline-variant/40 flex flex-col gap-6 relative max-w-[95%]">
+ 
+ <button id="explorer-modal-close" class="absolute top-6 right-6 text-outline hover:text-primary transition-colors">
+ <span class="material-symbols-outlined">close</span>
+ </button>
+ 
+ <div class="flex flex-col gap-1 border-b border-outline-variant/20 pb-4">
+ <h3 class="font-display text-2xl font-bold text-primary flex items-center gap-2">
+ <span class="material-symbols-outlined">network_node</span>
+ SomniaScan L1 Explorer
+ </h3>
+ <p class="text-[10px] text-outline uppercase font-bold tracking-widest">Authoritative EVM Transaction Receipt</p>
+ </div>
+ 
+ <div class="flex flex-col gap-4 text-xs font-mono">
+ <div class="flex flex-col bg-surface-container/60 p-4 rounded-2xl border border-outline-variant/20 gap-3">
+ 
+ <div class="flex justify-between items-center pb-2 border-b border-outline-variant/10">
+ <span class="text-outline uppercase text-[9px] font-bold">Transaction Hash</span>
+ <span class="text-primary font-bold select-all truncate max-w-[240px]" id="explorer-tx-hash">0x...</span>
+ </div>
+ 
+ <div class="flex justify-between items-center pb-2 border-b border-outline-variant/10">
+ <span class="text-outline uppercase text-[9px] font-bold">Smart Contract</span>
+ <span class="text-on-surface font-semibold select-all" id="explorer-tx-contract">0xSomniaContractFactory</span>
+ </div>
 
-                    <div class="flex justify-between items-center pb-2 border-b border-outline-variant/10">
-                        <span class="text-outline uppercase text-[9px] font-bold">EVM Block Height</span>
-                        <span class="text-on-surface font-bold" id="explorer-tx-block">14,892,903</span>
-                    </div>
-                    
-                    <div class="flex justify-between items-center pb-2 border-b border-outline-variant/10">
-                        <span class="text-outline uppercase text-[9px] font-bold">Timestamp</span>
-                        <span class="text-on-surface" id="explorer-tx-time">2026-05-30 12:30:12</span>
-                    </div>
-                    
-                    <div class="flex justify-between items-center pb-2 border-b border-outline-variant/10">
-                        <span class="text-outline uppercase text-[9px] font-bold">Action Event</span>
-                        <span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-primary/10 border border-primary/20 text-primary" id="explorer-tx-action">MARKET_GENESIS</span>
-                    </div>
+ <div class="flex justify-between items-center pb-2 border-b border-outline-variant/10">
+ <span class="text-outline uppercase text-[9px] font-bold">EVM Block Height</span>
+ <span class="text-on-surface font-bold" id="explorer-tx-block">14,892,903</span>
+ </div>
+ 
+ <div class="flex justify-between items-center pb-2 border-b border-outline-variant/10">
+ <span class="text-outline uppercase text-[9px] font-bold">Timestamp</span>
+ <span class="text-on-surface" id="explorer-tx-time">2026-05-30 12:30:12</span>
+ </div>
+ 
+ <div class="flex justify-between items-center pb-2 border-b border-outline-variant/10">
+ <span class="text-outline uppercase text-[9px] font-bold">Action Event</span>
+ <span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-primary/10 border border-primary/20 text-primary" id="explorer-tx-action">MARKET_GENESIS</span>
+ </div>
 
-                    <div class="flex justify-between items-center pb-2 border-b border-outline-variant/10">
-                        <span class="text-outline uppercase text-[9px] font-bold">Gas Limit / Gas Used</span>
-                        <span class="text-outline" id="explorer-tx-gas">50,000 / 34,215 (68.4%)</span>
-                    </div>
+ <div class="flex justify-between items-center pb-2 border-b border-outline-variant/10">
+ <span class="text-outline uppercase text-[9px] font-bold">Gas Limit / Gas Used</span>
+ <span class="text-outline" id="explorer-tx-gas">50,000 / 34,215 (68.4%)</span>
+ </div>
 
-                    <div class="flex flex-col gap-1.5">
-                        <span class="text-outline uppercase text-[9px] font-bold">Transaction Details</span>
-                        <p class="text-[10px] text-on-surface bg-surface-container-high/40 p-3 rounded-lg border border-outline-variant/15 leading-relaxed font-sans font-semibold" id="explorer-tx-details">Details...</p>
-                    </div>
+ <div class="flex flex-col gap-1.5">
+ <span class="text-outline uppercase text-[9px] font-bold">Transaction Details</span>
+ <p class="text-[10px] text-on-surface bg-surface-container-high/40 p-3 rounded-lg border border-outline-variant/15 leading-relaxed font-sans font-semibold" id="explorer-tx-details">Details...</p>
+ </div>
 
-                </div>
+ </div>
 
-                <div class="text-[10px] text-outline text-center px-4 leading-relaxed font-semibold italic border-t border-dashed border-outline-variant/30 pt-4 mt-2">
-                    🛡 Verified on-chain consensus receipt. Certified by Somnia L1 gas-stable consensus engine with zero discrepancies detected.
-                </div>
-            </div>
-            
-        </div>
-    </div>
+ <div class="text-[10px] text-outline text-center px-4 leading-relaxed font-semibold italic border-t border-dashed border-outline-variant/30 pt-4 mt-2">
+ Verified on-chain consensus receipt. Certified by Somnia L1 gas-stable consensus engine with zero discrepancies detected.
+ </div>
+ </div>
+ 
+ </div>
+ </div>
 
-    <!-- MAIN JAVASCRIPT LOGIC ENGINE -->
-    <script type="module" src="/app.js"></script>
-    
+ <!-- MAIN JAVASCRIPT LOGIC ENGINE -->
+ <script type="module" src="/app.js"></script>
+ 
 </body>
 </html>
