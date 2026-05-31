@@ -1,0 +1,7 @@
+node_modules
+dist
+.git
+.env
+astra_swarm_v2.db
+docs
+*.log

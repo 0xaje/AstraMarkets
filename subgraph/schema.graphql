@@ -1,0 +1,32 @@
+type Market @entity {
+  id: ID!
+  marketId: BigInt!
+  title: String!
+  category: String!
+  expiryTimestamp: BigInt!
+  creator: Bytes!
+  confidence: BigInt!
+  status: Int!
+  resolvedOutcome: Boolean!
+  pools: Pool!
+}
+
+type Pool @entity {
+  id: ID!
+  marketId: BigInt!
+  yesShares: BigInt!
+  noShares: BigInt!
+  yesOdds: BigInt!
+  noOdds: BigInt!
+}
+
+type Trade @entity {
+  id: ID!
+  transactionHash: Bytes!
+  marketId: BigInt!
+  trader: Bytes!
+  position: Boolean!
+  amountSpent: BigInt!
+  sharesMinted: BigInt!
+  timestamp: BigInt!
+}

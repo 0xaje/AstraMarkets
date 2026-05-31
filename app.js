@@ -6,7 +6,7 @@ import { ethers } from "ethers";
 
 // ─── SIGNAL INGESTION CLIENT ──────────────────────────────────────────────────
 const SignalClient = {
- SIGNAL_API: 'http://localhost:4000/api/signals',
+ SIGNAL_API: '/api/signals',
  POLL_INTERVAL_MS: 15000,
  _pollerRef: null,
  _lastSignalBatch:[],
@@ -209,11 +209,12 @@ const state = {
  address: '',
  balance: 0.00,
  lockedBalance: 0.00,
- get netWorth() {
- return this.balance + this.lockedBalance;
- }
- },
- activeTab: 'landing',
+    get netWorth() {
+      return this.balance + this.lockedBalance;
+    }
+  },
+  pendingTransactions: [],
+  activeTab: 'landing',
  activeAgentsCount: 4,
  backendOnline: false,
  
@@ -463,13 +464,43 @@ function startSSEListener() {
  market.resolvedOutcome = data.outcome;
  market.settlementTx = data.txHash;
  market.statusText = data.outcome ? 'Resolved YES' : 'Resolved NO';
- addSystemLog(`[SETTLEMENT CONFIRMED] Market "${market.title.substring(0, 50)}..." resolved. Tx: ${data.txHash.slice(0, 10)}...`, 'success');
+ if (data.reason) market.reasoning = data.reason;
+ if (data.sources) market.sources = data.sources;
+ if (data.confidence) market.confidence = data.confidence;
+ 
+ addSystemLog(`[SETTLEMENT CONFIRMED] Market "${market.title.substring(0, 50)}..." resolved with ${data.confidence || 100}% confidence. Tx: ${data.txHash.slice(0, 10)}...`, 'success');
  updateAgentEvolution(market, 'SETTLEMENT', data);
  renderAll();
  saveStateToLocalStorage();
  }
  } catch (err) { console.error("Error parsing MARKET_SETTLED:", err); }
  });
+
+  eventSource.addEventListener('MARKET_UPDATED', (e) => {
+    try {
+      const data = JSON.parse(e.data);
+      if (data && data.market) {
+        const raw = data.market;
+        const index = state.markets.findIndex(m => m.ref === raw.ref || m.onChainMarketId === raw.onChainMarketId);
+        if (index > -1) {
+          state.markets[index].status = raw.status;
+          if (raw.status === 'DISPUTED') {
+            state.markets[index].statusText = 'Under Review';
+          }
+          renderAll();
+          saveStateToLocalStorage();
+        }
+      }
+    } catch { /* ignore */ }
+  });
+
+  eventSource.addEventListener('ORACLE_UNCERTAIN', (e) => {
+    try {
+      const data = JSON.parse(e.data);
+      addSystemLog(`[ORACLE UNCERTAIN] Confidence threshold not met for "${data.title.substring(0, 40)}...". Flagged for manual review.`, 'warn');
+      alertFloatNotification(`Settlement Paused: ${data.title.substring(0, 30)}...`, 'error');
+    } catch { /* ignore */ }
+  });
 
  eventSource.addEventListener('CHAIN_TRANSPARENCY', (e) => {
  try {
@@ -636,7 +667,7 @@ async function fetchWithTimeout(resource, options = {}) {
 async function syncAgentsFromBackend() {
 
  try {
- const res = await fetch('http://localhost:4000/api/agents');
+ const res = await fetch('/api/agents');
  if (!res.ok) throw new Error(`HTTP status ${res.status}`);
  const data = await res.json();
  if (data.ok && Array.isArray(data.agents)) {
@@ -668,7 +699,7 @@ async function syncMarketsFromBackend() {
  await syncAgentsFromBackend();
 
  console.log("[AstraFE] Fetching live backend-approved markets...");
- const res = await fetch('http://localhost:4000/api/agents/markets');
+ const res = await fetch('/api/agents/markets');
  if (!res.ok) throw new Error(`HTTP status ${res.status}`);
  const data = await res.json();
  if (data.ok && Array.isArray(data.markets)) {
@@ -1057,8 +1088,27 @@ function setupEventHandlers() {
  if (badge) badge.classList.add('hidden');
  });
  }
- 
- // Settings Modal Triggers
+  // Walkthrough Modal Triggers
+  const walkthroughBtn = document.getElementById('hero-protocol-walkthrough');
+  const walkthroughModal = document.getElementById('walkthrough-modal');
+  const walkthroughClose = document.getElementById('walkthrough-modal-close');
+  
+  if (walkthroughBtn && walkthroughModal) {
+    walkthroughBtn.addEventListener('click', () => {
+      walkthroughModal.classList.remove('hidden');
+      // small delay to allow display block to apply before opacity transition
+      setTimeout(() => walkthroughModal.classList.remove('opacity-0'), 10);
+    });
+  }
+  
+  if (walkthroughClose && walkthroughModal) {
+    walkthroughClose.addEventListener('click', () => {
+      walkthroughModal.classList.add('opacity-0');
+      setTimeout(() => walkthroughModal.classList.add('hidden'), 300);
+    });
+  }
+
+  // Settings Modal Triggers
  const settingsBtn = document.getElementById('nav-settings');
  const settingsModal = document.getElementById('settings-modal');
  const settingsClose = document.getElementById('settings-modal-close');
@@ -1908,6 +1958,7 @@ window.claimRewards = async function(marketId) {
  addSystemLog(`Initiating reward claim for market ${market.onChainMarketId}...`, 'primary');
  const tx = await contract.claimRewards(market.onChainMarketId);
  alertFloatNotification('Claim submitted to network!', 'success');
+ addPendingTx(tx.hash, `Claim Rewards (Market ${market.onChainMarketId})`);
  
  await tx.wait();
  addSystemLog(` Rewards successfully claimed!`, 'success');
@@ -1920,6 +1971,7 @@ window.claimRewards = async function(marketId) {
  body: JSON.stringify({ marketId: market.onChainMarketId, txHash: tx.hash, claimant: state.wallet.address })
  }).catch(() => {});
 
+ removePendingTx(tx.hash);
  await syncOnChainPortfolio();
  } catch (err) {
  console.error("Claim failed:", err);
@@ -3056,6 +3108,7 @@ async function executeTradePrediction() {
  
  addSystemLog(`Trade submitted: ${tx.hash.substring(0,10)}... waiting for block confirmation.`, "secondary");
  alertFloatNotification('Trade submitted to Somnia L1!', 'success');
+ addPendingTx(tx.hash, `Trade ${market.title.substring(0,20)}...`);
  
  const receipt = await tx.wait();
  
@@ -3090,12 +3143,39 @@ async function executeTradePrediction() {
  })
  }).catch(() => {});
 
+ removePendingTx(tx.hash);
  closeInsightDrawer();
  await syncOnChainPortfolio(); // Refresh portfolio from chain
  } catch (err) {
  console.error("Trade execution failed:", err);
  addSystemLog(`Trade rejected or failed: ${err.shortMessage || err.message}`, "error");
  alertFloatNotification('Trade failed.', 'error');
+ if (err.receipt) removePendingTx(err.receipt.hash);
+ }
+}
+
+function addPendingTx(hash, description) {
+ state.pendingTransactions.push({ hash, description, status: 'PENDING' });
+ renderPendingTxs();
+}
+
+function removePendingTx(hash) {
+ state.pendingTransactions = state.pendingTransactions.filter(tx => tx.hash !== hash);
+ renderPendingTxs();
+}
+
+function renderPendingTxs() {
+ const btn = document.getElementById('pending-tx-btn');
+ const countSpan = document.getElementById('pending-tx-count');
+ if (!btn || !countSpan) return;
+ 
+ if (state.pendingTransactions.length > 0) {
+ btn.classList.remove('hidden');
+ btn.classList.add('flex');
+ countSpan.textContent = `${state.pendingTransactions.length} Pending`;
+ } else {
+ btn.classList.add('hidden');
+ btn.classList.remove('flex');
  }
 }
 
@@ -3122,19 +3202,7 @@ async function connectWallet(provider) {
  let address = '';
  let balance = 1000.00;
 
- if (provider === 'privy') {
- const email = prompt("Enter your email address to connect via Privy:");
- if (!email) throw new Error("Email connection cancelled.");
- alertFloatNotification(`Authenticating ${email}...`, 'info');
- await new Promise(r => setTimeout(r, 800));
- address = '0xPr1vY' + Math.floor(Math.random() * 100000).toString(16) + '...';
- balance = 0.00;
- } else if (provider === 'walletconnect') {
- alertFloatNotification("Waiting for WalletConnect Mobile Scan...", "info");
- await new Promise(r => setTimeout(r, 2000)); // Simulate time to scan QR
- address = '0xWcMobile' + Math.floor(Math.random() * 100000).toString(16) + '...';
- balance = 0.00;
- } else if (provider === 'injected') {
+ if (provider === 'injected' || provider === 'privy' || provider === 'walletconnect') {
  if (window.ethereum) {
  // Enforce Somnia L1 Network switch
  const somniaChainId = '0xc488'; // 50312 in hex
@@ -3631,31 +3699,36 @@ window.startTransparencyLoop = function() {
  "text-[9px] px-2 py-0.5 bg-error/10 border border-error/25 rounded text-error font-mono font-bold animate-pulse";
  }
  
- // 4. Update Protocol Health Dashboard details
- const healthCreatedEl = document.getElementById('health-markets-created');
- if (healthCreatedEl) {
- healthCreatedEl.textContent = '824';
- }
- const healthSettledEl = document.getElementById('health-markets-settled');
- if (healthSettledEl) {
- healthSettledEl.textContent = '791';
- }
- const healthAccuracyEl = document.getElementById('health-settlement-accuracy');
- if (healthAccuracyEl) {
- healthAccuracyEl.textContent = '78%';
- }
- const healthLiquidityEl = document.getElementById('health-active-liquidity');
- if (healthLiquidityEl) {
- healthLiquidityEl.textContent = '1.4M STT';
- }
- const healthVolumeEl = document.getElementById('health-total-volume');
- if (healthVolumeEl) {
- healthVolumeEl.textContent = '9.7M STT';
- }
- const healthAvgConfidenceEl = document.getElementById('health-avg-confidence');
- if (healthAvgConfidenceEl) {
- healthAvgConfidenceEl.textContent = '74%';
- }
+ // 4. Update Protocol Ops Dashboard via fetch
+ fetch('/api/ops/dashboard').then(res => res.json()).then(data => {
+   if(data && data.dashboard) {
+     const d = data.dashboard;
+     const setEl = (id, text, colorClass) => {
+       const el = document.getElementById(id);
+       if (el) {
+          el.textContent = text;
+          if (colorClass) el.className = `font-bold text-xs mt-0.5 ${colorClass}`;
+       }
+     };
+     
+     setEl('ops-reputation', d.avgReputationScore, 'text-primary');
+     setEl('ops-accuracy', d.avgAccuracyScore + '%', 'text-on-surface');
+     setEl('ops-economic-impact', Math.floor(d.totalEconomicImpact) + ' SOM', 'text-tertiary');
+     
+     setEl('ops-circuit-breaker', d.circuitBreakerActive ? 'OPEN (Blocked)' : 'CLOSED (Healthy)', 
+           d.circuitBreakerActive ? 'text-error animate-pulse' : 'text-emerald-500');
+           
+     setEl('ops-rpc-latency', d.rpcLatencyMs + 'ms', 'text-on-surface');
+     setEl('ops-llm-latency', d.llmLatencyAvgMs + 'ms', 'text-on-surface');
+     setEl('ops-throughput', d.eventThroughputPerMinute + '/min', 'text-on-surface');
+     setEl('ops-settlement-rate', d.settlementSuccessRate + '%', 'text-primary');
+     setEl('ops-failed-tx', d.failedTransactionCount, d.failedTransactionCount > 0 ? 'text-error' : 'text-emerald-500');
+     setEl('ops-sse-connections', d.activeSseConnections, 'text-secondary');
+     
+     const uptimeEl = document.getElementById('ops-uptime');
+     if (uptimeEl) uptimeEl.textContent = `UPTIME ${d.uptimePercentage}`;
+   }
+ }).catch(() => {});
  
  // 5. Populate Authoritative Settlement Confirmations inside Activity Tab
  const settlementsList = document.getElementById('transparency-settlements-list');

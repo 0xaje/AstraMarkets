@@ -134,6 +134,12 @@
  <span id="wallet-btn-text">CONNECT</span>
  </button>
  
+ <!-- Pending Transactions Tracker -->
+ <button id="pending-tx-btn" class="hidden items-center justify-center gap-1.5 bg-surface-container-high border border-outline-variant/50 text-outline hover:text-primary transition-colors px-3 py-1.5 rounded-full mr-2">
+ <span class="material-symbols-outlined text-sm animate-spin">sync</span>
+ <span class="font-label text-[10px] font-bold" id="pending-tx-count">1 Pending</span>
+ </button>
+
  <!-- Notification Bell -->
  <button id="notif-btn" class="text-outline hover:text-primary transition-colors relative">
  <span class="material-symbols-outlined">notifications</span>
@@ -195,6 +201,10 @@
  <button id="hero-explore-ai" class="bg-surface-solid border border-outline-variant/40 hover:border-primary/50 text-on-surface font-label text-xs font-bold px-8 py-3.5 rounded-xl uppercase tracking-wider transition-all flex items-center gap-2">
  <span class="material-symbols-outlined text-sm">psychology</span>
  Explore AI Swarm
+ </button>
+ <button id="hero-protocol-walkthrough" class="bg-primary/10 border border-primary/40 hover:border-primary text-primary font-label text-xs font-bold px-8 py-3.5 rounded-xl uppercase tracking-wider transition-all flex items-center gap-2">
+ <span class="material-symbols-outlined text-sm">play_circle</span>
+ View Walkthrough
  </button>
  </div>
  </div>
@@ -740,45 +750,56 @@
  </div>
  </div>
  </div>
- <!-- Panel 2: Protocol Health Dashboard -->
+ <!-- Panel 2: Protocol Operations Dashboard -->
  <div class="cosmic-card p-6 rounded-2xl border border-outline-variant/40 flex flex-col gap-4">
  <div class="flex items-center justify-between border-b border-outline-variant/20 pb-2">
  <span class="text-xs font-bold text-secondary uppercase tracking-wider flex items-center gap-1.5">
  <span class="material-symbols-outlined text-sm">health_and_safety</span>
- Protocol Health Dashboard
+ Protocol Operations Dashboard
  </span>
- <span class="text-[9px] px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/25 rounded text-emerald-500 font-mono font-bold" id="protocol-uptime-badge">UPTIME 99.98%</span>
+ <span class="text-[9px] px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/25 rounded text-emerald-500 font-mono font-bold" id="ops-uptime">UPTIME 99.98%</span>
  </div>
  
- <div class="grid grid-cols-2 gap-3 text-[11px] font-mono leading-normal">
+ <div class="grid grid-cols-2 md:grid-cols-3 gap-3 text-[11px] font-mono leading-normal">
  <div class="flex flex-col bg-surface-container/30 p-2.5 rounded-xl border border-outline-variant/10">
- <span class="text-[7.5px] uppercase tracking-wider text-outline font-bold">Markets Created</span>
- <span class="font-bold text-on-surface text-xs mt-0.5" id="health-markets-created">824</span>
+ <span class="text-[7.5px] uppercase tracking-wider text-outline font-bold">Avg Reputation Score</span>
+ <span class="font-bold text-primary text-xs mt-0.5" id="ops-reputation">--</span>
  </div>
- 
  <div class="flex flex-col bg-surface-container/30 p-2.5 rounded-xl border border-outline-variant/10">
- <span class="text-[7.5px] uppercase tracking-wider text-outline font-bold">Markets Settled</span>
- <span class="font-bold text-on-surface text-xs mt-0.5" id="health-markets-settled">791</span>
+ <span class="text-[7.5px] uppercase tracking-wider text-outline font-bold">Swarm Accuracy</span>
+ <span class="font-bold text-on-surface text-xs mt-0.5" id="ops-accuracy">--</span>
  </div>
- 
  <div class="flex flex-col bg-surface-container/30 p-2.5 rounded-xl border border-outline-variant/10">
- <span class="text-[7.5px] uppercase tracking-wider text-outline font-bold">Settlement Accuracy</span>
- <span class="font-bold text-primary text-xs mt-0.5" id="health-settlement-accuracy">78%</span>
+ <span class="text-[7.5px] uppercase tracking-wider text-outline font-bold">Economic Impact</span>
+ <span class="font-bold text-tertiary text-xs mt-0.5" id="ops-economic-impact">--</span>
  </div>
- 
  <div class="flex flex-col bg-surface-container/30 p-2.5 rounded-xl border border-outline-variant/10">
- <span class="text-[7.5px] uppercase tracking-wider text-outline font-bold">Active Liquidity</span>
- <span class="font-bold text-on-surface text-xs mt-0.5" id="health-active-liquidity">1.4M STT</span>
+ <span class="text-[7.5px] uppercase tracking-wider text-outline font-bold">Active Circuit Breaker</span>
+ <span class="font-bold text-emerald-500 text-xs mt-0.5" id="ops-circuit-breaker">CLOSED</span>
  </div>
- 
  <div class="flex flex-col bg-surface-container/30 p-2.5 rounded-xl border border-outline-variant/10">
- <span class="text-[7.5px] uppercase tracking-wider text-outline font-bold">Total Volume</span>
- <span class="font-bold text-on-surface text-xs mt-0.5" id="health-total-volume">9.7M STT</span>
+ <span class="text-[7.5px] uppercase tracking-wider text-outline font-bold">RPC Latency</span>
+ <span class="font-bold text-on-surface text-xs mt-0.5" id="ops-rpc-latency">--</span>
  </div>
- 
  <div class="flex flex-col bg-surface-container/30 p-2.5 rounded-xl border border-outline-variant/10">
- <span class="text-[7.5px] uppercase tracking-wider text-outline font-bold">Avg Agent Confidence</span>
- <span class="font-bold text-tertiary text-xs mt-0.5" id="health-avg-confidence">74%</span>
+ <span class="text-[7.5px] uppercase tracking-wider text-outline font-bold">LLM Latency</span>
+ <span class="font-bold text-on-surface text-xs mt-0.5" id="ops-llm-latency">--</span>
+ </div>
+ <div class="flex flex-col bg-surface-container/30 p-2.5 rounded-xl border border-outline-variant/10">
+ <span class="text-[7.5px] uppercase tracking-wider text-outline font-bold">Event Throughput</span>
+ <span class="font-bold text-on-surface text-xs mt-0.5" id="ops-throughput">--</span>
+ </div>
+ <div class="flex flex-col bg-surface-container/30 p-2.5 rounded-xl border border-outline-variant/10">
+ <span class="text-[7.5px] uppercase tracking-wider text-outline font-bold">Settlement Rate</span>
+ <span class="font-bold text-primary text-xs mt-0.5" id="ops-settlement-rate">--</span>
+ </div>
+ <div class="flex flex-col bg-surface-container/30 p-2.5 rounded-xl border border-outline-variant/10">
+ <span class="text-[7.5px] uppercase tracking-wider text-outline font-bold">Failed Transactions</span>
+ <span class="font-bold text-error text-xs mt-0.5" id="ops-failed-tx">0</span>
+ </div>
+ <div class="flex flex-col bg-surface-container/30 p-2.5 rounded-xl border border-outline-variant/10 col-span-2 md:col-span-3">
+ <span class="text-[7.5px] uppercase tracking-wider text-outline font-bold">Active SSE Connections</span>
+ <span class="font-bold text-secondary text-xs mt-0.5" id="ops-sse-connections">--</span>
  </div>
  </div>
  </div>
@@ -1408,6 +1429,51 @@
  <!-- Dynamically populated via renderWalletModal() in app.js -->
  </div>
  
+ </div>
+ </div>
+
+ <!-- MODAL OVERLAY: Protocol Walkthrough -->
+ <div id="walkthrough-modal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+ <div class="modal-container w-[700px] h-[80vh] overflow-y-auto cosmic-card p-8 rounded-3xl border border-outline-variant/40 flex flex-col gap-6 relative max-w-[95%]">
+ 
+ <button id="walkthrough-modal-close" class="absolute top-6 right-6 text-outline hover:text-primary transition-colors z-10">
+ <span class="material-symbols-outlined">close</span>
+ </button>
+ 
+ <div class="flex flex-col gap-1 border-b border-outline-variant/20 pb-4">
+ <h3 class="font-display text-3xl font-bold text-primary flex items-center gap-3">
+ <span class="material-symbols-outlined text-3xl">route</span>
+ Protocol Walkthrough
+ </h3>
+ <p class="text-xs text-outline font-bold tracking-wide">The complete lifecycle from Signal Detection to Reward Claim on AstraMarkets.</p>
+ </div>
+ 
+ <div class="flex flex-col gap-8 mt-2">
+ <div class="flex flex-col gap-2">
+ <h4 class="font-display text-xl text-on-surface font-bold flex items-center gap-2"><span class="bg-primary/20 text-primary w-6 h-6 flex justify-center items-center rounded-full text-xs">1</span> Signal Ingestion</h4>
+ <p class="text-sm text-outline leading-relaxed pl-8">AstraMarkets constantly monitors real-world APIs like CoinGecko, NewsAPI, and Google Trends. Signals are normalized and fed continuously into the backend EventBus.</p>
+ </div>
+ <div class="flex flex-col gap-2">
+ <h4 class="font-display text-xl text-on-surface font-bold flex items-center gap-2"><span class="bg-primary/20 text-primary w-6 h-6 flex justify-center items-center rounded-full text-xs">2</span> Agent Analysis</h4>
+ <p class="text-sm text-outline leading-relaxed pl-8">Autonomous AI Agents (Macro, Social, Tech) evaluate the signals. If a signal represents a viable market, it passes through the RiskAgent circuit breakers and a structural proposal is formed.</p>
+ </div>
+ <div class="flex flex-col gap-2">
+ <h4 class="font-display text-xl text-on-surface font-bold flex items-center gap-2"><span class="bg-primary/20 text-primary w-6 h-6 flex justify-center items-center rounded-full text-xs">3</span> Market Creation</h4>
+ <p class="text-sm text-outline leading-relaxed pl-8">The backend executes a transaction against <code class="bg-surface-container px-1 py-0.5 rounded text-primary">MarketFactory.sol</code> on Somnia L1. An automated market maker (AMM) pool is deployed and instantaneous UI syncing occurs via SSE.</p>
+ </div>
+ <div class="flex flex-col gap-2">
+ <h4 class="font-display text-xl text-on-surface font-bold flex items-center gap-2"><span class="bg-primary/20 text-primary w-6 h-6 flex justify-center items-center rounded-full text-xs">4</span> Trade Execution</h4>
+ <p class="text-sm text-outline leading-relaxed pl-8">Users connect their decentralized wallets, review the AI's reasoning, and cast votes by purchasing YES or NO shares. The smart contract dynamically balances the odds in real-time.</p>
+ </div>
+ <div class="flex flex-col gap-2">
+ <h4 class="font-display text-xl text-on-surface font-bold flex items-center gap-2"><span class="bg-primary/20 text-primary w-6 h-6 flex justify-center items-center rounded-full text-xs">5</span> Settlement Oracle</h4>
+ <p class="text-sm text-outline leading-relaxed pl-8">Upon expiry, the Autonomous Oracle triggers a multi-source consensus check. It demands &gt;= 75% confidence across multiple API endpoints. If verified, the market resolves. If uncertain, it falls back to a DISPUTED guardian state.</p>
+ </div>
+ <div class="flex flex-col gap-2">
+ <h4 class="font-display text-xl text-on-surface font-bold flex items-center gap-2"><span class="bg-primary/20 text-primary w-6 h-6 flex justify-center items-center rounded-full text-xs">6</span> Reward Claim</h4>
+ <p class="text-sm text-outline leading-relaxed pl-8">Winning participants call <code class="bg-surface-container px-1 py-0.5 rounded text-primary">claimRewards()</code> to unlock their initial liquidity plus the proportion of the losing pool.</p>
+ </div>
+ </div>
  </div>
  </div>
 

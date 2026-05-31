@@ -40,6 +40,10 @@ lerna-debug.log*
 # ---- Local dev overrides ----
 *.local
 
+# ---- Database ----
+*.db
+*.sqlite
+
 # ---- Test coverage ----
 coverage/
 

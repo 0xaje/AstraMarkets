@@ -1,0 +1,40 @@
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Install dependencies
+COPY package.json package-lock.json ./
+RUN npm ci
+
+# Copy backend source
+COPY server ./server
+COPY tsconfig.server.json ./
+
+# Build backend (if applicable) or rely on tsx for production
+# We'll run it directly with tsx in this setup as originally configured
+# but standard practice is compiling. We will install tsx globally or use local.
+RUN npm install -g tsx
+
+# Prune dev dependencies is ideal, but tsx relies on some typescript modules.
+
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy from builder
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/tsconfig.server.json ./tsconfig.server.json
+COPY --from=builder /app/server ./server
+RUN npm install -g tsx
+
+# Create directory for SQLite persistence
+RUN mkdir -p /app/data
+
+ENV NODE_ENV=production
+ENV DATABASE_PATH=/app/data/astra_swarm_v2.db
+ENV SIGNAL_PORT=4000
+
+EXPOSE 4000
+
+CMD ["npm", "run", "server:dev"]

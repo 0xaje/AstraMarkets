@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: astra-backend
+    restart: always
+    env_file:
+      - .env
+    environment:
+      - DATABASE_PATH=/app/data/astra_swarm_v2.db
+    ports:
+      - "4000:4000"
+    volumes:
+      - astra_db_data:/app/data
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: astra-frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  astra_db_data:

@@ -330,25 +330,40 @@ contract MarketFactory {
 
     /**
      * @dev Claims the winnings payout for a resolved market.
+     * Handles edge cases like zero trades or empty winning pools to prevent inaccessible funds.
      */
     function claimRewards(uint256 marketId) external {
         Market storage market = markets[marketId];
         require(market.status == MarketStatus.RESOLVED, "Market not resolved yet");
         require(!rewardsClaimed[marketId][msg.sender], "Winnings already claimed");
+        require(market.totalLiquidity > 0, "No liquidity in market to claim");
 
         bool winnerOutcome = market.resolvedOutcome;
         uint256 winningShares = winnerOutcome ? userYesShares[marketId][msg.sender] : userNoShares[marketId][msg.sender];
-        require(winningShares > 0, "You do not own winning shares");
-
         uint256 totalWinningPool = winnerOutcome ? market.yesSharesPool : market.noSharesPool;
-        require(totalWinningPool > 0, "Invalid winning pool state");
 
-        // Reward formula: (userWinningShares / totalWinningShares) * totalLiquidity
-        uint256 rewardAmount = (winningShares * market.totalLiquidity) / totalWinningPool;
+        uint256 rewardAmount = 0;
+
+        if (totalWinningPool > 0) {
+            require(winningShares > 0, "You do not own winning shares");
+            // Standard Reward formula: (userWinningShares / totalWinningShares) * totalLiquidity
+            rewardAmount = (winningShares * market.totalLiquidity) / totalWinningPool;
+        } else {
+            // Edge case: Winning pool is entirely empty. To prevent inaccessible funds, 
+            // refund liquidity proportionally to the users in the losing pool.
+            uint256 losingShares = winnerOutcome ? userNoShares[marketId][msg.sender] : userYesShares[marketId][msg.sender];
+            uint256 totalLosingPool = winnerOutcome ? market.noSharesPool : market.yesSharesPool;
+            require(losingShares > 0, "You do not own any shares to refund");
+            require(totalLosingPool > 0, "Invalid pool state for refund");
+            
+            rewardAmount = (losingShares * market.totalLiquidity) / totalLosingPool;
+        }
         
+        require(rewardAmount > 0, "Calculated reward is zero");
+
         rewardsClaimed[marketId][msg.sender] = true;
         
-        // Zero out user shares to prevent double-claiming
+        // Zero out user shares to prevent double-claiming (Checks-Effects-Interactions)
         userYesShares[marketId][msg.sender] = 0;
         userNoShares[marketId][msg.sender] = 0;
 

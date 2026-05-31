@@ -1,8 +1,6 @@
 import EventEmitter from "eventemitter3";
 import type { Response } from "express";
 
-// ─── EVENT TYPES & PAYLOAD DEFINITIONS ──────────────────────────────
-
 export type AstraEvent = 
   | "SIGNAL_DETECTED"
   | "MARKET_CREATED"
@@ -17,8 +15,8 @@ export interface Signal {
   topic: string;
   source: "crypto" | "news" | "reddit" | "trends" | "hackernews";
   sentiment: "bullish" | "bearish" | "neutral";
-  importance: number; // 0-100
-  velocity: number;   // 0-100
+  importance: number;
+  velocity: number;
   timestamp: number;
 }
 
@@ -50,91 +48,122 @@ export interface AgentDecision {
   timestamp: number;
 }
 
-export interface SignalDetectedPayload {
-  signal: Signal;
-  timestamp: number;
-}
-
-export interface MarketCreatedPayload {
-  market: MarketProposal;
-  onChainMarketId?: number;
-  txHash?: string;
-  timestamp: number;
-}
-
-export interface AgentDecisionMadePayload {
-  agentName: string;
-  decision: AgentDecision;
-  timestamp: number;
-}
-
-export interface TradeExecutedPayload {
-  marketId: string;
-  marketTitle: string;
-  ref: string;
-  trader: string;
-  position: boolean; // true = YES, false = NO
-  amountSpent: number;
-  sharesMinted: number;
-  txHash: string;
-  timestamp: number;
-}
-
-// ─── EVENT MAP FOR TYPE SAFETY ──────────────────────────────────────
-
 interface AstraEventTypes {
-  SIGNAL_DETECTED: [SignalDetectedPayload];
-  MARKET_CREATED: [MarketCreatedPayload];
-  AGENT_DECISION_MADE: [AgentDecisionMadePayload];
-  TRADE_EXECUTED: [TradeExecutedPayload];
-  PROPOSAL_CREATED: [MarketProposal];
+  SIGNAL_DETECTED: [any];
+  MARKET_CREATED: [any];
+  AGENT_DECISION_MADE: [any];
+  TRADE_EXECUTED: [any];
+  PROPOSAL_CREATED: [any];
   MARKET_EXECUTED: [any];
-  AGENT_ANALYZED: [AgentDecisionMadePayload];
+  AGENT_ANALYZED: [any];
   MARKET_SETTLED: [any];
+  MARKET_UPDATED: [any];
+  ORACLE_UNCERTAIN: [any];
 }
-
-// ─── EVENT BUS CLASS ────────────────────────────────────────────────
 
 class AstraEventBus extends EventEmitter<AstraEventTypes> {
-  private sseClients: Response[] = [];
+  private sseClients: Set<Response> = new Set();
+  private recentEvents: Map<string, number> = new Map();
+  private eventHistory: string[] = [];
+
+  public get getActiveClientCount(): number {
+    return this.sseClients.size;
+  }
 
   constructor() {
     super();
+    // Heartbeat & Stale Connection Cleanup
+    setInterval(() => {
+      this.sseClients.forEach((client) => {
+        try {
+          // Send an SSE comment to keep connection alive and detect dead sockets
+          client.write(":\\n\\n");
+        } catch (e) {
+          this.sseClients.delete(client);
+        }
+      });
+    }, 15000);
   }
 
-
-  /**
-   * Register a new client's Express Response object to receive SSE.
-   */
   public registerSseClient(res: Response) {
-    this.sseClients.push(res);
-    // Automatically prune on disconnect
-    res.on("close", () => {
-      this.sseClients = this.sseClients.filter((client) => client !== res);
+    this.sseClients.add(res);
+
+    // Event Replay on connect for immediate context
+    this.eventHistory.forEach((payload) => {
+      try {
+        if (!res.writableEnded) res.write(payload);
+      } catch (e) {
+        this.sseClients.delete(res);
+      }
     });
+
+    res.on("close", () => this.sseClients.delete(res));
+    res.on("error", () => this.sseClients.delete(res));
   }
 
-  /** Broadcast a raw (non-typed) SSE event to all connected clients. */
   public broadcastRaw(event: string, data: unknown) {
-    const payload = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
+    const payload = `event: \${event}\\ndata: \${JSON.stringify(data)}\\n\\n`;
     this.sseClients.forEach((client) => {
-      try { client.write(payload); } catch { /* dead client */ }
+      try {
+        if (!client.writableEnded) {
+          client.write(payload);
+        } else {
+          this.sseClients.delete(client);
+        }
+      } catch {
+        this.sseClients.delete(client);
+      }
     });
   }
 
-  /**
-   * Overridden emit — broadcasts typed events to SSE clients in real time.
-   */
+  private getEventFingerprint(event: string, data: any): string {
+    const key = data?.title || data?.market?.title || data?.topic || "";
+    return `\${event}:\${key}`;
+  }
+
   public emit<T extends keyof AstraEventTypes>(event: T, ...args: AstraEventTypes[T]): boolean {
+    const data = args[0] as any;
+    const fingerprint = this.getEventFingerprint(event as string, data);
+    
+    // Duplicate prevention (deduplication window of 3 seconds)
+    const now = Date.now();
+    const lastSeen = this.recentEvents.get(fingerprint);
+    if (lastSeen && now - lastSeen < 3000) {
+      return false; // Suppress duplicate
+    }
+    this.recentEvents.set(fingerprint, now);
+
+    // Housekeeping on recentEvents Map to prevent memory leaks
+    if (this.recentEvents.size > 1000) {
+      const evictionTime = now - 60000;
+      for (const [key, timestamp] of this.recentEvents.entries()) {
+        if (timestamp < evictionTime) this.recentEvents.delete(key);
+      }
+    }
+
     const success = super.emit(event, ...args as any);
-    const payload = `event: ${event}\ndata: ${JSON.stringify(args[0])}\n\n`;
+    const payload = `event: \${event}\\ndata: \${JSON.stringify(data)}\\n\\n`;
+
+    // Replay buffer (keep last 50 events)
+    this.eventHistory.push(payload);
+    if (this.eventHistory.length > 50) this.eventHistory.shift();
+
+    // Broadcast with Backpressure protection
     this.sseClients.forEach((client) => {
-      try { client.write(payload); } catch { /* dead client */ }
+      try {
+        if (!client.writableEnded) {
+          client.write(payload);
+        } else {
+          this.sseClients.delete(client);
+        }
+      } catch {
+        this.sseClients.delete(client);
+      }
     });
+    
     return success;
   }
 }
-
 
 export const eventBus = new AstraEventBus();
 export default eventBus;

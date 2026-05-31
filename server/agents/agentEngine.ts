@@ -18,6 +18,8 @@ import {
   recordPredictionMemory,
   recordResolutionMemory
 } from "./agentMemory.js";
+import { CryptoAgentImpl } from "./plugins/CryptoAgent.js";
+import { TechAgentImpl } from "./plugins/TechAgent.js";
 
 // ─── OPENAI CLIENT ───────────────────────────────────────────────
 const openai = env.OPENAI_API_KEY
@@ -125,7 +127,7 @@ export async function runEventReplayRecovery(): Promise<void> {
 // Start polling for pending transaction checks every 20 seconds
 setInterval(runEventReplayRecovery, 20000);
 
-// ─── LLM DECISION CALL ───────────────────────────────────────────
+// ─── LLM DECISION CALL & CIRCUIT BREAKER ─────────────────────────
 interface LLMDecisionResult {
   createMarket: boolean;
   title: string;
@@ -137,15 +139,25 @@ interface LLMDecisionResult {
   reasoning: string;
 }
 
+let llmConsecutiveFailures = 0;
+const MAX_LLM_FAILURES = 3;
+let llmCircuitBreakerOpenUntil = 0;
+
 async function callLLM(
   agentName: string,
   systemPrompt: string,
-  signals: Signal[]
+  signals: Signal[],
+  retries = 2
 ): Promise<LLMDecisionResult | null> {
   if (signals.length === 0) return null;
 
+  if (Date.now() < llmCircuitBreakerOpenUntil) {
+    console.warn(`[${agentName}] 🛑 LLM Circuit Breaker Open. Skipping analysis until ${new Date(llmCircuitBreakerOpenUntil).toISOString()}`);
+    return null;
+  }
+
   if (!openai) {
-    console.warn(`[${agentName}] ⚠️ OpenAI client unconfigured. Real LLM execution required. Skipping heuristic creation.`);
+    console.warn(`[${agentName}] ⚠️ OpenAI client unconfigured. Real LLM execution required.`);
     return null;
   }
 
@@ -177,33 +189,52 @@ Respond ONLY with valid JSON in this exact schema:
 
 Rules:
 - Only set createMarket=true if signals are strong (importance >= 65, clear narrative).
-- The title MUST be a binary yes/no question (e.g. "Will X happen by Y?").
+- The title MUST be a binary yes/no question.
 - Do NOT create vague or duplicate markets.
 - yesOdds should reflect signal sentiment (bullish > 0.55, bearish < 0.45).
 `.trim();
 
-  try {
-    const response = await openai.chat.completions.create({
-      model: LLM_MODEL,
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt },
-      ],
-      temperature: 0.4,
-      max_tokens: 500,
-      response_format: { type: "json_object" },
-    });
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 15000); // 15s hard timeout
 
-    const raw = response.choices[0]?.message?.content ?? "{}";
-    return JSON.parse(raw) as LLMDecisionResult;
-  } catch (err) {
-    console.error(`[${agentName}] LLM call failed:`, err);
-    return null;
+      const response = await openai.chat.completions.create({
+        model: LLM_MODEL,
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
+        ],
+        temperature: 0.4,
+        max_tokens: 500,
+        response_format: { type: "json_object" },
+      }, { signal: controller.signal as any });
+
+      clearTimeout(timeout);
+      llmConsecutiveFailures = 0; // Reset breaker on success
+      
+      const raw = response.choices[0]?.message?.content ?? "{}";
+      return JSON.parse(raw) as LLMDecisionResult;
+    } catch (err: any) {
+      console.warn(`[${agentName}] LLM call attempt ${attempt} failed: ${err.message}`);
+      
+      if (attempt === retries) {
+        llmConsecutiveFailures++;
+        if (llmConsecutiveFailures >= MAX_LLM_FAILURES) {
+          console.error(`[CircuitBreaker] 💥 LLM failures exceeded threshold. Opening circuit breaker for 2 minutes.`);
+          llmCircuitBreakerOpenUntil = Date.now() + 120_000;
+        }
+        return null;
+      }
+      // Exponential backoff
+      await new Promise(resolve => setTimeout(resolve, 1500 * Math.pow(2, attempt)));
+    }
   }
+  return null;
 }
 
 // ─── HELPER ──────────────────────────────────────────────────────
-function emit(level: AgentLog["level"], agentName: string, message: string, decision?: AgentDecision) {
+export function emit(level: AgentLog["level"], agentName: string, message: string, decision?: AgentDecision) {
   agentBus.emit("log", { agentName, level, message, timestamp: Date.now(), decision });
 }
 
@@ -231,7 +262,7 @@ function expiryDate(daysFromNow: number): string {
 }
 
 // ─── BASE AGENT ──────────────────────────────────────────────────
-abstract class BaseAgent {
+export abstract class BaseAgent {
   abstract name: string;
   abstract strategy: string;
   abstract sources: Signal["source"][];
@@ -347,97 +378,6 @@ abstract class BaseAgent {
   }
 }
 
-// ─── AGENT IMPLEMENTATIONS ────────────────────────────────────────
-class CryptoAgentImpl extends BaseAgent {
-  name = "CryptoAgent";
-  strategy = "Crypto & On-Chain Analytics";
-  sources: Signal["source"][] = ["crypto", "news", "reddit", "trends"];
-  color: AgentStatus["color"] = "primary";
-  specialbadge = "CRYPTO";
-  domainexpertise = "Asset Trends & On-Chain Momentum";
-  systemPrompt = `You are CryptoAgent, a domain specialist in cryptocurrency markets.
-Your specialized mandate is to:
-- Identify trending digital assets and significant price momentum
-- Detect regulatory news, ETF flows, and institutional adoption narratives
-- Generate highly contextual prediction opportunities based on verifiable crypto events.
-
-Only propose prediction markets that can be resolved via verifiable public block explorers, major CEX listings, or CoinGecko data.`;
-
-  protected filterSignals(all: Signal[]): Signal[] {
-    const cryptoKeywords = [
-      "crypto", "bitcoin", "btc", "ethereum", "eth", "solana", "sol", "etf", "defi",
-      "token", "listing", "binance", "coinbase", "sec", "regulation", "stablecoin"
-    ];
-    return all.filter(
-      (s) =>
-        this.sources.includes(s.source) &&
-        (s.source === "crypto" || s.source === "reddit" || cryptoKeywords.some((kw) => s.topic.toLowerCase().includes(kw)))
-    );
-  }
-
-  async run(allSignals: Signal[]): Promise<AgentDecision> {
-    const filtered = this.filterSignals(allSignals);
-    if (filtered.length === 0) {
-      const msg = "Crypto Registry: STEADY — no major asset spikes or regulatory news detected.";
-      emit("info", this.name, msg);
-      this.updateStatus(msg);
-      return { createMarket: false, reasoning: msg, agentName: this.name, timestamp: Date.now() };
-    }
-
-    const decision = await super.run(filtered);
-    if (decision.createMarket && decision.market) {
-      decision.market.description = `[CRYPTO PROTOCOL VERIFIED] ` + decision.market.description;
-      decision.reasoning = `[ON-CHAIN DATA CALIBRATED] ` + decision.reasoning;
-    }
-    return decision;
-  }
-}
-
-class TechAgentImpl extends BaseAgent {
-  name = "TechAgent";
-  strategy = "Emerging Tech & AI Narratives";
-  sources: Signal["source"][] = ["hackernews", "news", "trends"];
-  color: AgentStatus["color"] = "secondary";
-  specialbadge = "TECH";
-  domainexpertise = "AI, Developer Ecosystem & Tech Launches";
-  systemPrompt = `You are TechAgent, a domain specialist in emerging technologies, AI, and developer ecosystems.
-Your specialized mandate is to:
-- Detect emerging technology narratives and AI breakthroughs
-- Identify major software launches, hardware announcements, or developer adoption trends
-- Generate highly contextual prediction opportunities based on tech events.
-
-Only propose prediction markets around major tech company earnings, product launches, or verifiable open-source milestones.`;
-
-  protected filterSignals(all: Signal[]): Signal[] {
-    const techKeywords = [
-      "ai", "artificial intelligence", "openai", "claude", "gpu", "compute", "nvidia",
-      "apple", "microsoft", "google", "meta", "launch", "release", "developer", "open source"
-    ];
-    return all.filter(
-      (s) =>
-        this.sources.includes(s.source) &&
-        (s.source === "hackernews" || techKeywords.some((kw) => s.topic.toLowerCase().includes(kw)))
-    );
-  }
-
-  async run(allSignals: Signal[]): Promise<AgentDecision> {
-    const filtered = this.filterSignals(allSignals);
-    if (filtered.length === 0) {
-      const msg = "Tech Registry: STEADY — no major tech launches or AI breakthroughs detected.";
-      emit("info", this.name, msg);
-      this.updateStatus(msg);
-      return { createMarket: false, reasoning: msg, agentName: this.name, timestamp: Date.now() };
-    }
-
-    const decision = await super.run(filtered);
-    if (decision.createMarket && decision.market) {
-      decision.market.description = `[TECH ECOSYSTEM VERIFIED] ` + decision.market.description;
-      decision.reasoning = `[NARRATIVE TREND CALIBRATED] ` + decision.reasoning;
-    }
-    return decision;
-  }
-}
-
 // ─── AGENT INSTANCES ─────────────────────────────────────────────
 const agents = [
   new CryptoAgentImpl(),
@@ -533,7 +473,8 @@ async function runCycle(): Promise<void> {
     .filter((r): r is PromiseFulfilledResult<AgentDecision> => r.status === "fulfilled")
     .map((r) => r.value);
 
-    // Emit agent decisions
+  // Emit agent decisions
+  decisions.forEach(decision => {
     eventBus.emit("AGENT_ANALYZED", {
       agentName: decision.agentName,
       decision: {
@@ -548,6 +489,7 @@ async function runCycle(): Promise<void> {
       },
       timestamp: Date.now()
     });
+  });
 
   const created = decisions.filter((d) => d.createMarket).length;
   console.log(
@@ -591,4 +533,9 @@ export function getApprovedMarkets(): MarketProposal[] {
 
 export function getAgentLogs(limit = 50): AgentLog[] {
   return agentLogs.slice(0, limit);
+}
+
+export function getCircuitBreakerStatus(): { active: boolean; openUntil: number } {
+  const active = Date.now() < llmCircuitBreakerOpenUntil;
+  return { active, openUntil: active ? llmCircuitBreakerOpenUntil : 0 };
 }
